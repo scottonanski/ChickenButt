@@ -7,10 +7,11 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
-from urllib.parse import quote
+from urllib.parse import quote, urlsplit
 
 import gi
 
@@ -18,18 +19,49 @@ gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 gi.require_version("WebKit", "6.0")
 
-from gi.repository import Adw, GLib, Gtk, WebKit
+from gi.repository import Adw, Gio, GLib, Gtk, WebKit
 
 
 WEB_DIR = Path(__file__).resolve().parent / "web"
+
+_CONTROL_CHAR_RE = re.compile(r"[\x00-\x1f\x7f]")
+_EXTERNAL_SCHEMES = ("http", "https")
+
+
+def _is_external_web_uri(uri: str) -> bool:
+    """True only for a well-formed absolute http(s) URI with a real hostname.
+
+    Deliberately conservative: anything that fails to parse, has no
+    hostname, uses a scheme other than http/https, or contains a control
+    character is treated as not-external (and therefore blocked, never
+    launched) rather than risking a permissive default.
+    """
+    if not uri or _CONTROL_CHAR_RE.search(uri):
+        return False
+    try:
+        parts = urlsplit(uri)
+        hostname = parts.hostname
+    except ValueError:
+        return False
+    if parts.scheme not in _EXTERNAL_SCHEMES:
+        return False
+    return bool(hostname)
 
 
 class WebTranscriptView(Gtk.Box):
     """One WebKit view for the whole conversation (owns its own scrolling)."""
 
-    def __init__(self, *, on_intent: Callable[[dict[str, Any]], None] | None = None):
+    def __init__(
+        self,
+        *,
+        on_intent: Callable[[dict[str, Any]], None] | None = None,
+        external_launcher: Callable[[str], None] | None = None,
+    ):
         super().__init__(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         self._on_intent = on_intent
+        # Injectable so tests never open a real browser; production default
+        # hands off to the system's registered handler for the URI.
+        self._external_launcher = external_launcher or self._launch_external_default
         self._ready = False
         self._queue: list[dict[str, Any]] = []
         self.set_hexpand(True)
@@ -54,9 +86,12 @@ class WebTranscriptView(Gtk.Box):
             ucm.connect("script-message-received", self._on_script_message)
 
         self._view.connect("load-changed", self._on_load_changed)
+        self._view.connect("decide-policy", self._on_decide_policy)
 
         index = WEB_DIR / "index.html"
-        self._view.load_uri(index.as_uri())
+        uri = index.as_uri()
+        self._trusted_uri = uri
+        self._view.load_uri(uri)
 
         self.append(self._view)
 
@@ -73,6 +108,68 @@ class WebTranscriptView(Gtk.Box):
 
     def _apply_theme(self, dark: bool) -> None:
         self.post({"type": "theme_changed", "theme": "dark" if dark else "light"})
+
+    def _launch_external_default(self, uri: str) -> None:
+        try:
+            Gio.AppInfo.launch_default_for_uri(uri, None)
+        except Exception as exc:  # noqa: BLE001
+            print(f"external launch failed: {exc}", flush=True)
+
+    def _is_trusted_navigation(self, uri: str) -> bool:
+        """Exact trusted transcript URI, or a same-document fragment on it."""
+        return uri == self._trusted_uri or uri.startswith(self._trusted_uri + "#")
+
+    def _on_decide_policy(self, _view, decision, decision_type) -> bool:
+        """Authoritative navigation policy: the embedded WebView may only
+        ever display the local transcript page. Everything else is either
+        blocked outright or, for a genuine user-initiated http(s) link,
+        handed to the system's external application instead of loaded here.
+
+        RESPONSE decisions are left to WebKit's default handling — nothing
+        in this app has needed to intercept those.
+        """
+        if decision_type not in (
+            WebKit.PolicyDecisionType.NAVIGATION_ACTION,
+            WebKit.PolicyDecisionType.NEW_WINDOW_ACTION,
+        ):
+            return False
+
+        is_new_window = decision_type == WebKit.PolicyDecisionType.NEW_WINDOW_ACTION
+
+        try:
+            nav_action = decision.get_navigation_action()
+            uri = nav_action.get_request().get_uri()
+        except Exception:
+            # Fail closed: if we can't even read the request, don't allow it.
+            try:
+                decision.ignore()
+            except Exception:  # noqa: BLE001
+                pass
+            return True
+
+        try:
+            # A new window/tab is never actually created by this app (there
+            # is nothing to load the trusted page into), so only ordinary
+            # main-frame navigation to the exact trusted URI is allowed.
+            if not is_new_window and self._is_trusted_navigation(uri):
+                decision.use()
+                return True
+
+            if (
+                not nav_action.is_redirect()
+                and nav_action.is_user_gesture()
+                and _is_external_web_uri(uri)
+            ):
+                self._external_launcher(uri)
+
+            decision.ignore()
+            return True
+        except Exception:
+            try:
+                decision.ignore()
+            except Exception:  # noqa: BLE001
+                pass
+            return True
 
     def _on_load_changed(self, _view, event) -> None:
         if event == WebKit.LoadEvent.FINISHED:
