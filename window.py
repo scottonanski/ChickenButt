@@ -512,7 +512,8 @@ class ChatSidebar(Adw.ApplicationWindow):
         self._conversation_id: str | None = None
         self._messages: list[dict[str, str]] = []
         self._streaming = False
-        self._stop_stream = False
+        self._stream_generation = 0
+        self._active_stream_cancel: threading.Event | None = None
         self._model: str | None = None
         self._on_close_request: Callable[[], bool] | None = None
         self._empty_box: Gtk.Widget | None = None
@@ -1579,10 +1580,7 @@ class ChatSidebar(Adw.ApplicationWindow):
         just focus the composer.
         """
         if self._streaming:
-            self._request_stop()
-            self._streaming = False
-            self._stop_stream = False
-            self._stream_finished()
+            self._invalidate_active_stream()
         if self._loading_model:
             return
 
@@ -1919,12 +1917,7 @@ class ChatSidebar(Adw.ApplicationWindow):
         if not conversation_id:
             return
         if self._streaming and conversation_id == self._conversation_id:
-            self._request_stop()
-            self._streaming = False
-            try:
-                self._stream_finished()
-            except Exception:  # noqa: BLE001
-                pass
+            self._invalidate_active_stream()
         was_active = conversation_id == self._conversation_id
         try:
             self._store.delete_conversation(conversation_id)
@@ -1950,13 +1943,7 @@ class ChatSidebar(Adw.ApplicationWindow):
         if not conversation_id or conversation_id == self._conversation_id:
             return
         if self._streaming:
-            self._request_stop()
-            self._streaming = False
-            self._stop_stream = False
-            try:
-                self._stream_finished()
-            except Exception:  # noqa: BLE001
-                pass
+            self._invalidate_active_stream()
         if self._loading_model:
             return
         # Leaving an empty draft — drop it so Recent stays clean
@@ -2896,7 +2883,27 @@ class ChatSidebar(Adw.ApplicationWindow):
             self.send_btn.set_sensitive(True)
 
     def _request_stop(self) -> None:
-        self._stop_stream = True
+        """Manual Stop: cancel the current stream, keep its partial output."""
+        if self._active_stream_cancel is not None:
+            self._active_stream_cancel.set()
+
+    def _invalidate_active_stream(self) -> None:
+        """Cancel the in-flight generation and mark it stale.
+
+        Used when the active conversation changes out from under a running
+        stream (switch / new chat / delete). Unlike manual Stop, this bumps
+        the stream generation so the worker's pending UI and persistence
+        callbacks see themselves as superseded and discard their output,
+        even if the worker hasn't noticed the cancellation yet.
+        """
+        if self._active_stream_cancel is not None:
+            self._active_stream_cancel.set()
+        self._stream_generation += 1
+        if self._streaming:
+            try:
+                self._stream_finished()
+            except Exception:  # noqa: BLE001
+                pass
 
     def _post_status_message(self, text: str, *, streaming: bool = False) -> str:
         """Show a non-persisted assistant-style note in the transcript (not LLM context)."""
@@ -3425,8 +3432,13 @@ class ChatSidebar(Adw.ApplicationWindow):
         """mode: new | replace | continue."""
         if self._streaming:
             return
+        self._stream_generation += 1
+        my_generation = self._stream_generation
+        cancel_event = threading.Event()
+        self._active_stream_cancel = cancel_event
+        origin_conversation_id = self._conversation_id
+        origin_model = self._model or ""
         self._streaming = True
-        self._stop_stream = False
         self.send_btn.set_sensitive(False)
         self.send_btn.set_visible(False)
         self.stop_btn.set_visible(True)
@@ -3512,6 +3524,8 @@ class ChatSidebar(Adw.ApplicationWindow):
         )
 
         def still_current() -> bool:
+            if my_generation != self._stream_generation:
+                return False
             if use_web:
                 return True
             assert body is not None
@@ -3534,7 +3548,7 @@ class ChatSidebar(Adw.ApplicationWindow):
                     classify_error(
                         err,
                         context="stream",
-                        model=self._model,
+                        model=origin_model,
                     )
                 )
 
@@ -3560,7 +3574,11 @@ class ChatSidebar(Adw.ApplicationWindow):
                         }
                     )
                 self._commit_assistant_result(
-                    aid, final, mode=mode, allow_empty=bool(err)
+                    aid,
+                    final,
+                    mode=mode,
+                    origin_conversation_id=origin_conversation_id,
+                    allow_empty=bool(err),
                 )
                 self._stream_finished()
                 return
@@ -3578,7 +3596,11 @@ class ChatSidebar(Adw.ApplicationWindow):
             else:
                 body.set_plain("(no response)")
             self._commit_assistant_result(
-                aid, final, mode=mode, allow_empty=bool(err)
+                aid,
+                final,
+                mode=mode,
+                origin_conversation_id=origin_conversation_id,
+                allow_empty=bool(err),
             )
             # Refresh native action bar with final text
             if mode in ("replace", "continue", "new") and final:
@@ -3637,9 +3659,9 @@ class ChatSidebar(Adw.ApplicationWindow):
         def work():
             try:
                 for piece in self.client.chat_stream(
-                    self._model or "",
+                    origin_model,
                     list(outbound),
-                    should_stop=lambda: self._stop_stream,
+                    should_stop=cancel_event.is_set,
                 ):
                     collected.append(piece)
                     with state["lock"]:
@@ -3659,6 +3681,7 @@ class ChatSidebar(Adw.ApplicationWindow):
         final: str,
         *,
         mode: str,
+        origin_conversation_id: str,
         allow_empty: bool = False,
     ) -> None:
         if not final and not allow_empty:
@@ -3680,9 +3703,10 @@ class ChatSidebar(Adw.ApplicationWindow):
                     {"id": assistant_id, "role": "assistant", "content": text}
                 )
             try:
-                # Row was deleted before stream; re-insert
+                # Row was deleted before stream; re-insert into the
+                # conversation the stream actually belongs to.
                 self._store.append_message(
-                    self._ensure_conversation(),
+                    origin_conversation_id,
                     role="assistant",
                     content=text,
                     message_id=assistant_id,
@@ -3698,11 +3722,19 @@ class ChatSidebar(Adw.ApplicationWindow):
         self._messages.append(
             {"id": assistant_id, "role": "assistant", "content": text}
         )
-        self._persist_message("assistant", text, message_id=assistant_id)
+        try:
+            self._store.append_message(
+                origin_conversation_id,
+                role="assistant",
+                content=text,
+                message_id=assistant_id,
+            )
+        except Exception as exc:  # noqa: BLE001
+            print(f"persist message failed: {exc}", flush=True)
 
     def _stream_finished(self) -> bool:
         self._streaming = False
-        self._stop_stream = False
+        self._active_stream_cancel = None
         self.send_btn.set_sensitive(bool(self._model))
         self.send_btn.set_visible(True)
         self.stop_btn.set_visible(False)
