@@ -112,12 +112,16 @@
 
   function codeBlockHtml(lang, code) {
     const escaped = escapeHtml(code);
+    // Icon SVGs are injected by wireCodeUi() after this HTML has passed
+    // through the sanitizer (see renderMarkdown()) rather than embedded here,
+    // since an inline <svg> baked into marked's output wouldn't survive the
+    // HTML-only sanitize profile.
     return (
       `<pre data-lang="${escapeAttr(lang)}">` +
       `<div class="code-head"><span class="code-lang">${escapeHtml(lang || "code")}</span>` +
       `<div class="code-head-actions">` +
-      `<button type="button" class="icon-btn" data-expand hidden aria-label="Expand code" title="Expand code">${ICONS.expand}</button>` +
-      `<button type="button" class="icon-btn" data-copy aria-label="Copy code" title="Copy code">${ICONS.copy}</button>` +
+      `<button type="button" class="icon-btn" data-expand hidden aria-label="Expand code" title="Expand code"></button>` +
+      `<button type="button" class="icon-btn" data-copy aria-label="Copy code" title="Copy code"></button>` +
       `</div></div>` +
       `<code class="language-${escapeAttr(lang || "code")}">${escaped}</code></pre>`
     );
@@ -174,13 +178,45 @@
       : "../icons/chickenbutt-light-icon.svg";
   }
 
-  function renderMarkdown(text) {
-    if (typeof marked !== "undefined") {
-      try {
-        return marked.parse(text || "");
-      } catch (_) { /* fall through */ }
+  // Single sanitization boundary for model-derived HTML. marked.parse()
+  // does not sanitize its output (by its own documentation); every caller
+  // of renderMarkdown() relies on this to be the only place raw model text
+  // becomes innerHTML. HTML-only profile: no SVG/MathML needed from model
+  // output, and it keeps SVG-based script vectors out entirely. Remote
+  // content (img/iframe/object/embed/video/audio/source/picture) is
+  // forbidden outright for this pass.
+  const SANITIZE_CONFIG = {
+    USE_PROFILES: { html: true },
+    FORBID_TAGS: [
+      "img", "iframe", "object", "embed", "video", "audio", "source",
+      "picture", "svg", "math", "style", "script",
+    ],
+    FORBID_ATTR: ["style", "srcdoc"],
+  };
+
+  function sanitizeHtml(rawHtml) {
+    // DOMPurify.isSupported is how the library itself reports whether the
+    // current environment can actually sanitize — on an unsupported browser
+    // sanitize() can return the input untouched instead of throwing, so a
+    // present-and-non-throwing DOMPurify is not sufficient on its own.
+    if (
+      typeof DOMPurify === "undefined" ||
+      DOMPurify.isSupported !== true
+    ) {
+      throw new Error("DOMPurify unavailable or unsupported");
     }
-    return `<p>${escapeHtml(text || "").replace(/\n/g, "<br>")}</p>`;
+    return DOMPurify.sanitize(rawHtml, SANITIZE_CONFIG);
+  }
+
+  function renderMarkdown(text) {
+    const src = text || "";
+    try {
+      if (typeof marked === "undefined") throw new Error("marked unavailable");
+      return sanitizeHtml(marked.parse(src));
+    } catch (_) {
+      // Fail closed: never return unsanitized marked output.
+      return `<p>${escapeHtml(src).replace(/\n/g, "<br>")}</p>`;
+    }
   }
 
   function nearBottom(el, px) {
@@ -337,6 +373,7 @@
         if (copyBtn) actions.insertBefore(expandBtn, copyBtn);
         else actions.appendChild(expandBtn);
       }
+      if (!expandBtn.querySelector("svg")) expandBtn.innerHTML = ICONS.expand;
       if (!expandBtn._cbBound) {
         expandBtn._cbBound = true;
         expandBtn.addEventListener("click", () => {
