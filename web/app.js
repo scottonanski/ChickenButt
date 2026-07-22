@@ -931,7 +931,7 @@
       highlightAllIn(body);
       setActionsVisible(id, true);
     }
-    scrollIfPinned();
+    if (!opts.deferScroll) scrollIfPinned();
   }
 
   function updateMessage(id, text, opts) {
@@ -1016,6 +1016,10 @@
           event.messages.forEach((m) => {
             addMessage(m.id, m.role, m.content || m.text || "", {
               streaming: false,
+              // Restoring N messages must not force a scroll-height
+              // layout read N times — one pinned scroll after the whole
+              // batch below is enough and lands in the same place.
+              deferScroll: true,
             });
           });
         } else if (event.empty_title || event.empty_sub) {
