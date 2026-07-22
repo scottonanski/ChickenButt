@@ -1,11 +1,59 @@
 # ChickenButt — handoff for next session
 
-**Updated:** 2026-07-22  
+**Updated:** 2026-07-22 (post release-hardening session — see "This session" below)  
 **What it is:** GNOME desktop chat client for local **Ollama** (tray app, Adwaita chrome).  
 **Product aim:** be **the nicest lightweight GNOME client for Ollama** — simple, fast, native-looking, immediately understandable — **not** a smaller clone of Open WebUI or LM Studio.
 
 ChickenButt wins on **focus and feel**, not feature count.  
 **PMM (Persistent Mind Model):** out of band — do **not** integrate unless the user explicitly asks.
+
+---
+
+## This session (2026-07-22): release hardening, not features
+
+The prior snapshot of this file described a feature-complete-feeling prototype. Since then the project went through an **audit → fix → verify → commit** cycle focused entirely on correctness and performance, not new product surface. Read this section before touching generation, streaming, or the transcript restore path — it explains *why* the code looks the way it does now, not just what it does.
+
+### Landed (in commit order)
+
+1. **`a6fe621`** — Code-block resize instability. Root cause: `pre code` used `white-space: pre-wrap`, so `scrollHeight` (used to decide collapse state) was width-dependent — resizing the window changed which lines wrapped, which changed the collapse decision, which changed the card height. Fixed to `white-space: pre` + horizontal scroll (`overflow-x: auto; min-width: 0` on the flex child). Streaming and finalized code cards share the same rule (`.streaming-code` only adds an outline).
+2. **`b99a5fe`** — **Cross-chat generation corruption** (the big one). `switch_conversation`/`new_chat`/`delete_conversation` all stopped a running stream and *immediately* reset the shared `_stop_stream` flag back to `False`, un-cancelling it, then let a new generation start. The old stream's worker thread could keep running and its completion callback — in WebKit mode, `still_current()` returned `True` unconditionally — would persist its output into whatever conversation was now active. Fixed with stream-owned state: a monotonic `_stream_generation` counter + a per-stream `threading.Event` (`_active_stream_cancel`), captured conversation id/model at stream start, `_invalidate_active_stream()` as the one choke point for switch/new/delete. Manual Stop only cancels (keeps the partial reply); switching invalidates (discards it). Regression: `scripts/test_generation_lifecycle.py`.
+3. **`406df07`** — Tiny standalone fix for a flaky race in that new test (waits for cold-start model probe to settle before driving switch scenarios).
+4. **`62b207d`** — **Uninterruptible stalled stream.** `chat_stream` had no socket timeout and only checked `should_stop` between `readline()` calls, so a connection that stayed open but went quiet couldn't be cancelled — Stop just hung until data arrived. Rewritten on `http.client` (not `urlopen`, so the code holds `conn.sock` directly rather than reaching into `urlopen`'s response internals) with a watcher thread that shuts the socket down on cancellation, waking a blocked `readline()` immediately. A `stream_finished` event distinguishes "woken to clean up" from "woken because the user actually cancelled," so normal completion doesn't race a spurious shutdown. `saw_done` tracks whether Ollama's `done:true` ever arrived, so a graceful-but-premature close (which looks identical at the socket level to our own cancellation shutdown) still raises `OllamaError` instead of silently succeeding. Regression: `scripts/test_stream_cancellation.py` (real stub-server sockets, no mocking).
+5. **`81f666c`** — **Restoration scrolling.** Measured (not guessed — see profiling below) that `conversation_reset` called `scrollIfPinned()` once per restored message, forcing a `scrollHeight` layout read that grows with total DOM size — O(n²) for the whole restore. Added a local `deferScroll` option on `addMessage()`; only the restore loop sets it, then scrolls once after the batch. 1000-message restore: mixed ~1926–2169ms → 590ms, code-heavy ~2311–2542ms → 905ms, and — more importantly — per-message cost is now flat instead of doubling across the batch (restoration is linear again, not super-linear). Regression: `scripts/test_restore_scroll.py` (spies on `#root`'s real `scrollTop` setter via injected JS, no mocking).
+
+Each of the above is genuinely single-purpose — reviewed and split deliberately (e.g. `406df07` was pulled out of what became `62b207d` specifically so an unrelated test-stability fix wouldn't dilute the cancellation commit).
+
+### Performance audit — instrumentation is uncommitted, on purpose
+
+A measurement-only profiling pass (`CHICKENBUTT_PROFILE=1`, inert otherwise) was built to find the *next* bottleneck instead of guessing:
+
+- **`profiling.py`** (new, tiny, untracked) — Python-side `mark(name)`, no-ops unless the env var is set.
+- **`window.py` / `main.py` / `transcript_view.py`** — scattered `profiling.mark(...)` calls at lifecycle milestones (still uncommitted — these are `git status`-dirty right now, intentionally, pending a decision on whether/how to land them).
+- **`web/app.js`** — a matching JS-side profiler (`mark`/`markRaf`, gated on a `?profile=1` URL flag) instrumenting `finalizeStream()` stages and the streaming/restore bridge. **Not currently in the working tree** — it was deliberately kept out of the `81f666c` commit (see below) and would need to be re-added from scratch if wanted again; it is not saved anywhere.
+- **`scripts/profile_startup.py`**, **`scripts/profile_runtime.py`**, **`scripts/profile_ablation.py`** — benchmark drivers (untracked). Not part of the test suite; run manually.
+
+**Why `web/app.js` doesn't currently have the JS profiler**: the `81f666c` commit needed to be *only* the scrolling fix. Since the profiler and the fix were both live edits to the same file, the clean way to isolate the commit was to rebuild `app.js` from `git show HEAD:web/app.js` (the true untouched baseline) plus just the two fix lines, then commit that — which means the JS profiler that existed moments before is gone from the working tree now, not merely uncommitted. If you want to re-run `profile_runtime.py`'s streaming/finalize/restore benchmarks, the JS-side `mark()`/`markRaf()` calls and the `?profile=1` handling in `web/app.js` need to be re-added first (they're straightforward — see the pattern already sitting in `window.py`'s `profiling.mark(...)` calls for what the JS side mirrored).
+
+**Findings that still matter, even without re-adding the JS profiler:**
+- WebKit's own page-load cost (~2.1–2.4s) dominates *startup*, is bimodal (first launch in a fresh cache vs. a warm one differ ~4×), and is not something ChickenButt's code controls.
+- Ordinary prose streaming is fine; the existing ~33ms batching absorbs chunk count well regardless of how many chunks arrive.
+- Syntax highlighting is the dominant *single-stage* cost wherever code is present (both live streaming DOM-update cost and `finalizeStream`'s stage breakdown).
+- An ablation study (`scripts/profile_ablation.py`, temporary — reverted after use, not currently reflected in `app.js`) isolated that per-message `scrollIfPinned()` was the dominant restoration cost (now fixed in `81f666c`), and that batching `wireCodeUi()`'s per-message `requestAnimationFrame` code-height measurement is a *second, independent* win specifically for code-heavy histories (code-heavy 1000-msg restore: settled frame 4760ms baseline → 2949ms with scroll fix alone → **2485ms** with scroll fix + batched wireCodeUi). `highlightAllIn()` batching showed no meaningful effect and isn't worth doing.
+
+### Next task (not started)
+
+**Batch `wireCodeUi()` during restoration**, in its own commit, separate from everything above:
+- Render each restored message normally (Markdown + highlight unchanged — do **not** touch `highlightAllIn`, measurements say it's not worth it).
+- Don't call `wireCodeUi(body)` per message inside the restore loop.
+- After the whole batch is appended, call `wireCodeUi(messagesEl)` once on the container — `wireCodeCopy`/`wireCodeExpand` already operate via `querySelectorAll`, so a single call over the whole container correctly wires every restored code block in one pass (this was verified in the ablation run: `dom_check` — row count, `.hljs` count, copy/expand button count, collapsed count — matched baseline exactly in every variant tested).
+- Add a regression test analogous to `test_restore_scroll.py`: spy on however you choose to observe "wireCodeUi ran once, not N times" for a code-heavy 1000-message restore (the ablation's approach was a `?ablation=` URL flag + JS-side call counters — that machinery isn't in the tree anymore; a test-local spy in the same style as `test_restore_scroll.py`'s `scrollTop` interceptor is the cleaner path, since it doesn't require reintroducing any instrumentation into `app.js`).
+- Re-profile and report baseline-vs-fixed before committing (same discipline as the scrolling fix).
+
+**After that**, per the audit: the stalled-open HTTP defect is already fixed (`62b207d`), the scroll defect is fixed (`81f666c`), so the only items left from the performance audit are the wireCodeUi batch above and, longer-term, transcript virtualization / incremental history loading if code-heavy 1000+ message restores still aren't fast enough after both bounded fixes land (~2.5s was the last measured floor).
+
+### A gotcha worth remembering for anyone writing more benchmarks/tests
+
+If you seed a conversation into the DB and then construct a fresh `ChatSidebar`, that seeded conversation is the "active" one, so `ChatSidebar.__init__`'s own `_restore_history()` will restore it at construction time. If your test/benchmark *also* explicitly calls `switch_conversation()` on the same conversation afterward (common when forcing a fresh measurement), you get **two** restores of the same data back-to-back, silently doubling every count and cost you measure. Fix: after seeding the target conversation, create one more, empty conversation (`store.create_conversation(...)`) so *it* is active at construction time, and your explicit `switch_conversation()` call is the only real restore. This bit both `profile_ablation.py` and an early draft of the restore-scroll test.
 
 ---
 
@@ -21,7 +69,7 @@ CHICKENBUTT_TRANSCRIPT=native ./run.sh
 # Icons (FreeDesktop name chickenbutt, lowercase)
 python3 scripts/install-icons.py
 
-# Regression
+# Regression (see "Quick health check" below for the full current list)
 python3 scripts/smoke_gui.py              # ~25 checks — expect all PASS
 python3 scripts/test_multichat.py
 python3 scripts/test_message_actions.py
@@ -154,18 +202,19 @@ Type in the message box and Enter:
 | Path | Role |
 |------|------|
 | `main.py` | Adw.Application, tray, window icon, activate |
-| `window.py` | **Main shell** (~3.5k+ LOC) — UI, stream, multi-chat, composer commands |
-| `transcript_view.py` | WebKit bridge |
+| `window.py` | **Main shell** (~3.8k LOC) — UI, stream lifecycle, multi-chat, composer commands |
+| `transcript_view.py` | WebKit bridge (`WebTranscriptView`) |
 | `web/app.js` / `app.css` / `index.html` | Transcript presentation |
 | `conversation_store.py` | SQLite multi-conversation store |
-| `ollama_client.py` | HTTP: tags, ps, generate (warm), chat stream, **pull stream**, list/ps formatters |
+| `ollama_client.py` | HTTP: tags, ps, generate (warm), **interruptible** chat stream, pull stream, list/ps formatters |
 | `ollama_health.py` | Probe + classify errors |
 | `tray.py` | StatusNotifier + DBus menu + IconPixmap |
 | `message_widgets.py` | Native transcript fallback only |
 | `x11_sidebar.py` | X11 helpers (support) |
-| `scripts/` | install-icons, smoke_gui, feature tests |
+| `profiling.py` | Untracked. Measurement-only, no-ops unless `CHICKENBUTT_PROFILE=1` |
+| `scripts/` | install-icons, smoke_gui, feature tests, `profile_*.py` benchmark drivers (untracked) |
 | `icons/` | Brand SVGs, hicolor, tray PNGs |
-| `STATUS_REPORT.md` | Mid-session snapshot (may lag this file) |
+| `STATUS_REPORT.md` | Stale mid-session snapshot — **HANDOFF.md (this file) is authoritative** |
 
 **Vendor:** `web/vendor/` (marked, highlight.js) — leave alone.
 
@@ -186,7 +235,17 @@ Chat / composer clamp           768px (~48rem WebKit column)
 
 ---
 
-## Still open (next product work)
+## Still open
+
+### Stability & performance (current priority — do this before resuming product features)
+
+1. **Batch `wireCodeUi()` during restoration** — see "Next task" above. Bounded, already measured, ready to implement.
+2. Longer-term, only if still needed after #1: transcript virtualization or incremental history loading for very large (1000+ message) code-heavy histories.
+3. Markdown sanitization — `renderMarkdown()` pipes model output through `marked.parse()` straight into `innerHTML`, no sanitizer, no CSP. Flagged, not yet acted on. Matters more once cloud models / attachments / copied web content are in play.
+4. Installation reproducibility — no `pyproject.toml`/`requirements.txt`, no distro-specific dependency list in the README. `./run.sh` just runs `python3 main.py`.
+5. `STATUS_REPORT.md` vs this file — this file is authoritative; `STATUS_REPORT.md` is a stale mid-session snapshot. Consider deleting it rather than maintaining two.
+
+### Product work (resume once the above is settled)
 
 Ordered roughly by value:
 
@@ -230,6 +289,9 @@ Ordered roughly by value:
 - After icon changes: `python3 scripts/install-icons.py` and fully quit/restart for tray.  
 - Extend `scripts/smoke_gui.py` / feature tests when changing load/history/health/commands.  
 - This **HANDOFF.md** is the authoritative status snapshot for handoff.
+- **Commit discipline established this session, keep following it:** single-purpose commits. When a fix and an unrelated cleanup/test-stability change land in the same working-tree session, split them (see `406df07` pulled out of `62b207d`, or how `81f666c` was built from `git show HEAD:web/app.js` + just the fix lines to keep uncommitted profiling instrumentation out of it). Don't commit or push without being asked each time, even after doing so earlier in the same session.
+- **Test scripts follow one pattern** (`scripts/test_generation_lifecycle.py`, `test_stream_cancellation.py`, `test_restore_scroll.py`, `smoke_gui.py`): a real `Adw.Application` + `ChatSidebar`, a `pump(seconds)` helper that iterates `GLib.main_context_default()`, and `wait_until(cond, timeout)` polling on top of it. Prefer driving the *actual* production code path (monkeypatch `OllamaClient.chat_stream` for fake generations, inject a JS spy via `evaluate_javascript` for DOM assertions) over mocking the function under test.
+- Before profiling or testing restoration specifically, see the "gotcha" above about seeding a conversation that becomes active before `ChatSidebar.__init__` runs.
 
 ---
 
@@ -242,6 +304,15 @@ cd ChickenButt
 # UI: chicken empty mark, 320px model pill, header [↻][☰], floating composer,
 #     greeting sub with ollama pull hint
 python3 scripts/smoke_gui.py   # expect 25/25 PASS with Ollama available
+
+# Full regression suite added this session (all real WebKit, real GLib loop —
+# no Ollama server required except smoke_gui.py):
+python3 scripts/test_multichat.py
+python3 scripts/test_ollama_health.py
+python3 scripts/test_message_actions.py
+python3 scripts/test_generation_lifecycle.py   # 14 checks — cross-chat corruption regressions
+python3 scripts/test_stream_cancellation.py    # 21 checks — real stub-server socket cancellation
+python3 scripts/test_restore_scroll.py         # 8 checks — restore scroll-call-count regression
 ```
 
 WebKit import failure → log line and native fallback.
