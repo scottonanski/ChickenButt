@@ -139,6 +139,9 @@ def main() -> int:
     app.activate()
     assert win is not None
     pump(0.2)
+    # Let the real cold-start model probe/load settle so switch_conversation()
+    # doesn't bail out early on win._loading_model while we're mid-scenario.
+    wait_until(lambda: not win._loading_model, timeout=60, label="cold start settle")
 
     store = ConversationStore(DB)
 
