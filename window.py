@@ -34,8 +34,6 @@ from ollama_health import (
 DEFAULT_WIDTH = 780
 DEFAULT_HEIGHT = 720
 SIDEBAR_WIDTH = 220
-# Model DropDown closed-pill width (and list popup). ~2x the old content-hug size.
-MODEL_DROPDOWN_WIDTH = 320
 
 # Composer: visible height vs content length are independent.
 # Grow 1→N lines, then scroll inside; paste may be huge without eating the window.
@@ -92,21 +90,6 @@ def _save_last_model(model: str) -> None:
     _write_settings(data)
 
 
-def _load_sidebar_open() -> bool:
-    """Default open — chat history is primary navigation."""
-    val = _read_settings().get("sidebar_open")
-    if val is None:
-        return True
-    return bool(val)
-
-
-def _save_sidebar_open(open_: bool) -> None:
-    data = _read_settings()
-    if data.get("sidebar_open") is open_:
-        return
-    data["sidebar_open"] = bool(open_)
-    _write_settings(data)
-
 
 def _pick_startup_model(models: list[str], preferred: str | None) -> int:
     """Index of last-loaded model if still installed; else 0."""
@@ -129,6 +112,15 @@ def _transcript_mode() -> str:
     if raw in ("native", "gtk"):
         return "native"
     return "webkit"
+
+
+def _use_pointer_cursor(widget: Gtk.Widget) -> None:
+    """Show the pointer/hand cursor while hovering a clickable widget."""
+    try:
+        widget.set_cursor_from_name("pointer")
+    except Exception:  # noqa: BLE001
+        pass
+
 
 APP_CSS = b"""
 /* ---- chat surface (solid, matches WebKit --bg) ---- */
@@ -229,16 +221,12 @@ APP_CSS = b"""
     opacity: 0.55;
 }
 
-/* ---- model toolbar (dropdown only; refresh is in the header) ---- */
-.model-toolbar {
-    background: transparent;
-    padding: 0;
-    border: none;
+/* ---- sidebar model section (above the Settings footer) ---- */
+.chat-sidebar-model {
+    padding: 4px 12px 8px 12px;
 }
-/* Closed pill + open list share this width (~2x the old content-sized pill). */
-.model-toolbar dropdown {
+.chat-sidebar-model dropdown {
     min-height: 38px;
-    min-width: 320px;
     border-radius: 10px;
 }
 
@@ -659,23 +647,26 @@ class ChatSidebar(Adw.ApplicationWindow):
         header.set_title_widget(title_box)
         toolbar_view.add_top_bar(header)
 
-        # Toggle docked history rail
+        # Toggle docked history rail — always starts closed; opening it
+        # during a session works normally but is never persisted (see
+        # toggle_sidebar()).
         sidebar_btn = Gtk.ToggleButton()
         sidebar_btn.set_icon_name("sidebar-show-symbolic")
         sidebar_btn.set_tooltip_text("Show or hide chat list")
         sidebar_btn.set_valign(Gtk.Align.CENTER)
-        sidebar_open = _load_sidebar_open()
-        sidebar_btn.set_active(sidebar_open)
+        sidebar_btn.set_active(False)
         sidebar_btn.connect("toggled", self._on_sidebar_toggled)
+        _use_pointer_cursor(sidebar_btn)
         header.pack_start(sidebar_btn)
         self._sidebar_btn = sidebar_btn
-        sidebar.set_visible(sidebar_open)
+        sidebar.set_visible(False)
 
         # Clear current conversation (new conversation lives in the sidebar)
         clear_btn = Gtk.Button.new_from_icon_name("edit-clear-all-symbolic")
         clear_btn.set_tooltip_text("Clear conversation")
         clear_btn.set_valign(Gtk.Align.CENTER)
         clear_btn.connect("clicked", lambda *_: self.clear_chat())
+        _use_pointer_cursor(clear_btn)
         header.pack_start(clear_btn)
         self._clear_btn = clear_btn
         # Header no longer has a New conversation icon (sidebar header only)
@@ -699,6 +690,7 @@ class ChatSidebar(Adw.ApplicationWindow):
         menu_btn.set_menu_model(menu)
         menu_btn.set_valign(Gtk.Align.CENTER)
         menu_btn.set_tooltip_text("Menu")
+        _use_pointer_cursor(menu_btn)
         # pack_end: first widget sits at the far right edge
         header.pack_end(menu_btn)
 
@@ -707,6 +699,7 @@ class ChatSidebar(Adw.ApplicationWindow):
         refresh_btn.add_css_class("flat")
         refresh_btn.set_valign(Gtk.Align.CENTER)
         refresh_btn.set_action_name("win.refresh-models")
+        _use_pointer_cursor(refresh_btn)
         # Immediately left of the burger menu (pack_end: menu first = rightmost)
         header.pack_end(refresh_btn)
         self._refresh_btn = refresh_btn
@@ -757,35 +750,17 @@ class ChatSidebar(Adw.ApplicationWindow):
             app.set_accels_for_action("win.refresh-models", ["<Primary>r"])
             # app.quit already has <Control>q from main.py
 
-        # Model selector: fixed pill width (list popup matches the button).
-        model_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
-        model_row.add_css_class("model-toolbar")
-        model_row.set_halign(Gtk.Align.CENTER)
-        model_row.set_hexpand(True)
-        model_row.set_valign(Gtk.Align.CENTER)
-
-        self.model_combo = Gtk.DropDown.new_from_strings(["Loading models…"])
-        self.model_combo.set_hexpand(False)
-        self.model_combo.set_halign(Gtk.Align.CENTER)
-        self.model_combo.set_valign(Gtk.Align.CENTER)
-        # Force closed-pill width; Gtk.DropDown sizes to content otherwise.
-        self.model_combo.set_size_request(MODEL_DROPDOWN_WIDTH, 38)
-        self.model_combo.connect("notify::selected", self._on_model_selected)
-        model_row.append(self.model_combo)
-
-        model_bar = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
-        model_bar.set_hexpand(True)
-        model_bar.set_margin_top(10)
-        model_bar.set_margin_bottom(6)
-        model_bar.set_margin_start(24)
-        model_bar.set_margin_end(24)
-        model_bar.append(model_row)
-
-        # Ollama health / onboarding banner (below model row, above transcript)
+        # Ollama health / onboarding banner (main content starts here, above
+        # the transcript). The model selector used to share this bar but now
+        # lives in the sidebar, above the Settings footer.
         health_clamp = Adw.Clamp()
         health_clamp.set_maximum_size(768)
         health_clamp.set_tightening_threshold(400)
         health_clamp.set_hexpand(True)
+        health_clamp.set_margin_top(10)
+        health_clamp.set_margin_bottom(6)
+        health_clamp.set_margin_start(24)
+        health_clamp.set_margin_end(24)
         health_inner = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         health_inner.add_css_class("health-banner")
         health_text = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
@@ -807,11 +782,11 @@ class ChatSidebar(Adw.ApplicationWindow):
         self._health_action_btn.add_css_class("suggested-action")
         self._health_action_btn.set_valign(Gtk.Align.CENTER)
         self._health_action_btn.connect("clicked", self._on_health_action)
+        _use_pointer_cursor(self._health_action_btn)
         health_inner.append(self._health_action_btn)
         health_clamp.set_child(health_inner)
         self._health_banner = health_clamp
         self._health_banner.set_visible(False)
-        model_bar.append(self._health_banner)
 
         # ---- message list: native GTK blocks OR WebKit transcript ----
         self.scroller: Gtk.ScrolledWindow | None = None
@@ -921,6 +896,7 @@ class ChatSidebar(Adw.ApplicationWindow):
         self.stop_btn.set_valign(Gtk.Align.CENTER)
         self.stop_btn.set_visible(False)
         self.stop_btn.connect("clicked", lambda *_: self._request_stop())
+        _use_pointer_cursor(self.stop_btn)
 
         # Paper-plane send metaphor (Adwaita: mail-send-symbolic; no paper-plane name)
         send_icon = "mail-send-symbolic"
@@ -946,6 +922,7 @@ class ChatSidebar(Adw.ApplicationWindow):
         self.send_btn.set_tooltip_text("Send message (Enter)")
         self.send_btn.set_valign(Gtk.Align.CENTER)
         self.send_btn.connect("clicked", lambda *_: self._send())
+        _use_pointer_cursor(self.send_btn)
 
         shell.append(input_overlay)
         shell.append(self.stop_btn)
@@ -1009,8 +986,8 @@ class ChatSidebar(Adw.ApplicationWindow):
         outer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         outer.set_hexpand(True)
         outer.set_vexpand(True)
-        model_bar.set_vexpand(False)
-        outer.append(model_bar)
+        self._health_banner.set_vexpand(False)
+        outer.append(self._health_banner)
         outer.append(chat_column)
 
         # Overlay: model warm-up cover on top of chat chrome
@@ -1050,6 +1027,7 @@ class ChatSidebar(Adw.ApplicationWindow):
         new_btn.set_tooltip_text("New conversation")
         new_btn.set_size_request(32, 32)
         new_btn.connect("clicked", lambda *_: self.new_chat())
+        _use_pointer_cursor(new_btn)
         head.append(new_btn)
         self._sidebar_new_btn = new_btn
         side.append(head)
@@ -1073,6 +1051,28 @@ class ChatSidebar(Adw.ApplicationWindow):
         scroll.set_child(self._history_list)
         side.append(scroll)
 
+        # Model section — above the Settings footer, expands to the
+        # sidebar's inner width instead of a fixed pill width.
+        model_section = Gtk.Label(label="Model")
+        model_section.add_css_class("chat-sidebar-section")
+        model_section.set_halign(Gtk.Align.START)
+        model_section.set_xalign(0)
+        side.append(model_section)
+
+        model_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
+        model_box.add_css_class("chat-sidebar-model")
+        model_box.set_hexpand(True)
+
+        self.model_combo = Gtk.DropDown.new_from_strings(["Loading models…"])
+        self.model_combo.set_hexpand(True)
+        self.model_combo.set_halign(Gtk.Align.FILL)
+        self.model_combo.set_valign(Gtk.Align.CENTER)
+        self.model_combo.set_size_request(-1, 38)
+        self.model_combo.connect("notify::selected", self._on_model_selected)
+        _use_pointer_cursor(self.model_combo)
+        model_box.append(self.model_combo)
+        side.append(model_box)
+
         # Footer: app-level Settings
         foot = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
         foot.add_css_class("chat-sidebar-footer")
@@ -1091,6 +1091,7 @@ class ChatSidebar(Adw.ApplicationWindow):
         settings_btn.set_size_request(32, 32)
         settings_btn.set_halign(Gtk.Align.START)
         settings_btn.connect("clicked", lambda *_: self.open_settings())
+        _use_pointer_cursor(settings_btn)
         foot.append(settings_btn)
         self._settings_btn = settings_btn
         side.append(foot)
@@ -1104,7 +1105,6 @@ class ChatSidebar(Adw.ApplicationWindow):
         show = bool(show)
         if self._sidebar.get_visible() != show:
             self._sidebar.set_visible(show)
-            _save_sidebar_open(show)
         if show:
             self._rebuild_history_list()
         if self._sidebar_btn is not None and self._sidebar_btn.get_active() != show:
@@ -1710,9 +1710,11 @@ class ChatSidebar(Adw.ApplicationWindow):
             more_btn.set_can_focus(False)
             more_btn.set_valign(Gtk.Align.CENTER)
             more_btn.set_popover(self._make_chat_actions_popover(cid))
+            _use_pointer_cursor(more_btn)
             outer.append(more_btn)
 
             row.set_child(outer)
+            _use_pointer_cursor(row)
             self._history_list.append(row)
         if active_row is not None:
             self._history_list.select_row(active_row)
@@ -1770,6 +1772,7 @@ class ChatSidebar(Adw.ApplicationWindow):
             btn.set_tooltip_text(tooltip)
             btn.set_size_request(36, 36)
             btn.connect("clicked", lambda _b: (pop.popdown(), handler()))
+            _use_pointer_cursor(btn)
             box.append(btn)
 
         # MIME icons distinguish formats; trash is standard Adwaita symbolic
@@ -3280,6 +3283,7 @@ class ChatSidebar(Adw.ApplicationWindow):
             btn.set_tooltip_text(tooltip)
             btn.set_size_request(32, 32)
             btn.connect("clicked", handler)
+            _use_pointer_cursor(btn)
             bar.append(btn)
             return btn
 
@@ -3339,6 +3343,7 @@ class ChatSidebar(Adw.ApplicationWindow):
         more.set_has_frame(False)
         more.set_tooltip_text("More actions")
         more.set_size_request(32, 32)
+        _use_pointer_cursor(more)
         pop = Gtk.Popover()
         col = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
         col.set_margin_top(6)
@@ -3355,6 +3360,7 @@ class ChatSidebar(Adw.ApplicationWindow):
                 self._clipboard_set(current_text()),
             ),
         )
+        _use_pointer_cursor(md_btn)
         col.append(md_btn)
         pop.set_child(col)
         more.set_popover(pop)

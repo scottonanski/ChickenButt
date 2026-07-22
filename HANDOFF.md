@@ -82,7 +82,7 @@ python3 scripts/test_ollama_health.py
 | Version | `0.1.0` |
 | Desktop entry | `python3 scripts/install-desktop-entry.py` → `~/.local/share/applications/` |
 | SQLite DB | `~/.local/share/chickenbutt/conversations.db` (`CHICKENBUTT_DB` override) |
-| Settings | `~/.config/chickenbutt/settings.json` (last model, sidebar open) |
+| Settings | `~/.config/chickenbutt/settings.json` (last model only — sidebar-open state is no longer persisted; the sidebar always starts closed) |
 
 ### Stuck launch / desktop spinner
 
@@ -145,7 +145,7 @@ When yes → legitimate standalone V1 product.
 
 ### Multi-chat history (SQLite)
 - New / switch / delete conversations; auto-persist; restore last active on launch.
-- Docked **sidebar** (Chats + Recent + New + Settings footer).
+- Docked **sidebar** (Chats header + Recent + conversation list + **Model** section + Settings footer). Starts **closed** on every launch — sidebar-open state is intentionally not persisted; opening it during a session still works normally.
 - Empty-chat lifecycle: prune empty drafts; avoid blank-chat spam.
 - First user message can set the conversation title.
 - Export current chat: **Markdown** / **JSON** (file chooser).
@@ -181,8 +181,8 @@ Type in the message box and Enter:
 - Send = paper-plane family icon + tooltip; Enter send / Shift+Enter newline / Esc → tray.
 
 ### Model control & header
-- Model `Gtk.DropDown` only under header: fixed pill width **`MODEL_DROPDOWN_WIDTH = 320`**.
-- **Refresh** in header, immediately left of burger (`Ctrl+R` / `win.refresh-models`).
+- Model `Gtk.DropDown` lives in the **sidebar**, in its own Model section directly above the Settings footer — not under the header. It expands to the sidebar's inner width (no fixed pill width) at a fixed **38px** height.
+- **Refresh** stays in the header, immediately left of burger (`Ctrl+R` / `win.refresh-models`); the health banner stays in the main chat column above the transcript — only the selector moved.
 - App menu: New, Show Chat List, Settings, Export Chat Markdown/JSON…, Hide (Esc), Maximize (F11), Close (Ctrl+W), Quit (Ctrl+Q).
 
 ### Branding & tray
@@ -224,7 +224,6 @@ Type in the message box and Enter:
 ```text
 DEFAULT_WIDTH / HEIGHT          780 × 720
 SIDEBAR_WIDTH                   220
-MODEL_DROPDOWN_WIDTH            320
 COMPOSER_MIN_LINES              1
 COMPOSER_MAX_LINES              8
 COMPOSER_COMPACT_MAX_LINES      6
@@ -302,8 +301,8 @@ Ordered roughly by value:
 cd ChickenButt
 ./run.sh
 # Expect: Transcript: WebKit (default)
-# UI: chicken empty mark, 320px model pill, header [↻][☰], floating composer,
-#     greeting sub with ollama pull hint
+# UI: chicken empty mark, sidebar closed by default, header [↻][☰],
+#     floating composer, greeting sub with ollama pull hint
 python3 scripts/smoke_gui.py   # expect 25/25 PASS with Ollama available
 
 # Full regression suite added this session (all real WebKit, real GLib loop —

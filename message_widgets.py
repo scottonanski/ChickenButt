@@ -296,6 +296,7 @@ class CodeBlock(Gtk.Box):
         self._copy_btn.set_tooltip_text("Copy code")
         self._copy_btn.set_size_request(32, 32)
         self._copy_btn.connect("clicked", self._on_copy)
+        self._copy_btn.set_cursor_from_name("pointer")
         header.append(self._copy_btn)
 
         self._expand_btn = Gtk.Button.new_from_icon_name("view-fullscreen-symbolic")
@@ -305,6 +306,7 @@ class CodeBlock(Gtk.Box):
         self._expand_btn.set_size_request(32, 32)
         self._expand_btn.set_visible(False)
         self._expand_btn.connect("clicked", self._on_expand)
+        self._expand_btn.set_cursor_from_name("pointer")
         header.append(self._expand_btn)
         self._expanded = False
 
