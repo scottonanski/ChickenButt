@@ -19,11 +19,9 @@ gi.require_version("Adw", "1")
 from gi.repository import Adw, Gio, GLib
 
 from ollama_client import OllamaClient
+from release_info import APP_ID, APP_NAME
 from tray import TrayIcon
 from window import ChatSidebar
-
-
-APP_ID = "dev.local.ChickenButt"
 
 
 class ChickenButtApp(Adw.Application):
@@ -59,7 +57,7 @@ class ChickenButtApp(Adw.Application):
                 icon_name=tray_icon,
                 # Empty theme path → load from system Adwaita/Yaru icon theme
                 icon_theme_path="",
-                title="ChickenButt",
+                title=APP_NAME,
             )
             # Window icon: themed name + file fallback for the dock
             self.window.set_icon_name("chickenbutt")
@@ -197,8 +195,8 @@ class ChickenButtApp(Adw.Application):
 def main() -> int:
     Adw.init()
     # Shown in dock tooltips / about when desktop match works
-    GLib.set_application_name("ChickenButt")
-    GLib.set_prgname("ChickenButt")
+    GLib.set_application_name(APP_NAME)
+    GLib.set_prgname(APP_NAME)
     app = ChickenButtApp()
     return app.run(sys.argv)
 

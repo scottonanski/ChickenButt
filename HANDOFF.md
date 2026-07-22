@@ -78,7 +78,8 @@ python3 scripts/test_ollama_health.py
 
 | Item | Value |
 |------|--------|
-| App ID | `dev.local.ChickenButt` (must match desktop entry) |
+| App ID | `io.github.scottonanski.ChickenButt` (must match desktop entry) |
+| Version | `0.1.0` |
 | Desktop entry | `python3 scripts/install-desktop-entry.py` → `~/.local/share/applications/` |
 | SQLite DB | `~/.local/share/chickenbutt/conversations.db` (`CHICKENBUTT_DB` override) |
 | Settings | `~/.config/chickenbutt/settings.json` (last model, sidebar open) |
