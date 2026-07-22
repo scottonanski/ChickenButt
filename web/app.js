@@ -927,7 +927,7 @@
       setActionsVisible(id, false);
     } else {
       body.innerHTML = renderMarkdown(text || "");
-      wireCodeUi(body);
+      if (!opts.deferWire) wireCodeUi(body);
       highlightAllIn(body);
       setActionsVisible(id, true);
     }
@@ -1020,8 +1020,13 @@
               // layout read N times — one pinned scroll after the whole
               // batch below is enough and lands in the same place.
               deferScroll: true,
+              // Same reasoning for wireCodeUi's own layout reads: wire
+              // every restored code block in one pass over the container
+              // below instead of once per message.
+              deferWire: true,
             });
           });
+          wireCodeUi(messagesEl);
         } else if (event.empty_title || event.empty_sub) {
           setEmptyState(
             event.empty_title || "Start a conversation",
