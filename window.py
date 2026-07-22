@@ -3661,7 +3661,7 @@ class ChatSidebar(Adw.ApplicationWindow):
                 for piece in self.client.chat_stream(
                     origin_model,
                     list(outbound),
-                    should_stop=cancel_event.is_set,
+                    cancel_event=cancel_event,
                 ):
                     collected.append(piece)
                     with state["lock"]:

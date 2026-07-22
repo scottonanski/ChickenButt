@@ -82,7 +82,7 @@ def wait_until(cond, timeout=10.0, label="condition") -> bool:
 class ScriptedStream:
     """Fake chat_stream: yields chunks one at a time, gated by a threading.Event.
 
-    Checks should_stop() before every chunk (including the first), mirroring
+    Checks cancel_event before every chunk (including the first), mirroring
     OllamaClient.chat_stream's check-before-readline behavior.
     """
 
@@ -94,14 +94,14 @@ class ScriptedStream:
         self.stopped_early = False
         self.called_model: str | None = None
 
-    def __call__(self, model, messages, *, should_stop=None):
+    def __call__(self, model, messages, *, cancel_event=None):
         self.called_model = model
         self.started.set()
         for i, chunk in enumerate(self.chunks):
             if i > 0:
                 self.gate.wait(timeout=10)
                 self.gate.clear()
-            if should_stop and should_stop():
+            if cancel_event is not None and cancel_event.is_set():
                 self.stopped_early = True
                 self.finished.set()
                 return

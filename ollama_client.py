@@ -2,8 +2,12 @@
 
 from __future__ import annotations
 
+import http.client
 import json
+import socket
+import threading
 import urllib.error
+import urllib.parse
 import urllib.request
 from collections.abc import Callable, Iterator
 from typing import Any
@@ -130,16 +134,107 @@ class OllamaClient:
         model: str,
         messages: list[dict[str, str]],
         *,
-        should_stop: Callable[[], bool] | None = None,
+        cancel_event: threading.Event | None = None,
     ) -> Iterator[str]:
-        body = {"model": model, "messages": messages, "stream": True}
-        with self._request("POST", "/api/chat", body=body, stream=True) as resp:
+        """Stream a chat completion.
+
+        Uses http.client directly (rather than urlopen) so a cancellation
+        can shut down the exact connection socket from another thread and
+        wake a blocked readline() immediately, instead of waiting for the
+        model to produce another token. Normal generation gets no socket
+        timeout — a model that pauses for a long time is not an error.
+        """
+        parsed = urllib.parse.urlsplit(self.base_url)
+        conn_cls = (
+            http.client.HTTPSConnection
+            if parsed.scheme == "https"
+            else http.client.HTTPConnection
+        )
+        conn = conn_cls(parsed.hostname, parsed.port)
+        body = json.dumps(
+            {"model": model, "messages": messages, "stream": True}
+        ).encode("utf-8")
+
+        watcher: threading.Thread | None = None
+        # Set once this call is done (normally, on error, or cancelled) so
+        # the watcher — woken via cancel_event purely to release it — can
+        # tell "actually cancelled" apart from "just cleaning up" and skip
+        # the shutdown() in the latter case.
+        stream_finished = threading.Event()
+
+        def _watch(sock_holder: "list[socket.socket | None]") -> None:
+            cancel_event.wait()
+            if stream_finished.is_set():
+                return
+            sock = sock_holder[0]
+            if sock is not None:
+                try:
+                    sock.shutdown(socket.SHUT_RDWR)
+                except OSError:
+                    pass
+
+        sock_holder: list[socket.socket | None] = [None]
+        try:
+            try:
+                conn.putrequest("POST", "/api/chat")
+                conn.putheader("Content-Type", "application/json")
+                conn.putheader("Accept", "application/json")
+                conn.putheader("Content-Length", str(len(body)))
+                conn.endheaders(body)
+                sock_holder[0] = conn.sock
+                if cancel_event is not None:
+                    watcher = threading.Thread(
+                        target=_watch,
+                        args=(sock_holder,),
+                        daemon=True,
+                        name="ollama-chat-stream-watcher",
+                    )
+                    watcher.start()
+                resp = conn.getresponse()
+            except OSError as exc:
+                # A cancel_event.set() right after connect (before the
+                # model produced even the response headers) also shows up
+                # here as a socket error from the watcher's shutdown() —
+                # that's a clean cancellation, not a connection failure.
+                if cancel_event is not None and cancel_event.is_set():
+                    return
+                raise OllamaError(
+                    f"Cannot reach Ollama at {self.base_url}: {exc}"
+                ) from exc
+
+            if resp.status >= 400:
+                detail = resp.read().decode("utf-8", errors="replace")
+                try:
+                    payload = json.loads(detail)
+                    detail = str(payload.get("error") or detail).strip()
+                except json.JSONDecodeError:
+                    detail = detail.strip()
+                raise OllamaError(detail or f"Ollama HTTP {resp.status} for /api/chat")
+
+            saw_done = False
             while True:
-                if should_stop and should_stop():
+                if cancel_event is not None and cancel_event.is_set():
                     break
-                line = resp.readline()
+                try:
+                    line = resp.readline()
+                except OSError:
+                    if cancel_event is not None and cancel_event.is_set():
+                        break
+                    raise OllamaError(
+                        "Connection to Ollama was lost during streaming"
+                    ) from None
                 if not line:
-                    break
+                    if cancel_event is not None and cancel_event.is_set():
+                        break
+                    if saw_done:
+                        break
+                    # A graceful close (no RST) looks identical to our own
+                    # cancellation shutdown at the socket level — this is
+                    # only reached when cancel_event was never set, so it's
+                    # Ollama ending the response early, not us.
+                    raise OllamaError(
+                        "Ollama closed the response before generation completed"
+                    )
                 line = line.strip()
                 if not line:
                     continue
@@ -154,7 +249,21 @@ class OllamaClient:
                 if content:
                     yield content
                 if chunk.get("done"):
+                    saw_done = True
                     break
+        finally:
+            try:
+                conn.close()
+            except OSError:
+                pass
+            if cancel_event is not None:
+                # Order matters: mark done before waking the watcher, so it
+                # can tell "just cleaning up" apart from a real cancel that
+                # raced in at the same moment.
+                stream_finished.set()
+                cancel_event.set()
+                if watcher is not None:
+                    watcher.join(timeout=2)
 
     def pull_model(
         self,
