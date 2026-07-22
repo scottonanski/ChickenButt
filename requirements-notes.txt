@@ -1,0 +1,4 @@
+# Optional system package for syntax-highlighted code (vs plain monospace):
+#   sudo apt install gir1.2-gtksource-5
+#
+# mistune is vendored under vendor/mistune (no pip required).
