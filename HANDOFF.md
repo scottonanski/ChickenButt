@@ -84,6 +84,44 @@ python3 scripts/test_ollama_health.py
 | SQLite DB | `~/.local/share/chickenbutt/conversations.db` (`CHICKENBUTT_DB` override) |
 | Settings | `~/.config/chickenbutt/settings.json` (last model only — sidebar-open state is no longer persisted; the sidebar always starts closed) |
 
+---
+
+## Installed runtime layout (Meson) — private app dir, not a Python package
+
+Bounded first packaging step, landed this session: a real, installable runtime via Meson. This is deliberately **not** pip/pipx/a Python package — ChickenButt depends on system GI typelibs (GTK4/Adwaita/WebKit), a local WebKit page, and vendored JS/Python, so the installed layout mirrors the source tree's existing relative-resource structure instead:
+
+```text
+<prefix>/bin/chickenbutt
+<prefix>/<libdir>/chickenbutt/
+    main.py, conversation_store.py, message_widgets.py, ollama_client.py,
+    ollama_health.py, release_info.py, tray.py, transcript_view.py,
+    window.py, x11_sidebar.py
+    web/**       (transcript page + vendored marked/DOMPurify/highlight.js)
+    vendor/**    (vendored Python — mistune)
+    icons/**     (private fallback icons)
+```
+
+This preserves every existing relative-resource lookup unmodified: `transcript_view.WEB_DIR` still resolves sibling `web/`, `message_widgets.py` still finds sibling `vendor/mistune` via its own `sys.path` insert, `web/index.html` still resolves `../icons/`, and `main.py`'s APP_DIR-relative icon fallbacks still work — because `<libdir>/chickenbutt/` has exactly the same internal shape as the repo root.
+
+**Runtime Python files are an explicit allowlist in `meson.build`**, not a glob — this is what keeps the untracked, dev-only `profiling.py` (and anything else not named) out of the installed tree, on purpose.
+
+```bash
+# Build tools required (not part of the app's own runtime deps):
+#   meson >=0.64, ninja — via system packages, or a throwaway venv:
+#   python3 -m venv /tmp/bt && /tmp/bt/bin/pip install meson ninja
+
+meson setup builddir --prefix=/some/prefix
+meson install -C builddir
+/some/prefix/bin/chickenbutt          # launches normally
+/some/prefix/bin/chickenbutt --version   # → "ChickenButt 0.1.0", no window
+```
+
+`main.py --version` (and therefore `chickenbutt --version` / `./run.sh --version`) prints `{APP_NAME} {VERSION}` from `release_info.py` and returns before `Adw.init()` — no display/window needed.
+
+**Not yet done, on purpose** (separate follow-up commits): desktop entry installation via Meson, AppStream metadata, public hicolor icon-theme installation, Flatpak manifest, dependency documentation, README installation instructions, CI. `scripts/install-desktop-entry.py` and the tracked `.desktop` file are untouched by this step.
+
+Regression: `scripts/test_installed_layout.py` — does a real `meson setup`/`meson install` into a temporary prefix and runs the installed launcher from an unrelated directory. It builds from `git write-tree` + `git archive` (what would actually be committed), not the raw working directory — the working tree can carry uncommitted profiling instrumentation in `main.py` that would otherwise install a `main.py` requiring a `profiling` module that must never ship. Skips cleanly (exit 0, clear message) if `meson` isn't on `PATH`, so it doesn't block the rest of the suite on machines without it.
+
 ### Stuck launch / desktop spinner
 
 GApplication is single-instance. A zombie `python3 main.py` holding the DBus name makes new launches spin forever.
@@ -212,6 +250,9 @@ Type in the message box and Enter:
 | `tray.py` | StatusNotifier + DBus menu + IconPixmap |
 | `message_widgets.py` | Native transcript fallback only |
 | `x11_sidebar.py` | X11 helpers (support) |
+| `release_info.py` | Single source of truth: `APP_ID`, `APP_NAME`, `VERSION` |
+| `meson.build` | Installed runtime layout — see "Installed runtime layout" above |
+| `packaging/chickenbutt.in` | Launcher template, configured by Meson into `<prefix>/bin/chickenbutt` |
 | `profiling.py` | Untracked. Measurement-only, no-ops unless `CHICKENBUTT_PROFILE=1` |
 | `scripts/` | install-icons, smoke_gui, feature tests, `profile_*.py` benchmark drivers (untracked) |
 | `icons/` | Brand SVGs, hicolor, tray PNGs |
@@ -242,7 +283,7 @@ Chat / composer clamp           768px (~48rem WebKit column)
 1. **Batch `wireCodeUi()` during restoration** — see "Next task" above. Bounded, already measured, ready to implement.
 2. Longer-term, only if still needed after #1: transcript virtualization or incremental history loading for very large (1000+ message) code-heavy histories.
 3. Markdown sanitization — `renderMarkdown()` pipes model output through `marked.parse()` straight into `innerHTML`, no sanitizer, no CSP. Flagged, not yet acted on. Matters more once cloud models / attachments / copied web content are in play.
-4. Installation reproducibility — no `pyproject.toml`/`requirements.txt`, no distro-specific dependency list in the README. `./run.sh` just runs `python3 main.py`.
+4. Installation reproducibility — a real installed runtime now exists via Meson (see "Installed runtime layout" above), but there's still no distro-specific system-dependency list (GTK4/Adwaita/WebKitGTK/PyGObject typelibs) anywhere, no desktop entry installed by Meson, no AppStream metadata, no Flatpak manifest, and the README doesn't document any of this yet. `./run.sh` remains the source-tree dev launcher.
 5. `STATUS_REPORT.md` vs this file — this file is authoritative; `STATUS_REPORT.md` is a stale mid-session snapshot. Consider deleting it rather than maintaining two.
 
 ### Product work (resume once the above is settled)
@@ -313,6 +354,9 @@ python3 scripts/test_message_actions.py
 python3 scripts/test_generation_lifecycle.py   # 14 checks — cross-chat corruption regressions
 python3 scripts/test_stream_cancellation.py    # 21 checks — real stub-server socket cancellation
 python3 scripts/test_restore_scroll.py         # 8 checks — restore scroll-call-count regression
+python3 scripts/test_installed_layout.py       # 44 checks — real `meson install`; skips if meson isn't on PATH
+
+./run.sh --version   # → "ChickenButt 0.1.0", no window
 ```
 
 WebKit import failure → log line and native fallback.

@@ -19,7 +19,7 @@ gi.require_version("Adw", "1")
 from gi.repository import Adw, Gio, GLib
 
 from ollama_client import OllamaClient
-from release_info import APP_ID, APP_NAME
+from release_info import APP_ID, APP_NAME, VERSION
 from tray import TrayIcon
 from window import ChatSidebar
 
@@ -193,6 +193,9 @@ class ChickenButtApp(Adw.Application):
 
 
 def main() -> int:
+    if "--version" in sys.argv[1:]:
+        print(f"{APP_NAME} {VERSION}")
+        return 0
     Adw.init()
     # Shown in dock tooltips / about when desktop match works
     GLib.set_application_name(APP_NAME)
