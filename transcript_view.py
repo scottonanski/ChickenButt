@@ -48,6 +48,35 @@ def _is_external_web_uri(uri: str) -> bool:
     return bool(hostname)
 
 
+# Applied via WebKit's construct-only default-content-security-policy
+# property (behaves like an HTTP CSP header on every load), not a <meta>
+# tag — a meta-delivered policy can't enforce frame-ancestors and doesn't
+# apply as consistently across WebKit's load APIs. The transcript page only
+# needs its own local CSS/JS/icon; everything else is denied by default.
+# Host-side evaluate_javascript() calls are a separate, non-CSP-governed
+# API (WebKit documents this), so this stays strict without needing
+# 'unsafe-eval' for the Python->page bridge to keep working.
+TRANSCRIPT_CSP = (
+    "default-src 'none'; "
+    "script-src 'self'; "
+    "script-src-attr 'none'; "
+    "style-src 'self'; "
+    "style-src-attr 'none'; "
+    "img-src 'self'; "
+    "connect-src 'none'; "
+    "font-src 'none'; "
+    "media-src 'none'; "
+    "object-src 'none'; "
+    "frame-src 'none'; "
+    "child-src 'none'; "
+    "worker-src 'none'; "
+    "manifest-src 'none'; "
+    "base-uri 'none'; "
+    "form-action 'none'; "
+    "frame-ancestors 'none'"
+)
+
+
 class WebTranscriptView(Gtk.Box):
     """One WebKit view for the whole conversation (owns its own scrolling)."""
 
@@ -67,7 +96,7 @@ class WebTranscriptView(Gtk.Box):
         self.set_hexpand(True)
         self.set_vexpand(True)
 
-        self._view = WebKit.WebView()
+        self._view = WebKit.WebView(default_content_security_policy=TRANSCRIPT_CSP)
         self._view.set_hexpand(True)
         self._view.set_vexpand(True)
 
