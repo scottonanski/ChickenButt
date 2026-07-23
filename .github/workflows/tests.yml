@@ -9,6 +9,11 @@ on:
 jobs:
   test:
     runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      NEEDRESTART_MODE: a
+      NEEDRESTART_SUSPEND: 1
     steps:
       - uses: actions/checkout@v4
 
