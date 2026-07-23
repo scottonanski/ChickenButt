@@ -273,8 +273,8 @@ def main() -> int:
     store.append_message(target.id, role="assistant", content=MALICIOUS_MD, message_id="m-mal-restore")
     store.append_message(target.id, role="assistant", content=SAFE_MD, message_id="m-safe-restore")
     # Separate empty conversation active at construction time so ChatSidebar's
-    # own startup restore doesn't also touch the seeded target (see HANDOFF.md
-    # gotcha — would double-restore and confuse the execution-marker count).
+    # own startup restore doesn't also touch the seeded target — would
+    # otherwise double-restore and confuse the execution-marker count.
     store.create_conversation(model="idle")
 
     win._conversation_id = None

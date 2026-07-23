@@ -228,10 +228,10 @@ def main() -> int:
     # === [5] Model selection and last-model persistence still work ===
     print("\n[5] Model selection and last-model persistence (real refresh/select/load chain)", flush=True)
     # Let the real cold-start model probe/warm-up (kicked off from __init__)
-    # settle first, same gotcha noted in HANDOFF.md for other tests — otherwise
-    # our explicit _refresh_models() call below just no-ops against the
-    # in-flight real one (_loading_model guard) and we'd observe the real
-    # model instead of the fake ones we're about to substitute.
+    # settle first — otherwise our explicit _refresh_models() call below
+    # just no-ops against the in-flight real one (_loading_model guard) and
+    # we'd observe the real model instead of the fake ones we're about to
+    # substitute.
     wait_until(lambda: not win._loading_model, timeout=60.0)
     pump(0.2)
     win.client.list_models = lambda: ["fake-model-a", "fake-model-b"]
