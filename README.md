@@ -63,7 +63,7 @@ meson install -C build
 
 - Make sure `$HOME/.local/bin` is on your `PATH` (add `export PATH="$HOME/.local/bin:$PATH"` to your shell profile if `chickenbutt` isn't found afterward).
 - This installs the `chickenbutt` command, its private runtime directory, a desktop launcher entry, and the public app icon — AppStream metadata is installed alongside them, and installed ChickenButt should appear in your GNOME app grid under "ChickenButt" (you may need to log out and back in, or restart the shell, for the icon/app-grid cache to pick it up). You can still launch it from a terminal by running `chickenbutt` at any time.
-- Screenshot and release-history metadata in the AppStream file, plus Flatpak packaging, remain unfinished — see [HANDOFF.md](HANDOFF.md).
+- Screenshot and release-history metadata in the AppStream file, plus Flatpak packaging, remain unfinished.
 - Rebuilding after pulling changes:
 
   ```bash
@@ -116,7 +116,11 @@ python3 scripts/test_dependency_declaration.py
 
 ## Project status
 
-See [HANDOFF.md](HANDOFF.md) for the current architecture, what's implemented, and what's still open.
+ChickenButt is currently in a repository-recovery phase — feature work is
+paused while known documentation, dead-code, and dead-asset debt is
+cleaned up under a verified baseline. See
+[REPOSITORY_RECOVERY.md](REPOSITORY_RECOVERY.md) for the current recovery
+ledger and status.
 
 ## License
 
