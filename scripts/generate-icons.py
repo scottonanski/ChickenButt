@@ -15,8 +15,12 @@ Source (in icons/):
   chickenbutt-dash-desktop-icon.svg  → app grid / window icon (full color)
 
 Regenerates (in icons/, tracked in git):
-  icons/hicolor/...          (private project-tree mirror; see main.py's
-                               APP_DIR-relative fallback icon paths)
+  icons/hicolor/...          (private project-tree mirror, installed into
+                               the runtime tree by meson.build; main.py
+                               resolves the window icon via GTK icon-theme
+                               name lookup against APP_ID, not a literal
+                               file path — see main.py's set_icon_name(APP_ID)
+                               call and meson.build)
 
 Does NOT generate icons/tray/ — TrayIcon is always constructed with
 icon_theme_path="" (main.py), so it resolves its icon by name from the
