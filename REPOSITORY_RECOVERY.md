@@ -46,8 +46,11 @@ recovery task done under it:
 
 ## 3. Verified repository baseline
 
-**Baseline commit:** `origin/main` at `93375d4`. All recovery findings were
-verified against the code tree at that commit.
+**Baseline commit:** `origin/main` at `e49c6d0` (merge of PR #3, RR-01). All
+recovery findings in §4 were verified against the code tree at `93375d4`,
+the commit that preceded RR-01 — RR-01 changed only `HANDOFF.md`,
+`STATUS_REPORT.md`, and `README.md`, none of which any §4 finding cites, so
+nothing in §4 requires re-verification as a result of that merge.
 
 **Runtime architecture, concisely:** `main.py` constructs one `Adw.Application`
 (`ChickenButtApp`) which owns one `ChatSidebar` (`window.py`) and one
@@ -281,8 +284,8 @@ restructuring, and none is proposed — nothing found in §4 requires one.
 
 | ID | Scope | Evidence | Status | Branch/PR | Verification required | Decision owner |
 |----|-------|----------|--------|-----------|------------------------|-----------------|
-| RR-01 | Delete `HANDOFF.md`, `STATUS_REPORT.md`; add `REPOSITORY_RECOVERY.md`; update `README.md`'s "Project status" pointer; close PR #2 unmerged; delete `docs/handoff-audit` branch (local+remote) | §4 "Obsolete or contradictory documentation"; §7 decision log | active | `docs/repository-recovery-bootstrap` | `git status` clean, no other internal status doc present anywhere in tree, `README.md` contains no dead link | Scott (this PR) |
-| RR-00 | Classify every tracked file and generator output against current `main` into: runtime, build/install, test/tooling, vendor, documentation, intentional asset, dead, or decision-pending | §4 is spot-checks, not exhaustive coverage | blocked — waits on RR-01 merging | none yet | a complete table covering every path in `git ls-files`, cross-checked against imports/references, not just the files §4 already names | Scott |
+| RR-01 | Delete `HANDOFF.md`, `STATUS_REPORT.md`; add `REPOSITORY_RECOVERY.md`; update `README.md`'s "Project status" pointer; close PR #2 unmerged; delete `docs/handoff-audit` branch (local+remote) | §4 "Obsolete or contradictory documentation"; §7 decision log | verified complete | PR #3 (`docs/repository-recovery-bootstrap`), merged as `e49c6d0` | `git status` clean (confirmed); no `HANDOFF.md`/`STATUS_REPORT.md` in tree (confirmed); `README.md` contains no dead link (confirmed); local `main` fast-forwarded to `e49c6d0` and matches `origin/main` (confirmed); `docs/handoff-audit` and `docs/repository-recovery-bootstrap` both deleted locally and remotely (confirmed) | Scott (approved and merged) |
+| RR-00 | Classify every tracked file and generator output against current `main` into: runtime, build/install, test/tooling, vendor, documentation, intentional asset, dead, or decision-pending | §4 is spot-checks, not exhaustive coverage | blocked — RR-01 has merged, so the blocker on ordering is resolved, but Scott has not yet authorized starting this task | none yet | a complete table covering every path in `git ls-files`, cross-checked against imports/references, not just the files §4 already names | Scott |
 | RR-02 | Fold mistune-vendoring line into `DEPENDENCIES.md`; delete `requirements-notes.txt` | §4, line-by-line comparison above | blocked | none yet | grep confirms zero remaining references to `requirements-notes.txt` | Scott |
 | RR-03 | Reconcile stale source documentation: `conversation_store.py`'s module docstring; `x11_sidebar.py`'s `GDK_BACKEND` comment only if that file is retained (moot if removed by RR-04); `generate-icons.py`'s module docstring describing `icons/tray/` as the live tray IconThemePath, which current runtime behavior contradicts | §4 "Stale source comments and docstrings" | blocked | none yet | direct read confirms the corrected text matches actual behavior | Scott |
 | RR-04 | Remove `x11_sidebar.py`; remove its `meson.build` allowlist entry; update `test_installed_layout.py:64` | §4 "Dead or unreachable code" | blocked | none yet | real `meson install`, confirm file absent from installed tree, `test_installed_layout.py` passes | Scott (§4 uncertain items — must decide "remove" vs "wire in" first) |
