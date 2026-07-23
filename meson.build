@@ -14,7 +14,7 @@ project('chickenbutt', meson_version: '>=0.64.0')
 # show up in the desktop application grid.
 #
 # Flatpak packaging, screenshot/release AppStream data and CI remain
-# separate follow-up work — see HANDOFF.md.
+# separate follow-up work.
 
 python3 = find_program('python3')
 
