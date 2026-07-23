@@ -61,7 +61,6 @@ REQUIRED_PY_MODULES = [
     "tray.py",
     "transcript_view.py",
     "window.py",
-    "x11_sidebar.py",
 ]
 
 REQUIRED_RESOURCES = [
@@ -84,6 +83,7 @@ FORBIDDEN_TOP_LEVEL = [
     "profile_ablation.py",
     "profile_runtime.py",
     "profile_startup.py",
+    "x11_sidebar.py",
 ]
 
 
@@ -104,7 +104,16 @@ def export_clean_source_tree(dest: Path) -> None:
 
 
 def find_pkglibdir(prefix: Path) -> Path | None:
-    matches = list(prefix.glob("lib*/chickenbutt"))
+    """Locate the installed .../chickenbutt runtime dir under any lib*
+    root, at any depth — Debian/Ubuntu's multiarch libdir convention
+    (e.g. lib/x86_64-linux-gnu) puts it two levels down, not one."""
+    matches = [
+        p
+        for lib_root in prefix.glob("lib*")
+        if lib_root.is_dir()
+        for p in lib_root.rglob("chickenbutt")
+        if p.is_dir()
+    ]
     return matches[0] if len(matches) == 1 else None
 
 

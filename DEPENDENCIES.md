@@ -18,6 +18,10 @@ installing anything.
 | WebKitGTK 6.0 | Default transcript renderer (`transcript_view.py`) |
 | dasbus | **Required**, not optional — `tray.py` imports it unconditionally to implement the StatusNotifierItem D-Bus interface for the tray icon. ChickenButt will not start without it. |
 
+mistune (Markdown parsing for the native GTK transcript fallback,
+`message_widgets.py`) is vendored under `vendor/mistune/` — no pip install
+required.
+
 ## 2. Build / install tools
 
 Only needed to build and install ChickenButt via Meson — not part of its

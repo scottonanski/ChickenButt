@@ -59,9 +59,9 @@ class ChickenButtApp(Adw.Application):
                 icon_theme_path="",
                 title=APP_NAME,
             )
-            # Window icon: themed name + file fallback for the dock
+            # Window icon: themed name (icon-theme lookup resolves APP_ID
+            # to the installed hicolor icon; see meson.build).
             self.window.set_icon_name(APP_ID)
-            self._apply_window_icon(self.window)
             ok = self.tray.start()
             if not ok:
                 print(
@@ -114,44 +114,6 @@ class ChickenButtApp(Adw.Application):
         except Exception:  # noqa: BLE001
             pass
         return "chat-message-new-symbolic"
-
-    def _apply_window_icon(self, window) -> None:
-        """Ensure dock/task switcher gets the chicken icon, not a generic gear."""
-        try:
-            from gi.repository import Gdk, Gtk
-
-            display = Gdk.Display.get_default()
-            if display is None:
-                return
-            theme = Gtk.IconTheme.get_for_display(display)
-            if theme.has_icon(APP_ID):
-                window.set_icon_name(APP_ID)
-                return
-            # Fallback: load PNG from project tree. These are private,
-            # untouched runtime file paths (see meson.build's private
-            # icons/ install) — not the public icon-theme name, which is
-            # APP_ID above.
-            for rel in (
-                "icons/hicolor/128x128/apps/chickenbutt.png",
-                "icons/chickenbutt-dash-desktop-icon.svg",
-                "icons/tray/chickenbutt.png",
-            ):
-                path = os.path.join(APP_DIR, rel)
-                if not os.path.isfile(path):
-                    continue
-                try:
-                    texture = Gdk.Texture.new_from_filename(path)
-                    # GTK4 ApplicationWindow: set via default icon list if available
-                    if hasattr(window, "set_icon_name"):
-                        window.set_icon_name(APP_ID)
-                    # Paint as paintable on the native surface when supported
-                    if texture is not None and hasattr(Gtk, "Window"):
-                        pass
-                except Exception:  # noqa: BLE001
-                    continue
-                break
-        except Exception as exc:  # noqa: BLE001
-            print(f"Icon setup: {exc}", flush=True)
 
     def _window_is_visible(self) -> bool:
         return bool(self.window and self.window.is_visible())

@@ -63,7 +63,6 @@ runtime_python_sources = files(
   'tray.py',
   'transcript_view.py',
   'window.py',
-  'x11_sidebar.py',
 )
 
 install_data(runtime_python_sources, install_dir: pkglibdir)
