@@ -119,8 +119,8 @@ python3 scripts/test_dependency_declaration.py
 ChickenButt is currently in a repository-recovery phase — feature work is
 paused while known documentation, dead-code, and dead-asset debt is
 cleaned up under a verified baseline. See
-[REPOSITORY_RECOVERY.md](REPOSITORY_RECOVERY.md) for the current recovery
-ledger and status.
+[recovery-reports/REPOSITORY_RECOVERY.md](recovery-reports/REPOSITORY_RECOVERY.md)
+for the current recovery ledger and status.
 
 ## License
 
