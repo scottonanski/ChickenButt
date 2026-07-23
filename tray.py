@@ -81,10 +81,8 @@ def _pixbuf_to_sni_pixmap(pb) -> List[Tuple[Int, Int, List[Byte]]]:
     return [(Int(w), Int(h), argb)]
 
 
-def _load_icon_pixmap(
-    icon_theme_path: str, icon_name: str
-) -> List[Tuple[Int, Int, List[Byte]]]:
-    """Build StatusNotifier IconPixmap from theme files or the system icon theme."""
+def _load_icon_pixmap(icon_name: str) -> List[Tuple[Int, Int, List[Byte]]]:
+    """Build StatusNotifier IconPixmap from the system icon theme."""
     if not icon_name:
         return []
     target = 64
@@ -96,27 +94,6 @@ def _load_icon_pixmap(
         gi.require_version("Gdk", "4.0")
         from gi.repository import Gdk, GdkPixbuf, Gtk
 
-        # 1) Explicit tray dir PNGs/SVGs (legacy chicken assets still work if asked for)
-        if icon_theme_path:
-            for name in (
-                f"{icon_name}@2.png",
-                f"{icon_name}.png",
-                f"{icon_name}.svg",
-            ):
-                p = os.path.join(icon_theme_path, name)
-                if not os.path.isfile(p):
-                    continue
-                if p.endswith(".svg"):
-                    pb = GdkPixbuf.Pixbuf.new_from_file_at_size(p, target, target)
-                else:
-                    pb = GdkPixbuf.Pixbuf.new_from_file(p)
-                    if pb.get_width() != target or pb.get_height() != target:
-                        pb = pb.scale_simple(
-                            target, target, GdkPixbuf.InterpType.BILINEAR
-                        )
-                return _pixbuf_to_sni_pixmap(pb)
-
-        # 2) System / Adwaita / Yaru icon theme (chat bubble, etc.)
         display = Gdk.Display.get_default()
         if display is not None:
             theme = Gtk.IconTheme.get_for_display(display)
@@ -461,7 +438,7 @@ class TrayIcon:
         _is_visible = self._is_visible
         _icon_name = self._icon_name
         _icon_theme_path = self._icon_theme_path or ""
-        _icon_pixmap = _load_icon_pixmap(_icon_theme_path, _icon_name)
+        _icon_pixmap = _load_icon_pixmap(_icon_name)
         _title = self._title
         _menu_kind = "primary"
 
