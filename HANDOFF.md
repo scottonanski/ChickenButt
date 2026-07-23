@@ -29,7 +29,7 @@ Each of the above is genuinely single-purpose — reviewed and split deliberatel
 A measurement-only profiling pass (`CHICKENBUTT_PROFILE=1`, inert otherwise) was built to find the *next* bottleneck instead of guessing:
 
 - **`profiling.py`** (new, tiny, untracked) — Python-side `mark(name)`, no-ops unless the env var is set.
-- **`window.py` / `main.py` / `transcript_view.py`** — scattered `profiling.mark(...)` calls at lifecycle milestones (still uncommitted — currently parked in a local `git stash`, not landed anywhere, pending a decision on whether/how to commit them).
+- **`window.py` / `main.py` / `transcript_view.py`** — scattered `profiling.mark(...)` calls at lifecycle milestones. Never committed to any branch, on purpose, pending a decision on whether/how to land them — check `git log -- window.py main.py transcript_view.py` if you need to know whether that's changed, since this file can't track anyone's local working-tree or stash state.
 - **`web/app.js`** — a matching JS-side profiler (`mark`/`markRaf`, gated on a `?profile=1` URL flag) instrumenting `finalizeStream()` stages and the streaming/restore bridge. **Not currently in the working tree** — it was deliberately kept out of the `81f666c` commit (see below) and would need to be re-added from scratch if wanted again; it is not saved anywhere.
 - **`scripts/profile_startup.py`**, **`scripts/profile_runtime.py`**, **`scripts/profile_ablation.py`** — benchmark drivers (untracked). Not part of the test suite; run manually.
 
@@ -50,7 +50,7 @@ Every defect the audit set out to fix has landed: the stalled-open HTTP stream (
 Three commits harden the WebKit transcript against untrusted content — relevant now that model output, and eventually cloud models / attachments / pasted web content, reach it:
 
 - **`0f50cf1`** — **Markdown sanitization.** `renderMarkdown()` used to pipe `marked.parse()` output straight into `innerHTML` with no sanitizer. Rendered output now passes through vendored DOMPurify (`web/vendor/purify.min.js`) first. Regression: `scripts/test_markdown_sanitization.py` (84 checks).
-- **`b4bd7d1`** — **WebKit navigation confinement.** `transcript_view.py` hooks `WebView`'s `decide-policy` signal (`_on_decide_policy`) so only trusted in-page navigation is loaded directly; other targets (including `NEW_WINDOW_ACTION`) are handed to the system's external application launcher instead of being loaded inside the transcript WebView. Regression: `scripts/test_web_navigation_policy.py` (56 checks).
+- **`b4bd7d1`** — **WebKit navigation confinement.** `transcript_view.py` hooks `WebView`'s `decide-policy` signal (`_on_decide_policy`) so the embedded WebView can only ever display the local trusted transcript page. Exact navigation back to that trusted URI is allowed; everything else is blocked (`decision.ignore()`) except one narrow case — a genuine user-initiated, non-redirect navigation to an external http(s) URI, which is handed to the system's default application via `Gio.AppInfo.launch_default_for_uri` instead of being loaded in the WebView. `NEW_WINDOW_ACTION` is never allowed to load in-view either way, since this app never creates a second window to load it into. Regression: `scripts/test_web_navigation_policy.py` (56 checks).
 - **`90965ca`** — **Strict CSP on the transcript WebView.** `transcript_view.py` constructs the `WebView` with a `default_content_security_policy` (`TRANSCRIPT_CSP`) that defaults every directive to `'none'` and only allows `'self'` for `script-src`/`style-src`/`img-src`. Regression: `scripts/test_web_content_security_policy.py` (53 checks).
 
 All three regression tests are part of the standard suite — see "Quick health check" below.
@@ -100,7 +100,7 @@ Bounded first packaging step, landed this session: a real, installable runtime v
 <prefix>/<libdir>/chickenbutt/
     main.py, conversation_store.py, message_widgets.py, ollama_client.py,
     ollama_health.py, release_info.py, tray.py, transcript_view.py,
-    window.py, x11_sidebar.py
+    window.py, x11_sidebar.py (dead code, unimported — see Repository map)
     web/**       (transcript page + vendored marked/DOMPurify/highlight.js)
     vendor/**    (vendored Python — mistune)
     icons/**     (private fallback icons)
@@ -345,7 +345,7 @@ Type in the message box and Enter:
 | `ollama_health.py` | Probe + classify errors |
 | `tray.py` | StatusNotifier + DBus menu + IconPixmap |
 | `message_widgets.py` | Native transcript fallback only |
-| `x11_sidebar.py` | X11 helpers (support) |
+| `x11_sidebar.py` | **Dead code.** Not imported by `main.py`, `window.py`, or anywhere else (`grep -rn x11_sidebar` outside this file and `meson.build`/`test_installed_layout.py` turns up nothing) — installed only because `meson.build` still lists it. Candidate for removal in a dedicated cleanup pass, not confirmed-in-use "support." |
 | `release_info.py` | Single source of truth: `APP_ID`, `APP_NAME`, `VERSION` |
 | `meson.build` | Installed runtime layout — see "Installed runtime layout" above |
 | `data/*.desktop.in`, `data/*.metainfo.xml.in` | Canonical desktop-entry/AppStream templates — see "Desktop integration" above |
@@ -377,9 +377,16 @@ Chat / composer clamp           768px (~48rem WebKit column)
 
 ## Still open
 
-### Stability & performance (current priority — do this before resuming product features)
+### Maintenance debt surfaced by auditing this file (not fixed here — status notes only)
 
-Both `wireCodeUi` restoration batching and markdown sanitization used to be listed here — they're done (`467017d`, `0f50cf1`; see "Performance audit — closed out" and "Security hardening" above). What's actually still open:
+This file has a history of being patched incrementally by commits focused on their own topic, without reconciling older sections — several stale claims got fixed in the PR that introduced this note, but treat that as an improvement, not a guarantee of full accuracy. Verify any specific claim that matters against real code/tests/`git log` before relying on it. Known, verified problems not fixed in that pass:
+
+- `x11_sidebar.py` is dead code — not imported by `main.py`, `window.py`, or anywhere else, but still installed because `meson.build` lists it (see Repository map above). Removing the file, its Meson entry, and updating `test_installed_layout.py`'s expected-file list is a small, bounded cleanup on its own.
+- `conversation_store.py`'s module docstring still says "No multi-chat UI yet" — multi-chat has been implemented and tested (`scripts/test_multichat.py`) for a while now. Source-level stale comments like this exist outside HANDOFF.md too; this file can't catch all of them.
+
+### Stability & performance
+
+The correctness and performance defects that used to justify gating product work behind this section are fixed (see "Landed" and "Performance audit — closed out" above) — nothing below is a hard blocker to resuming product work.
 
 1. Transcript virtualization or incremental history loading for very large (1000+ message) code-heavy histories — only if still needed; both restoration-cost fixes (scroll + wireCodeUi batching) are landed, so this is speculative until a real history is measurably slow.
 2. Installation reproducibility — largely done: a real installed runtime via Meson, a desktop entry / public icon / AppStream metadata installed by Meson (see "Desktop integration" above), a system-dependency checker (`scripts/check_dependencies.py`), a canonical dependency doc (`DEPENDENCIES.md`, with verified Fedora/Ubuntu package names), and README documents the full source-install path. Still open: no screenshot/release-history metadata in the AppStream file, no tagged release, no Flatpak manifest, no CI (so `test_installed_layout.py` / `test_desktop_integration.py` / `test_dependency_declaration.py` aren't yet continuously exercised against a real meson/ninja install). `./run.sh` remains the source-tree dev launcher.
