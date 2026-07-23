@@ -1,7 +1,7 @@
 """SQLite-backed conversation storage (Python-authoritative).
 
-First persistence slice: one active conversation, incremental message
-appends, restore most recent on launch. No multi-chat UI yet.
+Persists multiple conversations: creation, incremental message appends,
+listing/switching/deleting, and restoring the most recent on launch.
 """
 
 from __future__ import annotations
