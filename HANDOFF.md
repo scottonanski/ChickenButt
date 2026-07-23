@@ -110,17 +110,32 @@ This preserves every existing relative-resource lookup unmodified: `transcript_v
 #   meson >=0.64, ninja — via system packages, or a throwaway venv:
 #   python3 -m venv /tmp/bt && /tmp/bt/bin/pip install meson ninja
 
-meson setup builddir --prefix=/some/prefix
-meson install -C builddir
-/some/prefix/bin/chickenbutt          # launches normally
-/some/prefix/bin/chickenbutt --version   # → "ChickenButt 0.1.0", no window
+meson setup build --prefix="$HOME/.local"
+meson install -C build
+"$HOME/.local/bin/chickenbutt"             # launches normally
+"$HOME/.local/bin/chickenbutt" --version   # → "ChickenButt 0.1.0", no window
 ```
 
 `main.py --version` (and therefore `chickenbutt --version` / `./run.sh --version`) prints `{APP_NAME} {VERSION}` from `release_info.py` and returns before `Adw.init()` — no display/window needed.
 
-**Not yet done, on purpose** (separate follow-up commits): desktop entry installation via Meson, AppStream metadata, public hicolor icon-theme installation, Flatpak manifest, dependency documentation, README installation instructions, CI. `scripts/install-desktop-entry.py` and the tracked `.desktop` file are untouched by this step.
+**The installed launcher resolves `python3` from the runtime environment's own `PATH`** (`exec python3 '@PKGLIBDIR@/main.py' "$@"`), not the interpreter Meson happened to find at configure time. Meson itself is often run from a disposable build-tool venv (`find_program('python3')` in `meson.build` is only used for enumerating vendor files at configure time) — embedding `python3.full_path()` into the launcher would have permanently tied an installed ChickenButt to that venv, breaking the moment it's deleted. `scripts/test_installed_layout.py` proves this: it configures with a fake, uniquely-pathed `python3` wrapper first on `PATH`, confirms Meson actually used it, confirms it never appears anywhere in the generated launcher, deletes that fake venv entirely, and *then* confirms the installed `chickenbutt --version` still works.
 
-Regression: `scripts/test_installed_layout.py` — does a real `meson setup`/`meson install` into a temporary prefix and runs the installed launcher from an unrelated directory. It builds from `git write-tree` + `git archive` (what would actually be committed), not the raw working directory — the working tree can carry uncommitted profiling instrumentation in `main.py` that would otherwise install a `main.py` requiring a `profiling` module that must never ship. Skips cleanly (exit 0, clear message) if `meson` isn't on `PATH`, so it doesn't block the rest of the suite on machines without it.
+**Not yet done, on purpose** (separate follow-up commits): desktop entry installation via Meson, AppStream metadata, public hicolor icon-theme installation, Flatpak manifest, CI.
+
+Regression: `scripts/test_installed_layout.py` — does a real `meson setup`/`meson install` into a temporary prefix and runs the installed launcher from an unrelated directory. It builds from `git write-tree` + `git archive` (what would actually be committed), not the raw working directory — the working tree can carry uncommitted profiling instrumentation in `main.py` that would otherwise install a `main.py` requiring a `profiling` module that must never ship. Skips cleanly (exit 0, clear message) if `meson` isn't on `PATH`, so it doesn't block the rest of the suite on machines without it. **CI must install `meson`/`ninja` once CI exists — this test cannot remain silently skipped there.**
+
+### System dependencies and reproducible installation
+
+Canonical dependency list: **[DEPENDENCIES.md](DEPENDENCIES.md)** — four categories (required runtime libraries, build/install tools, optional integration, external Ollama service), why `dasbus` is required (not optional — `tray.py` imports it unconditionally for the StatusNotifier D-Bus interface), why `GtkSource 5` only affects the optional native transcript fallback, and verified Fedora 43/44 / Ubuntu 24.04+ package names.
+
+```bash
+python3 scripts/check_dependencies.py            # required runtime deps; optional/external reported, never fail the exit code
+python3 scripts/check_dependencies.py --build     # also requires git/meson/ninja
+```
+
+Stdlib-only until it starts probing; no GTK init, no window, no `DISPLAY`/`WAYLAND_DISPLAY`/D-Bus session requirement, no distro detection, no package-manager execution, no pip invocation. Regression: `scripts/test_dependency_declaration.py` (headless run, shadowed `gi`/`dasbus` modules that fail clearly, a too-old fake `meson` correctly rejected by the version gate, GtkSource/Ollama absence never fail it, README/DEPENDENCIES.md content checks).
+
+README now documents the full reproducible source-install path (`meson setup build --prefix="$HOME/.local"` → `meson install -C build` → `chickenbutt --version`), rebuilding (`meson setup --reconfigure`), uninstalling (`ninja -C build uninstall`), and running Ollama — while being explicit that desktop-entry/icon-theme/AppStream integration isn't installed by Meson yet, so the installed app is launched via `chickenbutt` from a terminal for now, not an app grid.
 
 ### Stuck launch / desktop spinner
 
@@ -253,12 +268,14 @@ Type in the message box and Enter:
 | `release_info.py` | Single source of truth: `APP_ID`, `APP_NAME`, `VERSION` |
 | `meson.build` | Installed runtime layout — see "Installed runtime layout" above |
 | `packaging/chickenbutt.in` | Launcher template, configured by Meson into `<prefix>/bin/chickenbutt` |
+| `scripts/check_dependencies.py` | System-dependency checker — see "System dependencies" above |
+| `DEPENDENCIES.md` | Canonical dependency list + Fedora/Ubuntu install commands |
 | `profiling.py` | Untracked. Measurement-only, no-ops unless `CHICKENBUTT_PROFILE=1` |
 | `scripts/` | install-icons, smoke_gui, feature tests, `profile_*.py` benchmark drivers (untracked) |
 | `icons/` | Brand SVGs, hicolor, tray PNGs |
 | `STATUS_REPORT.md` | Stale mid-session snapshot — **HANDOFF.md (this file) is authoritative** |
 
-**Vendor:** `web/vendor/` (marked, highlight.js) — leave alone.
+**Vendor:** `web/vendor/` (marked, DOMPurify, highlight.js) — leave alone.
 
 ### Key constants (`window.py`)
 
@@ -283,7 +300,7 @@ Chat / composer clamp           768px (~48rem WebKit column)
 1. **Batch `wireCodeUi()` during restoration** — see "Next task" above. Bounded, already measured, ready to implement.
 2. Longer-term, only if still needed after #1: transcript virtualization or incremental history loading for very large (1000+ message) code-heavy histories.
 3. Markdown sanitization — `renderMarkdown()` pipes model output through `marked.parse()` straight into `innerHTML`, no sanitizer, no CSP. Flagged, not yet acted on. Matters more once cloud models / attachments / copied web content are in play.
-4. Installation reproducibility — a real installed runtime now exists via Meson (see "Installed runtime layout" above), but there's still no distro-specific system-dependency list (GTK4/Adwaita/WebKitGTK/PyGObject typelibs) anywhere, no desktop entry installed by Meson, no AppStream metadata, no Flatpak manifest, and the README doesn't document any of this yet. `./run.sh` remains the source-tree dev launcher.
+4. Installation reproducibility — largely done: a real installed runtime via Meson, a system-dependency checker (`scripts/check_dependencies.py`), a canonical dependency doc (`DEPENDENCIES.md`, with verified Fedora/Ubuntu package names), and README documents the full source-install path. Still open: no desktop entry installed by Meson, no AppStream metadata, no public icon-theme installation, no Flatpak manifest, no CI (so `test_installed_layout.py` / `test_dependency_declaration.py` aren't yet continuously exercised against a real meson/ninja install). `./run.sh` remains the source-tree dev launcher.
 5. `STATUS_REPORT.md` vs this file — this file is authoritative; `STATUS_REPORT.md` is a stale mid-session snapshot. Consider deleting it rather than maintaining two.
 
 ### Product work (resume once the above is settled)
@@ -346,17 +363,25 @@ cd ChickenButt
 #     floating composer, greeting sub with ollama pull hint
 python3 scripts/smoke_gui.py   # expect 25/25 PASS with Ollama available
 
-# Full regression suite added this session (all real WebKit, real GLib loop —
-# no Ollama server required except smoke_gui.py):
+# Full regression suite (all real WebKit, real GLib loop — no Ollama server
+# required except smoke_gui.py):
 python3 scripts/test_multichat.py
 python3 scripts/test_ollama_health.py
 python3 scripts/test_message_actions.py
-python3 scripts/test_generation_lifecycle.py   # 14 checks — cross-chat corruption regressions
-python3 scripts/test_stream_cancellation.py    # 21 checks — real stub-server socket cancellation
-python3 scripts/test_restore_scroll.py         # 8 checks — restore scroll-call-count regression
-python3 scripts/test_installed_layout.py       # 44 checks — real `meson install`; skips if meson isn't on PATH
+python3 scripts/test_generation_lifecycle.py         # 14 checks — cross-chat corruption regressions
+python3 scripts/test_stream_cancellation.py          # 21 checks — real stub-server socket cancellation
+python3 scripts/test_restore_scroll.py               # 8 checks — restore scroll-call-count regression
+python3 scripts/test_wire_code_ui_batch.py           # 8 checks — restore wireCodeUi batching regression
+python3 scripts/test_markdown_sanitization.py        # 84 checks — DOMPurify sanitization boundary
+python3 scripts/test_web_navigation_policy.py        # 56 checks — WebKit decide-policy confinement
+python3 scripts/test_web_content_security_policy.py  # 53 checks — transcript CSP
+python3 scripts/test_release_identity.py             # 15 checks — APP_ID/desktop-entry/version consistency
+python3 scripts/test_sidebar_interactions.py         # 37 checks — pointer cursor, model selector, sidebar state
+python3 scripts/test_installed_layout.py             # 47 checks — real `meson install`; skips if meson isn't on PATH
+python3 scripts/test_dependency_declaration.py       # 42 checks — check_dependencies.py + doc content
 
 ./run.sh --version   # → "ChickenButt 0.1.0", no window
+python3 scripts/check_dependencies.py                # → all required deps satisfied
 ```
 
 WebKit import failure → log line and native fallback.

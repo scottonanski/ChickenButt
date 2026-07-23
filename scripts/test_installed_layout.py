@@ -151,14 +151,34 @@ def main() -> int:
             not (src_dir / "profiling.py").exists(),
         )
 
-        print("\n[2] meson setup + meson install into a temporary absolute prefix", flush=True)
+        print("\n[2] meson setup with a disposable fake python3 wrapper first on PATH", flush=True)
+        # Simulates running Meson from a throwaway build-tool venv. The
+        # wrapper's own path is unique and distinctive (lives under this
+        # test's tempdir) so we can positively confirm it never leaks into
+        # the generated launcher, rather than just failing to find nothing.
+        fake_py3_dir = tmp_path / "fake-configure-time-venv" / "bin"
+        fake_py3_dir.mkdir(parents=True)
+        fake_python3 = fake_py3_dir / "python3"
+        fake_python3.write_text(f"#!/bin/sh\nexec '{sys.executable}' \"$@\"\n", encoding="utf-8")
+        fake_python3.chmod(0o755)
+
+        setup_env = dict(os.environ)
+        setup_env["PATH"] = f"{fake_py3_dir}{os.pathsep}{setup_env.get('PATH', '')}"
+
         setup = subprocess.run(
             [meson, "setup", str(build_dir), f"--prefix={prefix}"],
             cwd=src_dir,
             capture_output=True,
             text=True,
+            env=setup_env,
         )
         results.check("meson setup succeeds", setup.returncode == 0, setup.stderr[-800:])
+        results.check(
+            "meson actually configured using the fake wrapper (the risk this test exercises is real)",
+            str(fake_python3) in setup.stdout,
+            setup.stdout[-500:],
+        )
+
         install = subprocess.run(
             [meson, "install", "-C", str(build_dir)],
             capture_output=True,
@@ -173,7 +193,7 @@ def main() -> int:
             launcher.is_file() and os.access(launcher, os.X_OK),
         )
 
-        print("\n[3] Launcher references the temporary prefix, not the checkout", flush=True)
+        print("\n[3] Launcher references the temporary prefix, not the checkout or the fake configure-time interpreter", flush=True)
         launcher_text = launcher.read_text(encoding="utf-8") if launcher.is_file() else ""
         results.check(
             "[2] launcher script contains the configured temp prefix",
@@ -185,20 +205,36 @@ def main() -> int:
             str(REPO_ROOT) not in launcher_text,
             launcher_text,
         )
+        results.check(
+            "launcher does not embed the fake configure-time python3 wrapper's path",
+            str(fake_python3) not in launcher_text and str(fake_py3_dir) not in launcher_text,
+            launcher_text,
+        )
+        results.check(
+            "launcher resolves python3 unqualified (via runtime PATH), not any absolute interpreter path",
+            "exec python3 " in launcher_text,
+            launcher_text,
+        )
 
         pkglibdir = find_pkglibdir(prefix)
         results.check("resolved a single installed lib*/chickenbutt dir", pkglibdir is not None, str(list(prefix.glob("lib*"))))
 
-        print("\n[4] Running the installed launcher from an unrelated directory", flush=True)
+        print("\n[4] Deleting the fake configure-time venv, then running the installed launcher from an unrelated directory", flush=True)
+        shutil.rmtree(tmp_path / "fake-configure-time-venv")
+        # A fresh, unmodified environment — no trace of the fake wrapper's
+        # directory on PATH, but still a real, working python3 (whatever
+        # this test process itself is already running under).
+        runtime_env = dict(os.environ)
         unrelated_cwd = tempfile.gettempdir()
         run = subprocess.run(
             [str(launcher), "--version"],
             cwd=unrelated_cwd,
             capture_output=True,
             text=True,
+            env=runtime_env,
         )
         results.check(
-            "[3] `chickenbutt --version` exits 0",
+            "[3] `chickenbutt --version` exits 0 after the configure-time venv is gone",
             run.returncode == 0,
             f"rc={run.returncode} stderr={run.stderr[-500:]}",
         )

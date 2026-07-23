@@ -18,12 +18,15 @@ A simple, lightweight GNOME desktop client for chatting with local [Ollama](http
 
 ## Requirements
 
-- Linux with GTK4 + libadwaita (GNOME or GNOME-compatible desktop)
-- Python 3
-- [Ollama](https://ollama.com) running locally
-- Optional: `gir1.2-gtksource-5` for enhanced syntax highlighting (`sudo apt install gir1.2-gtksource-5`)
+Linux with GTK4, libadwaita, WebKitGTK, PyGObject and dasbus (system packages, not pip), plus Python 3.10+. See **[DEPENDENCIES.md](DEPENDENCIES.md)** for the full list, why each one is required, and distro-specific install commands (Fedora, Ubuntu 24.04+). Check your system without installing anything:
 
-## Running
+```bash
+python3 scripts/check_dependencies.py
+```
+
+[Ollama](https://ollama.com) is not a build/install dependency — ChickenButt starts and shows its own onboarding UI without it. See [Running Ollama](#running-ollama) below.
+
+## Running (source tree, no install)
 
 ```bash
 git clone https://github.com/scottonanski/ChickenButt.git
@@ -44,6 +47,47 @@ python3 scripts/install-icons.py
 python3 scripts/install-desktop-entry.py
 ```
 
+## Install from source
+
+For a real `chickenbutt` command outside the checkout, ChickenButt uses [Meson](https://mesonbuild.com):
+
+```bash
+git clone https://github.com/scottonanski/ChickenButt.git
+cd ChickenButt
+
+python3 scripts/check_dependencies.py --build
+
+meson setup build --prefix="$HOME/.local"
+meson install -C build
+
+"$HOME/.local/bin/chickenbutt" --version
+"$HOME/.local/bin/chickenbutt"
+```
+
+- Make sure `$HOME/.local/bin` is on your `PATH` (add `export PATH="$HOME/.local/bin:$PATH"` to your shell profile if `chickenbutt` isn't found afterward).
+- This installs the `chickenbutt` command and its private runtime directory only. **The desktop entry, public icon theme and AppStream metadata are not installed by Meson yet.** The existing source-tree helper scripts (`scripts/install-icons.py`, `scripts/install-desktop-entry.py`) remain separate from the installed runtime — that integration is separate, later work. Until then, launch the installed app by running `chickenbutt` from a terminal, not from an app grid/launcher.
+- Rebuilding after pulling changes:
+
+  ```bash
+  meson setup --reconfigure build --prefix="$HOME/.local"
+  meson install -C build
+  ```
+
+- Uninstalling (from the retained build directory):
+
+  ```bash
+  ninja -C build uninstall
+  ```
+
+### Running Ollama
+
+```bash
+ollama serve   # if it isn't already running as a service
+ollama list    # confirm at least one model is pulled
+```
+
+See the official [Ollama Linux documentation](https://docs.ollama.com/linux) for installation and running it as a service.
+
 ## Data locations
 
 | What | Where |
@@ -58,6 +102,17 @@ python3 scripts/smoke_gui.py
 python3 scripts/test_multichat.py
 python3 scripts/test_message_actions.py
 python3 scripts/test_ollama_health.py
+python3 scripts/test_generation_lifecycle.py
+python3 scripts/test_stream_cancellation.py
+python3 scripts/test_restore_scroll.py
+python3 scripts/test_wire_code_ui_batch.py
+python3 scripts/test_markdown_sanitization.py
+python3 scripts/test_web_navigation_policy.py
+python3 scripts/test_web_content_security_policy.py
+python3 scripts/test_release_identity.py
+python3 scripts/test_sidebar_interactions.py
+python3 scripts/test_installed_layout.py       # real `meson install`; skips if meson isn't on PATH
+python3 scripts/test_dependency_declaration.py
 ```
 
 ## Project status
@@ -68,4 +123,4 @@ See [HANDOFF.md](HANDOFF.md) for the current architecture, what's implemented, a
 
 [GPL-3.0-or-later](LICENSE).
 
-Vendored third-party code: [mistune](vendor/mistune) (BSD-3-Clause), [marked.js](web/vendor/marked.min.js) (MIT), [highlight.js](web/vendor/highlight.min.js) (BSD-3-Clause).
+Vendored third-party code: [mistune](vendor/mistune) (BSD-3-Clause), [marked.js](web/vendor/marked.min.js) (MIT), [DOMPurify](web/vendor/purify.min.js) (Apache-2.0 OR MPL-2.0), [highlight.js](web/vendor/highlight.min.js) (BSD-3-Clause).

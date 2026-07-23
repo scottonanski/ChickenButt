@@ -63,10 +63,16 @@ install_data(
   preserve_path: true,
 )
 
-# Launcher: <prefix>/<bindir>/chickenbutt — resolved at configure time
-# against the actual selected prefix/libdir, never hardcoded.
+# Launcher: <prefix>/<bindir>/chickenbutt — PKGLIBDIR is resolved at
+# configure time against the actual selected prefix/libdir, never
+# hardcoded. The launcher deliberately does NOT embed python3.full_path():
+# Meson (and its `python3 = find_program('python3')` above, used only for
+# the vendor-file enumeration) may itself be run from a disposable
+# build-tool venv, and baking that interpreter's path into the installed
+# launcher would break ChickenButt the moment that venv is deleted. `exec
+# python3` at run time resolves through the installed environment's own
+# PATH instead.
 launcher_conf = configuration_data()
-launcher_conf.set('PYTHON3', python3.full_path())
 launcher_conf.set('PKGLIBDIR', pkglibdir)
 
 configure_file(
