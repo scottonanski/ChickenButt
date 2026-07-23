@@ -61,7 +61,6 @@ REQUIRED_PY_MODULES = [
     "tray.py",
     "transcript_view.py",
     "window.py",
-    "x11_sidebar.py",
 ]
 
 REQUIRED_RESOURCES = [
@@ -84,6 +83,7 @@ FORBIDDEN_TOP_LEVEL = [
     "profile_ablation.py",
     "profile_runtime.py",
     "profile_startup.py",
+    "x11_sidebar.py",
 ]
 
 
