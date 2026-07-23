@@ -147,6 +147,10 @@ any prior document without verification.
 ### Dead or unreachable assets
 - `chickenbutt-logo.png` (repo root) — zero references in any `.py`/`.md`/
   `.build` file (verified via `grep -rl`). Not produced by any generator.
+- `icons/chickenbutt-logo.png` — a second, distinct 256×256 PNG nested
+  under `icons/`, found during RR-00 (`recovery-reports/
+  00-initial-file-audit-discovery.md`). Zero references anywhere, same as
+  the root file above but not previously recorded.
 - `icons/hicolor/{16,22,24,32}x{16,22,24,32}/apps/chickenbutt-panel.png`
   — 4 files (verified: `find icons -iname "*panel*"`, exactly 4 paths, no
   5th size exists). Zero references anywhere. Not produced by the current
@@ -252,9 +256,18 @@ any prior document without verification.
   is deferred to product-development work after this document retires.
 - Whether manual test enforcement is acceptable long-term or CI is required
   before recovery is considered done.
-- Whether §4's inventory, built from targeted spot-checks, actually covers
-  every tracked file — RR-00 (§6) exists specifically because it does not
-  yet prove that.
+- Whether the vendored `vendor/mistune/` files that ChickenButt's own call
+  (`message_widgets.py:48`, `plugins=None`) never exercises — 11 plugin
+  files, 8 directive files, 3 alternate renderer files, `toc.py` — should
+  be trimmed to only what's used, or kept as-is on the reasoning that
+  vendoring a whole library and using part of it is normal. Found during
+  RR-00 (`recovery-reports/00-initial-file-audit-discovery.md`); not
+  individually confirmed dead, since that would require tracing a
+  third-party library's internals rather than ChickenButt's own code.
+
+RR-00's classification itself is done — see
+`recovery-reports/00-initial-file-audit-discovery.md` for the full,
+file-by-file table. §4 above now reflects everything it found.
 
 ## 5. Recovery sequence
 
@@ -296,7 +309,7 @@ restructuring, and none is proposed — nothing found in §4 requires one.
 | ID | Scope | Evidence | Status | Branch/PR | Verification required | Decision owner |
 |----|-------|----------|--------|-----------|------------------------|-----------------|
 | RR-01 | Delete `HANDOFF.md`, `STATUS_REPORT.md`; add `REPOSITORY_RECOVERY.md`; update `README.md`'s "Project status" pointer; close PR #2 unmerged; delete `docs/handoff-audit` branch (local+remote) | §4 "Obsolete or contradictory documentation"; §7 decision log | verified complete | PR #3 (`docs/repository-recovery-bootstrap`), merged as `e49c6d0` | `git status` clean (confirmed); no `HANDOFF.md`/`STATUS_REPORT.md` in tree (confirmed); `README.md` contains no dead link (confirmed); `origin/main` confirmed at `e49c6d0` immediately after the PR #3 merge (confirmed via `git ls-remote`, not a local-checkout claim); `docs/handoff-audit` and `docs/repository-recovery-bootstrap` both deleted locally and remotely (confirmed) | Scott (approved and merged) |
-| RR-00 | Classify every tracked file and generator output against current `main` into: runtime, build/install, test/tooling, vendor, documentation, intentional asset, dead, or decision-pending | §4 is spot-checks, not exhaustive coverage | blocked — RR-01 has merged, so the blocker on ordering is resolved, but Scott has not yet authorized starting this task | none yet | a complete table covering every path in `git ls-files`, cross-checked against imports/references, not just the files §4 already names | Scott |
+| RR-00 | Classify every tracked file and generator output against current `main` into: runtime, build/install, test/tooling, vendor, documentation, intentional asset, dead, or decision-pending | Full table: `recovery-reports/00-initial-file-audit-discovery.md`, all 112 tracked files | active — report written, awaiting Scott's review | `recovery/rr-00-file-audit` | full classification present, no gaps left unaccounted for; found one new orphaned asset (`icons/chickenbutt-logo.png`) and flagged vendored `mistune`'s unused-plugin surface as decision-pending, neither previously recorded in §4 | Scott (this PR) |
 | RR-02 | Fold mistune-vendoring line into `DEPENDENCIES.md`; delete `requirements-notes.txt` | §4, line-by-line comparison above | blocked | none yet | grep confirms zero remaining references to `requirements-notes.txt` | Scott |
 | RR-03 | Reconcile stale source documentation: `conversation_store.py`'s module docstring; `x11_sidebar.py`'s `GDK_BACKEND` comment only if that file is retained (moot if removed by RR-04); `generate-icons.py`'s module docstring describing `icons/tray/` as the live tray IconThemePath, which current runtime behavior contradicts | §4 "Stale source comments and docstrings" | blocked | none yet | direct read confirms the corrected text matches actual behavior | Scott |
 | RR-04 | Remove `x11_sidebar.py`; remove its `meson.build` allowlist entry; update `test_installed_layout.py:64` | §4 "Dead or unreachable code" | blocked | none yet | real `meson install`, confirm file absent from installed tree, `test_installed_layout.py` passes | Scott (§4 uncertain items — must decide "remove" vs "wire in" first) |
