@@ -2053,16 +2053,6 @@ class ChatSidebar(Adw.ApplicationWindow):
             display = Gdk.Display.get_default()
             if display is not None and text:
                 display.get_clipboard().set(text)
-        elif typ == "open_link":
-            url = payload.get("url") or ""
-            if url:
-                try:
-                    Gtk.show_uri(self, url, Gdk.CURRENT_TIME)
-                except Exception:
-                    try:
-                        Gtk.UriLauncher.new(url).launch(self, None, None, None)
-                    except Exception as exc:  # noqa: BLE001
-                        print(f"open_link: {exc}", flush=True)
         elif typ == "ready":
             pass
         elif typ == "regenerate":
