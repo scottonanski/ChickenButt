@@ -40,12 +40,9 @@ Use the native GTK bubble transcript instead of the default WebKit view:
 CHICKENBUTT_TRANSCRIPT=native ./run.sh
 ```
 
-Install desktop icons (dock/app icon under the `chickenbutt` FreeDesktop name) and add ChickenButt to your app launcher:
-
-```bash
-python3 scripts/install-icons.py
-python3 scripts/install-desktop-entry.py
-```
+Running straight from the source tree does not add a launcher entry to
+your app grid — use `./run.sh` from a terminal, or see **Install from
+source** below for a real installed app-grid entry.
 
 ## Install from source
 
@@ -65,7 +62,8 @@ meson install -C build
 ```
 
 - Make sure `$HOME/.local/bin` is on your `PATH` (add `export PATH="$HOME/.local/bin:$PATH"` to your shell profile if `chickenbutt` isn't found afterward).
-- This installs the `chickenbutt` command and its private runtime directory only. **The desktop entry, public icon theme and AppStream metadata are not installed by Meson yet.** The existing source-tree helper scripts (`scripts/install-icons.py`, `scripts/install-desktop-entry.py`) remain separate from the installed runtime — that integration is separate, later work. Until then, launch the installed app by running `chickenbutt` from a terminal, not from an app grid/launcher.
+- This installs the `chickenbutt` command, its private runtime directory, a desktop launcher entry, and the public app icon — AppStream metadata is installed alongside them, and installed ChickenButt should appear in your GNOME app grid under "ChickenButt" (you may need to log out and back in, or restart the shell, for the icon/app-grid cache to pick it up). You can still launch it from a terminal by running `chickenbutt` at any time.
+- Screenshot and release-history metadata in the AppStream file, plus Flatpak packaging, remain unfinished — see [HANDOFF.md](HANDOFF.md).
 - Rebuilding after pulling changes:
 
   ```bash
@@ -112,6 +110,7 @@ python3 scripts/test_web_content_security_policy.py
 python3 scripts/test_release_identity.py
 python3 scripts/test_sidebar_interactions.py
 python3 scripts/test_installed_layout.py       # real `meson install`; skips if meson isn't on PATH
+python3 scripts/test_desktop_integration.py    # real `meson install`; skips if meson isn't on PATH
 python3 scripts/test_dependency_declaration.py
 ```
 

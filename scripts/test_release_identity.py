@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 """Regression: release_info is the single source of truth for ChickenButt's
 public identity, and everything that must agree with it actually does —
-the real GApplication's application_id, the tracked desktop entry's
-filename and StartupWMClass, and the installer's real output.
+the real GApplication's application_id, and that the old clone-bound
+desktop-entry files are retired rather than left as a second, conflicting
+source of desktop metadata.
 
-Real ChickenButtApp construction and a real subprocess run of the actual
-installer script (against a throwaway HOME) — no mocking of the code
-under test.
+The desktop entry's actual content and a real Meson install now live in
+scripts/test_desktop_integration.py — see that file's docstring.
+
+Real ChickenButtApp construction — no mocking of the code under test.
 """
 from __future__ import annotations
 
 import os
 import re
-import subprocess
 import sys
-import tempfile
 from pathlib import Path
 
 APP_DIR = Path(__file__).resolve().parent.parent
@@ -45,19 +45,6 @@ class Results:
 
 REVERSE_DNS_RE = re.compile(r"^[A-Za-z][A-Za-z0-9]*(\.[A-Za-z][A-Za-z0-9]*){2,}$")
 SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+$")
-
-
-def parse_desktop_entry(text: str) -> dict[str, str]:
-    entries: dict[str, str] = {}
-    for line in text.splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or line.startswith("["):
-            continue
-        if "=" not in line:
-            continue
-        key, _, value = line.partition("=")
-        entries[key.strip()] = value.strip()
-    return entries
 
 
 def main() -> int:
@@ -97,75 +84,25 @@ def main() -> int:
         app.get_application_id(),
     )
 
-    print("\n[3] Tracked desktop entry file matches APP_ID", flush=True)
-    desktop_filename = f"{release_info.APP_ID}.desktop"
-    desktop_path = APP_DIR / desktop_filename
+    print("\n[3] Old clone-bound desktop install path is retired, not duplicated", flush=True)
+    # The tracked root .desktop file and scripts/install-desktop-entry.py
+    # were superseded by Meson's desktop-entry install (data/*.desktop.in →
+    # <prefix>/share/applications/<APP_ID>.desktop). Desktop-entry content,
+    # StartupWMClass, Icon, Exec and a real installed-file check now live in
+    # scripts/test_desktop_integration.py, which drives the real `meson
+    # install` rather than the retired clone-specific installer script.
+    old_desktop = APP_DIR / f"{release_info.APP_ID}.desktop"
     results.check(
-        f"tracked desktop file exists at repo root: {desktop_filename}",
-        desktop_path.is_file(),
-        str(desktop_path),
+        "old root .desktop file is absent (superseded by Meson-installed entry)",
+        not old_desktop.exists(),
+        str(old_desktop),
     )
-    old_stray = APP_DIR / "dev.local.ChickenButt.desktop"
+    old_installer = APP_DIR / "scripts" / "install-desktop-entry.py"
     results.check(
-        "old dev.local.ChickenButt.desktop no longer present (renamed, not duplicated)",
-        not old_stray.exists(),
-        str(old_stray),
+        "old scripts/install-desktop-entry.py is absent (superseded by Meson)",
+        not old_installer.exists(),
+        str(old_installer),
     )
-    entries = parse_desktop_entry(desktop_path.read_text(encoding="utf-8")) if desktop_path.is_file() else {}
-    results.check(
-        "desktop entry StartupWMClass matches release_info.APP_ID",
-        entries.get("StartupWMClass") == release_info.APP_ID,
-        entries.get("StartupWMClass"),
-    )
-    results.check(
-        "desktop entry Name matches release_info.APP_NAME",
-        entries.get("Name") == release_info.APP_NAME,
-        entries.get("Name"),
-    )
-    # The desktop entry's Version= key is the Desktop Entry Specification
-    # version this file conforms to, NOT ChickenButt's own release version
-    # — they are unrelated fields that happen to share a key name. This
-    # guards against someone "fixing" it to track release_info.VERSION.
-    results.check(
-        "desktop entry Version stays the desktop-entry-spec version ('1.0'), "
-        "not release_info.VERSION",
-        entries.get("Version") == "1.0",
-        entries.get("Version"),
-    )
-
-    print("\n[4] The real installer script produces a consistent, working install", flush=True)
-    with tempfile.TemporaryDirectory(prefix="cb-release-identity-") as tmp_home:
-        env = dict(os.environ)
-        env["HOME"] = tmp_home
-        proc = subprocess.run(
-            [sys.executable, str(APP_DIR / "scripts" / "install-desktop-entry.py")],
-            env=env,
-            capture_output=True,
-            text=True,
-            timeout=30,
-        )
-        results.check("installer script exits 0", proc.returncode == 0, proc.stderr[-500:])
-        installed_path = Path(tmp_home) / ".local" / "share" / "applications" / desktop_filename
-        results.check(
-            "installer wrote the desktop file under the APP_ID-derived filename",
-            installed_path.is_file(),
-            str(installed_path),
-        )
-        installed_entries = (
-            parse_desktop_entry(installed_path.read_text(encoding="utf-8"))
-            if installed_path.is_file()
-            else {}
-        )
-        results.check(
-            "installed entry's StartupWMClass matches release_info.APP_ID",
-            installed_entries.get("StartupWMClass") == release_info.APP_ID,
-            installed_entries.get("StartupWMClass"),
-        )
-        results.check(
-            "installer resolved @REPO_DIR@ to the real repo path",
-            installed_entries.get("Exec") == f"{APP_DIR}/run.sh",
-            installed_entries.get("Exec"),
-        )
 
     print("\n=== Summary ===", flush=True)
     print(f"Passed: {len(results.ok)}  Failed: {len(results.fail)}", flush=True)

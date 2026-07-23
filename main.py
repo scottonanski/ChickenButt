@@ -60,7 +60,7 @@ class ChickenButtApp(Adw.Application):
                 title=APP_NAME,
             )
             # Window icon: themed name + file fallback for the dock
-            self.window.set_icon_name("chickenbutt")
+            self.window.set_icon_name(APP_ID)
             self._apply_window_icon(self.window)
             ok = self.tray.start()
             if not ok:
@@ -124,10 +124,13 @@ class ChickenButtApp(Adw.Application):
             if display is None:
                 return
             theme = Gtk.IconTheme.get_for_display(display)
-            if theme.has_icon("chickenbutt"):
-                window.set_icon_name("chickenbutt")
+            if theme.has_icon(APP_ID):
+                window.set_icon_name(APP_ID)
                 return
-            # Fallback: load PNG from project tree
+            # Fallback: load PNG from project tree. These are private,
+            # untouched runtime file paths (see meson.build's private
+            # icons/ install) — not the public icon-theme name, which is
+            # APP_ID above.
             for rel in (
                 "icons/hicolor/128x128/apps/chickenbutt.png",
                 "icons/chickenbutt-dash-desktop-icon.svg",
@@ -140,7 +143,7 @@ class ChickenButtApp(Adw.Application):
                     texture = Gdk.Texture.new_from_filename(path)
                     # GTK4 ApplicationWindow: set via default icon list if available
                     if hasattr(window, "set_icon_name"):
-                        window.set_icon_name("chickenbutt")
+                        window.set_icon_name(APP_ID)
                     # Paint as paintable on the native surface when supported
                     if texture is not None and hasattr(Gtk, "Window"):
                         pass

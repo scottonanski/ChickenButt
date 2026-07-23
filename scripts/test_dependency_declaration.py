@@ -202,6 +202,40 @@ def main() -> int:
         results.check(f"[10] Fedora package {pkg!r} listed", pkg in deps_text)
     for pkg in ("python3-gi", "python3-dasbus", "gir1.2-gtk-4.0", "gir1.2-adw-1", "gir1.2-webkit-6.0"):
         results.check(f"[10] Ubuntu package {pkg!r} listed", pkg in deps_text)
+    # Both distros document the same two package names for the optional
+    # desktop-file-validate/appstreamcli validation tools.
+    results.check(
+        "[10] desktop-file-utils documented for both distros",
+        deps_text.count("desktop-file-utils") >= 2,
+        deps_text.count("desktop-file-utils"),
+    )
+    results.check(
+        "[10] appstream package documented for both distros",
+        deps_text.count("appstream") >= 2,
+        deps_text.count("appstream"),
+    )
+
+    print("\n[10b] check_dependencies.py declares desktop-file-validate/appstreamcli as optional --build tools", flush=True)
+    results.check(
+        "[10b] source declares a desktop-file-validate check",
+        "check_desktop_file_validate(r)" in checker_source,
+    )
+    results.check(
+        "[10b] source declares an appstreamcli check",
+        "check_appstreamcli(r)" in checker_source,
+    )
+    results.check(
+        "[10b] both are reported via r.optional(...), not r.required(...)",
+        'r.optional(\n        "desktop-file-validate"' in checker_source
+        and 'r.optional(\n        "appstreamcli"' in checker_source,
+    )
+    proc_build = run_checker(["--build"])
+    results.check(
+        "[10b] --build run never fails solely due to these two tools "
+        "(both present on this dev machine, reported PASS not skipped)",
+        "desktop-file-validate" in proc_build.stdout and "appstreamcli" in proc_build.stdout,
+        proc_build.stdout[-600:],
+    )
 
     print("\n[11]-[15] README.md content checks", flush=True)
     readme_text = README_MD.read_text(encoding="utf-8") if README_MD.is_file() else ""
@@ -219,8 +253,13 @@ def main() -> int:
         readme_text,
     )
     results.check(
-        "[14] README explicitly says desktop/AppStream integration is not installed by Meson yet",
-        "not installed by Meson yet" in readme_text,
+        "[14] README says AppStream metadata is now installed",
+        "AppStream metadata is installed" in readme_text,
+        readme_text,
+    )
+    results.check(
+        "[14] README says screenshot/release metadata and Flatpak packaging remain unfinished",
+        "remain unfinished" in readme_text,
         readme_text,
     )
     results.check("[15] vendored-code notice includes DOMPurify", "DOMPurify" in readme_text)
