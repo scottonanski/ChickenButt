@@ -93,14 +93,23 @@ CI integration that wasn't checked. Meson-dependent tests
 (`test_installed_layout.py`, `test_desktop_integration.py`) drive a real
 `meson install` into a temp prefix and verify installed-file correctness —
 but installed-file presence is not the same claim as runtime use (see §4).
-Note on RR-02 through RR-08/RR-12's execution: the environment those tasks
-were run in had no `meson`/`ninja` on PATH and no passwordless sudo to
-install them, so `test_installed_layout.py` self-skipped (its own
-documented behavior, `scripts/test_installed_layout.py:125-133`) rather
-than actually exercising a real install for those changes. The other 13
-scripts were run directly and did pass. A real `meson install` run is
-still outstanding for RR-04's and RR-08's `meson.build`/installed-layout
-claims specifically.
+Note on RR-02 through RR-08/RR-12's execution: at the time those tasks
+were done, the environment had no `meson`/`ninja` on PATH and no
+passwordless sudo to install them, so `test_installed_layout.py`
+self-skipped (its own documented behavior,
+`scripts/test_installed_layout.py:125-133`) rather than actually
+exercising a real install for those changes; the other 13 scripts were
+run directly and did pass. Scott then installed meson/ninja himself and
+ran both meson-dependent tests directly against unmerged `main`, which
+surfaced a real, previously-undiscovered bug (`find_pkglibdir()`'s
+single-level-deep glob failing on Debian/Ubuntu's multiarch libdir
+layout — see RR-13). Once meson/ninja became available in the execution
+environment too and RR-13's fix was applied, both scripts were re-run for
+real: `test_installed_layout.py` → 47 passed, 0 failed;
+`test_desktop_integration.py` → 37 passed, 0 failed. All 15/15 scripts in
+the documented suite now genuinely pass, not skipped — RR-04's and
+RR-08's `meson.build`/installed-layout claims are confirmed by a real
+install, not just static analysis.
 
 **Deliberate, load-bearing constraints — do not "fix" these without
 recognizing the cost:** the installed runtime is flat and un-namespaced by
@@ -330,7 +339,7 @@ restructuring, and none is proposed — nothing found in §4 requires one.
 | RR-10 | `ChatSidebar` responsibility reduction (scope TBD pending authorization) | §4 "Architectural concentration" (coupling counts independently re-derived above) | blocked — not authorized | none yet | any adopted extraction plan must be re-verified against current `main` at authorization time | Scott |
 | RR-11 | Final repository verification | all prior tasks | blocked — depends on RR-00 through RR-10 (and RR-12, RR-13) each reaching verified-complete, explicitly-retained, or explicitly-deferred status (§7) | none yet | full test run recorded, real build/install/run, `main` synced with `origin` | verification only |
 | RR-12 | Remove `tray.py`'s dead file-based icon lookup branch inside `_load_icon_pixmap` (`if icon_theme_path:` block, ~lines 99-117) | §4 "Dead or unreachable code" listed this finding (`tray.py`'s `_load_icon_pixmap`, `tray.py:98-113`) but it was never assigned a ticket in this ledger — found and fixed while executing RR-08; added here now | code complete, PR open, awaiting Scott's merge | PR #11 (`recovery/rr-12-remove-tray-file-lookup`) | confirmed `main.py`'s only `TrayIcon` construction site passes `icon_theme_path=""`, so the branch never executes; `TrayIcon`'s public `icon_theme_path` constructor param, `self._icon_theme_path`, and the `IconThemePath` DBus property left untouched (StatusNotifierItem interface contract, not dead code); 13/15 test scripts run directly, 0 failures | Scott (merge) |
-| RR-13 | Fix `find_pkglibdir()` in `scripts/test_installed_layout.py`: its glob only searched one directory level below any `lib*` root, so it never found the installed `chickenbutt/` dir on Debian/Ubuntu's multiarch libdir layout (e.g. `lib/x86_64-linux-gnu/chickenbutt`, two levels down) | Newly discovered — not previously in §4. Scott ran `test_installed_layout.py`/`test_desktop_integration.py` directly against unmerged `main` on his own machine (installing meson/ninja himself) and hit this; confirmed pre-existing and unrelated to RR-04/RR-08 — fails identically on unmodified `main` | code complete, PR open, awaiting Scott's merge and re-run confirmation | PR #13 (`recovery/rr-13-fix-pkglibdir-multiarch`) | unit-tested the fixed function against 3 synthetic layouts (plain, multiarch matching Scott's actual reported path, and a deliberately ambiguous two-match case that must still return `None`) — all 3 correct; 13/15 other test scripts run directly, 0 failures; real meson-based confirmation left to Scott, who has meson installed locally and is the one who found the bug | Scott (merge, and please re-run both scripts to confirm the fix actually resolves what you saw) |
+| RR-13 | Fix `find_pkglibdir()`: its glob only searched one directory level below any `lib*` root, so it never found the installed `chickenbutt/` dir on Debian/Ubuntu's multiarch libdir layout (e.g. `lib/x86_64-linux-gnu/chickenbutt`, two levels down). Fixed in both `scripts/test_installed_layout.py` **and** `scripts/test_desktop_integration.py`, which had a separately copy-pasted duplicate of the same function with the identical bug | Newly discovered — not previously in §4. Scott ran `test_installed_layout.py`/`test_desktop_integration.py` directly against unmerged `main` on his own machine (installing meson/ninja himself) and hit this; confirmed pre-existing and unrelated to RR-04/RR-08 — fails identically on unmodified `main` | code complete, PR open, awaiting Scott's merge | PR #13 (`recovery/rr-13-fix-pkglibdir-multiarch`) | meson/ninja became available in the execution environment partway through this task (Scott installed them); real verification then performed directly: `test_installed_layout.py` → 47 passed, 0 failed; `test_desktop_integration.py` → 37 passed, 0 failed; all 13 other test scripts re-run clean — all 15/15 scripts in the documented suite genuinely pass now, not skipped | Scott (merge) |
 
 ## 7. Decision log
 
