@@ -1,0 +1,64 @@
+Transcript: WebKit (default)
+
+[1] Startup sidebar state (despite a stale sidebar_open=true settings file)
+  PASS  sidebar hidden on startup
+  PASS  stale sidebar_open=true in settings.json was ignored
+  PASS  sidebar toggle button inactive on startup
+
+[2] Opening and closing the sidebar
+  PASS  toggle_sidebar(True) opens it
+  PASS  toggle button reflects open state
+  PASS  toggle_sidebar(False) closes it
+  PASS  toggle button reflects closed state
+
+[3] Model dropdown location
+  PASS  exactly one model dropdown, a descendant of the sidebar
+  PASS  model section appears after the conversation list — scroller=2 model=4
+  PASS  model section appears before the Settings footer — model=4 foot=5
+  PASS  model dropdown is no longer fixed to 320px wide — size_request=(-1, 38)
+  PASS  model dropdown keeps its 38px height — size_request=(-1, 38)
+
+[4] Health banner location
+  PASS  health banner is not a descendant of the sidebar
+  PASS  health banner shares the main-content container with the transcript
+
+[5] Model selection and last-model persistence (real refresh/select/load chain)
+  PASS  initial refresh selects and loads the first fake model — fake-model-a
+  PASS  last-model persisted after initial load — fake-model-a
+  PASS  selecting a different model in the dropdown still loads it — fake-model-b
+  PASS  last-model persistence follows the new selection — fake-model-b
+
+[6] GTK pointer cursor on representative click targets
+  PASS  sidebar toggle reports pointer cursor — pointer
+  PASS  clear conversation reports pointer cursor — pointer
+  PASS  refresh models reports pointer cursor — pointer
+  PASS  model dropdown reports pointer cursor — pointer
+  PASS  sidebar new chat reports pointer cursor — pointer
+  PASS  sidebar settings reports pointer cursor — pointer
+  PASS  health banner action reports pointer cursor — pointer
+  PASS  send reports pointer cursor — pointer
+  PASS  stop reports pointer cursor — pointer
+
+[7] Conversation row + overflow control pointer cursor
+  PASS  generated conversation row found
+  PASS  conversation row reports pointer cursor
+  PASS  row's overflow (more) button reports pointer cursor
+
+[8] WebKit computed cursor: pointer for interactive elements, not prose
+  PASS  link computed cursor is pointer — {'link': 'pointer', 'copyBtn': 'pointer', 'expandBtn': 'pointer', 'actionBtn': 'pointer', 'prose': 'auto'}
+  PASS  code copy control computed cursor is pointer — {'link': 'pointer', 'copyBtn': 'pointer', 'expandBtn': 'pointer', 'actionBtn': 'pointer', 'prose': 'auto'}
+  PASS  code expand control computed cursor is pointer — {'link': 'pointer', 'copyBtn': 'pointer', 'expandBtn': 'pointer', 'actionBtn': 'pointer', 'prose': 'auto'}
+  PASS  message-action control computed cursor is pointer — {'link': 'pointer', 'copyBtn': 'pointer', 'expandBtn': 'pointer', 'actionBtn': 'pointer', 'prose': 'auto'}
+  PASS  noninteractive prose text does NOT compute to pointer — {'link': 'pointer', 'copyBtn': 'pointer', 'expandBtn': 'pointer', 'actionBtn': 'pointer', 'prose': 'auto'}
+
+[9] A fresh ChatSidebar construction starts closed again
+Transcript: WebKit (default)
+Pruned 1 empty chat(s)
+Restored conversation conv-6631268… (1 messages)
+  PASS  a freshly constructed second window also starts with the sidebar hidden
+  PASS  its sidebar toggle button is also inactive
+
+=== Summary ===
+Passed: 37  Failed: 0
+
+(WebKitWebProcess:2): GLib-GIO-WARNING **: 16:30:23.043: Error releasing name dev.local.chickenbutt.sidebarinteractions.Sandboxed.WebProcess-4c75bae3-9060-445f-8010-37564f401707: The connection is closed

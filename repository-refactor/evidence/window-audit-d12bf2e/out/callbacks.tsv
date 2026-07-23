@@ -1,0 +1,56 @@
+registering_method	registration_line	mechanism	signal	callback	sync_timed_queued_threaded	enclosing_closure	source_text
+__init__	570	connect	close-request	self._handle_close_request	GObject/GTK signal handler (delivery deferred to signal emission)		"self.connect(""close-request"", self._handle_close_request)"
+__init__	572	connect	notify::dark	self._sync_empty_brand_icon	GObject/GTK signal handler (delivery deferred to signal emission)		"Adw.StyleManager.get_default().connect(\n                ""notify::dark"", self._sync_empty_brand_icon\n            )"
+__init__	579	connect	key-pressed	self._on_key	GObject/GTK signal handler (delivery deferred to signal emission)		"key.connect(""key-pressed"", self._on_key)"
+__init__	584	GLib.idle_add		self._refresh_models	queued (GLib.idle_add)		GLib.idle_add(self._refresh_models)
+_build_ui	658	connect	toggled	self._on_sidebar_toggled	GObject/GTK signal handler (delivery deferred to signal emission)		"sidebar_btn.connect(""toggled"", self._on_sidebar_toggled)"
+_build_ui	668	connect	clicked	lambda *_: self.clear_chat()	GObject/GTK signal handler (delivery deferred to signal emission)		"clear_btn.connect(""clicked"", lambda *_: self.clear_chat())"
+_build_ui	709	connect	activate	lambda *_: self.new_chat()	GObject/GTK signal handler (delivery deferred to signal emission)		"new_action.connect(""activate"", lambda *_: self.new_chat())"
+_build_ui	712	connect	activate	lambda *_: self.toggle_sidebar()	GObject/GTK signal handler (delivery deferred to signal emission)		"side_action.connect(""activate"", lambda *_: self.toggle_sidebar())"
+_build_ui	715	connect	activate	lambda *_: self.open_settings()	GObject/GTK signal handler (delivery deferred to signal emission)		"settings_action.connect(""activate"", lambda *_: self.open_settings())"
+_build_ui	718	connect	activate	"lambda *_: self.export_conversation(self._conversation_id or """", ""md"")"	GObject/GTK signal handler (delivery deferred to signal emission)		"exp_md.connect(\n            ""activate"",\n            lambda *_: self.export_conversation(self._conversation_id or """", ""md""),\n        )"
+_build_ui	724	connect	activate	"lambda *_: self.export_conversation(self._conversation_id or """", ""json"")"	GObject/GTK signal handler (delivery deferred to signal emission)		"exp_json.connect(\n            ""activate"",\n            lambda *_: self.export_conversation(self._conversation_id or """", ""json""),\n        )"
+_build_ui	731	connect	activate	lambda *_: self.hide_to_tray()	GObject/GTK signal handler (delivery deferred to signal emission)		"hide_action.connect(""activate"", lambda *_: self.hide_to_tray())"
+_build_ui	734	connect	activate	lambda *_: self.toggle_maximize()	GObject/GTK signal handler (delivery deferred to signal emission)		"max_action.connect(""activate"", lambda *_: self.toggle_maximize())"
+_build_ui	737	connect	activate	lambda *_: self.hide_to_tray()	GObject/GTK signal handler (delivery deferred to signal emission)		"close_action.connect(""activate"", lambda *_: self.hide_to_tray())"
+_build_ui	740	connect	activate	lambda *_: self._refresh_models()	GObject/GTK signal handler (delivery deferred to signal emission)		"refresh_action.connect(""activate"", lambda *_: self._refresh_models())"
+_build_ui	784	connect	clicked	self._on_health_action	GObject/GTK signal handler (delivery deferred to signal emission)		"self._health_action_btn.connect(""clicked"", self._on_health_action)"
+_build_ui	883	connect	changed	self._on_buffer_changed	GObject/GTK signal handler (delivery deferred to signal emission)		"buf.connect(""changed"", self._on_buffer_changed)"
+_build_ui	884	connect	insert-text	self._on_composer_insert_text	GObject/GTK signal handler (delivery deferred to signal emission)		"buf.connect(""insert-text"", self._on_composer_insert_text)"
+_build_ui	887	connect	key-pressed	self._on_input_key	GObject/GTK signal handler (delivery deferred to signal emission)		"input_key.connect(""key-pressed"", self._on_input_key)"
+_build_ui	898	connect	clicked	lambda *_: self._request_stop()	GObject/GTK signal handler (delivery deferred to signal emission)		"self.stop_btn.connect(""clicked"", lambda *_: self._request_stop())"
+_build_ui	924	connect	clicked	lambda *_: self._send()	GObject/GTK signal handler (delivery deferred to signal emission)		"self.send_btn.connect(""clicked"", lambda *_: self._send())"
+_build_ui	960	connect	realize	self._hook_composer_surface_layout	GObject/GTK signal handler (delivery deferred to signal emission)		"self.connect(""realize"", self._hook_composer_surface_layout)"
+_build_ui	961	connect	map	lambda *_: self._apply_composer_height()	GObject/GTK signal handler (delivery deferred to signal emission)		"self.connect(""map"", lambda *_: self._apply_composer_height())"
+_build_ui	1004	GLib.idle_add		self._rebuild_history_list	queued (GLib.idle_add)		GLib.idle_add(self._rebuild_history_list)
+_build_ui	1005	GLib.idle_add		self._refresh_chat_title	queued (GLib.idle_add)		GLib.idle_add(self._refresh_chat_title)
+_build_history_sidebar	1029	connect	clicked	lambda *_: self.new_chat()	GObject/GTK signal handler (delivery deferred to signal emission)		"new_btn.connect(""clicked"", lambda *_: self.new_chat())"
+_build_history_sidebar	1045	connect	row-activated	self._on_history_row_activated	GObject/GTK signal handler (delivery deferred to signal emission)		"self._history_list.connect(""row-activated"", self._on_history_row_activated)"
+_build_history_sidebar	1071	connect	notify::selected	self._on_model_selected	GObject/GTK signal handler (delivery deferred to signal emission)		"self.model_combo.connect(""notify::selected"", self._on_model_selected)"
+_build_history_sidebar	1093	connect	clicked	lambda *_: self.open_settings()	GObject/GTK signal handler (delivery deferred to signal emission)		"settings_btn.connect(""clicked"", lambda *_: self.open_settings())"
+open_settings	1148	connect	response	on_response	GObject/GTK signal handler (delivery deferred to signal emission)		"dialog.connect(""response"", on_response)"
+_hook_composer_surface_layout	1246	connect	layout	lambda *_: self._apply_composer_height()	GObject/GTK signal handler (delivery deferred to signal emission)		"surface.connect(""layout"", lambda *_: self._apply_composer_height())"
+_sync_composer_hint	1390	GLib.timeout_add		_hide	timed (timeout_add)		GLib.timeout_add(300, _hide)
+_on_buffer_changed	1433	GLib.idle_add		self._sync_composer_action_valign	queued (GLib.idle_add)		GLib.idle_add(self._sync_composer_action_valign)
+_make_chat_actions_popover	1774	connect	clicked	lambda _b: (pop.popdown(), handler())	GObject/GTK signal handler (delivery deferred to signal emission)	add_icon	"btn.connect(""clicked"", lambda _b: (pop.popdown(), handler()))"
+_confirm_delete_conversation	1915	connect	response	on_response	GObject/GTK signal handler (delivery deferred to signal emission)		"dialog.connect(""response"", on_response)"
+_persist_message	2094	GLib.idle_add		self._refresh_chat_title	queued (GLib.idle_add)		GLib.idle_add(self._refresh_chat_title)
+_refresh_models	2423	GLib.idle_add		self._on_ollama_probe	queued (GLib.idle_add)	work	GLib.idle_add(self._on_ollama_probe, result)
+_refresh_models	2425	threading.Thread		work	threaded		threading.Thread(target=work, daemon=True)
+_start_load_pulse	2632	GLib.timeout_add		tick	timed (timeout_add)		GLib.timeout_add(100, tick)
+_begin_model_load	2713	GLib.idle_add		self._on_load_status	queued (GLib.idle_add)	work	"GLib.idle_add(\n                        self._on_load_status,\n                        gen,\n                        model,\n                        ""Model already loaded"",\n                        ""Ready."",\n                        1.0,\n                    )"
+_begin_model_load	2722	GLib.idle_add		self._on_load_status	queued (GLib.idle_add)	work	"GLib.idle_add(\n                        self._on_load_status,\n                        gen,\n                        model,\n                        ""Loading model"",\n                        ""Warming weights into memory…"",\n                        None,\n                    )"
+_begin_model_load	2737	GLib.idle_add		self._on_load_chunk	queued (GLib.idle_add)	work	GLib.idle_add(self._on_load_chunk, gen, chunk)
+_begin_model_load	2742	GLib.idle_add		self._on_model_load_finished	queued (GLib.idle_add)	work	GLib.idle_add(self._on_model_load_finished, gen, model, err, greet)
+_begin_model_load	2744	threading.Thread		work	threaded		threading.Thread(target=work, daemon=True)
+_run_ollama_pull	3042	GLib.idle_add		lambda b=body: (\n                                self._update_status_message(mid, b, done=False) or False\n                            )	queued (GLib.idle_add)	work	GLib.idle_add(\n                            lambda b=body: (\n                                self._update_status_message(mid, b, done=False) or False\n                            )\n                        )
+_run_ollama_pull	3081	GLib.idle_add		done	queued (GLib.idle_add)	work	GLib.idle_add(done)
+_run_ollama_pull	3083	threading.Thread		work	threaded		threading.Thread(target=work, daemon=True)
+_run_ollama_info	3117	GLib.idle_add		done	queued (GLib.idle_add)	work	GLib.idle_add(done)
+_run_ollama_info	3119	threading.Thread		work	threaded		threading.Thread(target=work, daemon=True)
+_native_action_bar	3275	connect	clicked	handler	GObject/GTK signal handler (delivery deferred to signal emission)	icon_btn	"btn.connect(""clicked"", handler)"
+_native_action_bar	3346	connect	clicked	lambda *_: (\n                pop.popdown(),\n                self._clipboard_set(current_text()),\n            )	GObject/GTK signal handler (delivery deferred to signal emission)		"md_btn.connect(\n            ""clicked"",\n            lambda *_: (\n                pop.popdown(),\n                self._clipboard_set(current_text()),\n            ),\n        )"
+_native_edit_user	3398	connect	response	on_response	GObject/GTK signal handler (delivery deferred to signal emission)		"dialog.connect(""response"", on_response)"
+_scroll_to_end	3418	GLib.idle_add		_do	queued (GLib.idle_add)		GLib.idle_add(_do)
+_start_assistant_stream	3653	GLib.timeout_add		flush_stream	timed (timeout_add)		GLib.timeout_add(33, flush_stream)
+_start_assistant_stream	3672	threading.Thread		work	threaded		threading.Thread(target=work, daemon=True)

@@ -1,0 +1,1029 @@
+test_script	receiver_var	receiver_class	method	line	source_text
+test_dependency_declaration.py	subprocess	<unresolved>	run	43	subprocess.run(\n        [sys.executable, str(CHECKER), *(args or [])],\n        capture_output=True,\n        text=True,\n        env=env,\n        timeout=timeout,\n    )
+test_dependency_declaration.py	CHECKER	<unresolved>	read_text	54	"CHECKER.read_text(encoding=""utf-8"")"
+test_dependency_declaration.py	headless_env	<unresolved>	pop	59	headless_env.pop(var, None)
+test_dependency_declaration.py	results	Results	check	61	"results.check(\n        ""[1] check_dependencies.py exits 0 with no display/D-Bus session env vars"",\n        proc.returncode == 0,\n        f""rc={proc.returncode} stdout_tail={proc.stdout[-300:]!r} stderr_tail={proc.stderr[-300:]!r}"",\n    )"
+test_dependency_declaration.py	results	Results	check	68	"results.check(\n        ""[2] default run reports PASS for every required check on this dev machine"",\n        proc.returncode == 0 and ""FAIL"" not in proc.stdout,\n        proc.stdout,\n    )"
+test_dependency_declaration.py	results	Results	check	76	"results.check(\n            f""[3] source declares required namespace {ns}"",\n            f'check_gi_namespace(r, gi_module, ""{ns}""' in checker_source,\n        )"
+test_dependency_declaration.py	results	Results	check	80	"results.check(""[3] source declares a PyGObject (gi) check"", ""check_gi(r)"" in checker_source or ""PyGObject"" in checker_source)"
+test_dependency_declaration.py	results	Results	check	81	"results.check(""[3] source declares a dasbus check"", ""check_dasbus(r)"" in checker_source)"
+test_dependency_declaration.py	results	Results	check	85	"results.check(\n        ""[3] GdkPixbuf is declared optional, not required"",\n        'check_gi_namespace(r, gi_module, ""GdkPixbuf"", ""2.0"", optional=True)' in checker_source,\n    )"
+test_dependency_declaration.py	results	Results	check	89	"results.check(\n        ""[3] GtkSource is declared optional"",\n        'check_gi_namespace(r, gi_module, ""GtkSource"", ""5"", optional=True)' in checker_source,\n    )"
+test_dependency_declaration.py	results	Results	check	95	"results.check(\n        ""[4] default run exits 0 even though GtkSource reports SKIP on this machine"",\n        proc.returncode == 0 and ""GtkSource"" in proc.stdout,\n        proc.stdout,\n    )"
+test_dependency_declaration.py	results	Results	check	100	"results.check(\n        ""[4] GdkPixbuf is reported under Optional capability, not Required"",\n        proc.returncode == 0\n        and ""GdkPixbuf"" in proc.stdout.split(""=== Optional capability ==="")[-1].split(""=== External service ==="")[0],\n        proc.stdout,\n    )"
+test_dependency_declaration.py	no_ollama_env	<unresolved>	get	109	"no_ollama_env.get(""PATH"", """")"
+test_dependency_declaration.py	results	Results	check	113	"results.check(\n        ""[5] checker still exits 0 when ollama isn't on PATH"",\n        proc_no_ollama.returncode == 0,\n        f""rc={proc_no_ollama.returncode}"",\n    )"
+test_dependency_declaration.py	results	Results	check	118	"results.check(\n        ""[5] checker reports ollama as WARN, not FAIL"",\n        ""WARN"" in proc_no_ollama.stdout and ""ollama"" in proc_no_ollama.stdout.lower(),\n        proc_no_ollama.stdout,\n    )"
+test_dependency_declaration.py	results	Results	check	125	"results.check(""[6] source checks git"", ""check_git(r)"" in checker_source)"
+test_dependency_declaration.py	results	Results	check	126	"results.check(""[6] source checks meson"", ""check_meson(r)"" in checker_source)"
+test_dependency_declaration.py	results	Results	check	127	"results.check(""[6] source checks ninja"", ""check_ninja(r)"" in checker_source)"
+test_dependency_declaration.py	results	Results	check	128	"results.check(""[6] source enforces MIN_MESON = (0, 64, 0)"", ""MIN_MESON = (0, 64, 0)"" in checker_source)"
+test_dependency_declaration.py	tempfile	<unresolved>	TemporaryDirectory	130	"tempfile.TemporaryDirectory(prefix=""cb-fake-meson-"")"
+test_dependency_declaration.py	fake_meson	<unresolved>	write_text	135	"fake_meson.write_text(""#!/bin/sh\necho '0.50.0'\n"", encoding=""utf-8"")"
+test_dependency_declaration.py	fake_meson	<unresolved>	chmod	136	fake_meson.chmod(0o755)
+test_dependency_declaration.py	fake_git	<unresolved>	write_text	138	"fake_git.write_text(""#!/bin/sh\nexit 0\n"", encoding=""utf-8"")"
+test_dependency_declaration.py	fake_git	<unresolved>	chmod	139	fake_git.chmod(0o755)
+test_dependency_declaration.py	fake_ninja	<unresolved>	write_text	141	"fake_ninja.write_text(""#!/bin/sh\nexit 0\n"", encoding=""utf-8"")"
+test_dependency_declaration.py	fake_ninja	<unresolved>	chmod	142	fake_ninja.chmod(0o755)
+test_dependency_declaration.py	build_env	<unresolved>	get	145	build_env.get('PATH', '')
+test_dependency_declaration.py	results	Results	check	147	"results.check(\n            ""[6] a too-old fake meson (0.50.0) is correctly rejected by the version gate"",\n            proc_old_meson.returncode != 0 and ""meson"" in proc_old_meson.stdout.lower(),\n            proc_old_meson.stdout[-500:],\n        )"
+test_dependency_declaration.py	tempfile	<unresolved>	TemporaryDirectory	154	"tempfile.TemporaryDirectory(prefix=""cb-shadow-gi-"")"
+test_dependency_declaration.py	shadow_env	<unresolved>	get	159	"shadow_env.get(""PYTHONPATH"", """")"
+test_dependency_declaration.py	results	Results	check	161	"results.check(\n            ""[7] checker fails when gi cannot be imported"",\n            proc_shadow_gi.returncode != 0,\n            f""rc={proc_shadow_gi.returncode}"",\n        )"
+test_dependency_declaration.py	results	Results	check	166	"results.check(\n            ""[7] failure output names PyGObject/gi"",\n            ""PyGObject"" in proc_shadow_gi.stdout or ""gi)"" in proc_shadow_gi.stdout,\n            proc_shadow_gi.stdout,\n        )"
+test_dependency_declaration.py	tempfile	<unresolved>	TemporaryDirectory	173	"tempfile.TemporaryDirectory(prefix=""cb-shadow-dasbus-"")"
+test_dependency_declaration.py	shadow_env	<unresolved>	get	178	"shadow_env.get(""PYTHONPATH"", """")"
+test_dependency_declaration.py	results	Results	check	180	"results.check(\n            ""[8] checker fails when dasbus cannot be imported"",\n            proc_shadow_dasbus.returncode != 0,\n            f""rc={proc_shadow_dasbus.returncode}"",\n        )"
+test_dependency_declaration.py	results	Results	check	185	"results.check(\n            ""[8] failure output names dasbus"",\n            ""dasbus"" in proc_shadow_dasbus.stdout,\n            proc_shadow_dasbus.stdout,\n        )"
+test_dependency_declaration.py	results	Results	check	193	"results.check(f""[9] source never calls {forbidden!r}"", forbidden not in checker_source)"
+test_dependency_declaration.py	results	Results	check	194	"results.check(\n        ""[9] headless run (check [1]) completed without hanging (real evidence, not just source inspection)"",\n        proc.returncode == 0,\n    )"
+test_dependency_declaration.py	DEPENDENCIES_MD	<unresolved>	read_text	200	"DEPENDENCIES_MD.read_text(encoding=""utf-8"")"
+test_dependency_declaration.py	DEPENDENCIES_MD	<unresolved>	is_file	200	DEPENDENCIES_MD.is_file()
+test_dependency_declaration.py	results	Results	check	202	"results.check(f""[10] Fedora package {pkg!r} listed"", pkg in deps_text)"
+test_dependency_declaration.py	results	Results	check	204	"results.check(f""[10] Ubuntu package {pkg!r} listed"", pkg in deps_text)"
+test_dependency_declaration.py	results	Results	check	207	"results.check(\n        ""[10] desktop-file-utils documented for both distros"",\n        deps_text.count(""desktop-file-utils"") >= 2,\n        deps_text.count(""desktop-file-utils""),\n    )"
+test_dependency_declaration.py	deps_text	<unresolved>	count	209	"deps_text.count(""desktop-file-utils"")"
+test_dependency_declaration.py	deps_text	<unresolved>	count	210	"deps_text.count(""desktop-file-utils"")"
+test_dependency_declaration.py	results	Results	check	212	"results.check(\n        ""[10] appstream package documented for both distros"",\n        deps_text.count(""appstream"") >= 2,\n        deps_text.count(""appstream""),\n    )"
+test_dependency_declaration.py	deps_text	<unresolved>	count	214	"deps_text.count(""appstream"")"
+test_dependency_declaration.py	deps_text	<unresolved>	count	215	"deps_text.count(""appstream"")"
+test_dependency_declaration.py	results	Results	check	219	"results.check(\n        ""[10b] source declares a desktop-file-validate check"",\n        ""check_desktop_file_validate(r)"" in checker_source,\n    )"
+test_dependency_declaration.py	results	Results	check	223	"results.check(\n        ""[10b] source declares an appstreamcli check"",\n        ""check_appstreamcli(r)"" in checker_source,\n    )"
+test_dependency_declaration.py	results	Results	check	227	"results.check(\n        ""[10b] both are reported via r.optional(...), not r.required(...)"",\n        'r.optional(\n        ""desktop-file-validate""' in checker_source\n        and 'r.optional(\n        ""appstreamcli""' in checker_source,\n    )"
+test_dependency_declaration.py	results	Results	check	233	"results.check(\n        ""[10b] --build run never fails solely due to these two tools ""\n        ""(both present on this dev machine, reported PASS not skipped)"",\n        ""desktop-file-validate"" in proc_build.stdout and ""appstreamcli"" in proc_build.stdout,\n        proc_build.stdout[-600:],\n    )"
+test_dependency_declaration.py	README_MD	<unresolved>	read_text	241	"README_MD.read_text(encoding=""utf-8"")"
+test_dependency_declaration.py	README_MD	<unresolved>	is_file	241	README_MD.is_file()
+test_dependency_declaration.py	results	Results	check	242	"results.check(""[11] README links to DEPENDENCIES.md"", ""DEPENDENCIES.md"" in readme_text)"
+test_dependency_declaration.py	results	Results	check	243	"results.check(\n        ""[12] README contains the reproducible local-prefix meson commands"",\n        'meson setup build --prefix=""$HOME/.local""' in readme_text and ""meson install -C build"" in readme_text,\n    )"
+test_dependency_declaration.py	results	Results	check	247	"results.check(\n        ""[13] README does not recommend pip install of PyGObject/pygobject/dasbus"",\n        not any(\n            bad in readme_text.lower()\n            for bad in (""pip install pygobject"", ""pip install dasbus"")\n        ),\n        readme_text,\n    )"
+test_dependency_declaration.py	readme_text	<unresolved>	lower	250	readme_text.lower()
+test_dependency_declaration.py	results	Results	check	255	"results.check(\n        ""[14] README says AppStream metadata is now installed"",\n        ""AppStream metadata is installed"" in readme_text,\n        readme_text,\n    )"
+test_dependency_declaration.py	results	Results	check	260	"results.check(\n        ""[14] README says screenshot/release metadata and Flatpak packaging remain unfinished"",\n        ""remain unfinished"" in readme_text,\n        readme_text,\n    )"
+test_dependency_declaration.py	results	Results	check	265	"results.check(""[15] vendored-code notice includes DOMPurify"", ""DOMPurify"" in readme_text)"
+test_dependency_declaration.py	sys	<unresolved>	exit	276	sys.exit(main())
+test_dependency_declaration.py	traceback	<unresolved>	print_exc	280	traceback.print_exc()
+test_dependency_declaration.py	sys	<unresolved>	exit	281	sys.exit(2)
+test_desktop_integration.py	subprocess	<unresolved>	run	58	"subprocess.run(\n        [""git"", ""write-tree""], cwd=REPO_ROOT, capture_output=True, text=True, check=True\n    )"
+test_desktop_integration.py	subprocess	<unresolved>	run	61	"subprocess.run(\n        [""git"", ""archive"", ""--format=tar"", tree],\n        cwd=REPO_ROOT,\n        capture_output=True,\n        check=True,\n    )"
+test_desktop_integration.py	tarfile	<unresolved>	open	67	tarfile.open(fileobj=io.BytesIO(archive))
+test_desktop_integration.py	io	<unresolved>	BytesIO	67	io.BytesIO(archive)
+test_desktop_integration.py	tf	<unresolved>	extractall	68	tf.extractall(dest)
+test_desktop_integration.py	prefix	<unresolved>	glob	77	"prefix.glob(""lib*"")"
+test_desktop_integration.py	lib_root	<unresolved>	is_dir	78	lib_root.is_dir()
+test_desktop_integration.py	lib_root	<unresolved>	rglob	79	"lib_root.rglob(""chickenbutt"")"
+test_desktop_integration.py	p	<unresolved>	is_dir	80	p.is_dir()
+test_desktop_integration.py	text	<unresolved>	splitlines	87	text.splitlines()
+test_desktop_integration.py	line	<unresolved>	strip	88	line.strip()
+test_desktop_integration.py	line	<unresolved>	startswith	89	"line.startswith(""#"")"
+test_desktop_integration.py	line	<unresolved>	startswith	89	"line.startswith(""["")"
+test_desktop_integration.py	line	<unresolved>	partition	93	"line.partition(""="")"
+test_desktop_integration.py	key	<unresolved>	strip	94	key.strip()
+test_desktop_integration.py	value	<unresolved>	strip	94	value.strip()
+test_desktop_integration.py	shutil	<unresolved>	which	104	"shutil.which(""meson"")"
+test_desktop_integration.py	tempfile	<unresolved>	TemporaryDirectory	118	"tempfile.TemporaryDirectory(prefix=""cb-desktop-integration-"")"
+test_desktop_integration.py	src_dir	<unresolved>	mkdir	123	src_dir.mkdir()
+test_desktop_integration.py	subprocess	<unresolved>	run	127	"subprocess.run(\n            [meson, ""setup"", str(build_dir), f""--prefix={prefix}""],\n            cwd=src_dir, capture_output=True, text=True,\n        )"
+test_desktop_integration.py	results	Results	check	131	"results.check(""meson setup succeeds"", setup.returncode == 0, setup.stderr[-800:])"
+test_desktop_integration.py	subprocess	<unresolved>	run	132	"subprocess.run(\n            [meson, ""install"", ""-C"", str(build_dir)], capture_output=True, text=True,\n        )"
+test_desktop_integration.py	results	Results	check	135	"results.check(""meson install succeeds"", install.returncode == 0, install.stderr[-800:])"
+test_desktop_integration.py	results	Results	check	144	"results.check(""[1] desktop file exists under share/applications"", desktop_path.is_file(), str(desktop_path))"
+test_desktop_integration.py	desktop_path	<unresolved>	is_file	144	desktop_path.is_file()
+test_desktop_integration.py	applications_dir	<unresolved>	glob	145	"applications_dir.glob(""*.desktop"")"
+test_desktop_integration.py	applications_dir	<unresolved>	is_dir	145	applications_dir.is_dir()
+test_desktop_integration.py	results	Results	check	146	"results.check(\n            ""[2] its filename exactly matches APP_ID + '.desktop' (only one desktop file installed)"",\n            [p.name for p in matching] == [desktop_filename],\n            str([p.name for p in matching]),\n        )"
+test_desktop_integration.py	desktop_path	<unresolved>	read_text	152	"desktop_path.read_text(encoding=""utf-8"")"
+test_desktop_integration.py	desktop_path	<unresolved>	is_file	152	desktop_path.is_file()
+test_desktop_integration.py	results	Results	check	153	"results.check(""[3] Exec=chickenbutt"", entries.get(""Exec"") == ""chickenbutt"", entries.get(""Exec""))"
+test_desktop_integration.py	entries	<unresolved>	get	153	"entries.get(""Exec"")"
+test_desktop_integration.py	entries	<unresolved>	get	153	"entries.get(""Exec"")"
+test_desktop_integration.py	results	Results	check	154	"results.check(""[4] TryExec=chickenbutt"", entries.get(""TryExec"") == ""chickenbutt"", entries.get(""TryExec""))"
+test_desktop_integration.py	entries	<unresolved>	get	154	"entries.get(""TryExec"")"
+test_desktop_integration.py	entries	<unresolved>	get	154	"entries.get(""TryExec"")"
+test_desktop_integration.py	results	Results	check	155	"results.check(""[5] Icon exactly equals APP_ID"", entries.get(""Icon"") == APP_ID, entries.get(""Icon""))"
+test_desktop_integration.py	entries	<unresolved>	get	155	"entries.get(""Icon"")"
+test_desktop_integration.py	entries	<unresolved>	get	155	"entries.get(""Icon"")"
+test_desktop_integration.py	results	Results	check	156	"results.check(\n            ""[6] StartupWMClass exactly equals APP_ID"",\n            entries.get(""StartupWMClass"") == APP_ID,\n            entries.get(""StartupWMClass""),\n        )"
+test_desktop_integration.py	entries	<unresolved>	get	158	"entries.get(""StartupWMClass"")"
+test_desktop_integration.py	entries	<unresolved>	get	159	"entries.get(""StartupWMClass"")"
+test_desktop_integration.py	results	Results	check	161	"results.check(""[7] DBusActivatable=false"", entries.get(""DBusActivatable"") == ""false"", entries.get(""DBusActivatable""))"
+test_desktop_integration.py	entries	<unresolved>	get	161	"entries.get(""DBusActivatable"")"
+test_desktop_integration.py	entries	<unresolved>	get	161	"entries.get(""DBusActivatable"")"
+test_desktop_integration.py	desktop_path	<unresolved>	read_text	163	"desktop_path.read_text(encoding=""utf-8"")"
+test_desktop_integration.py	desktop_path	<unresolved>	is_file	163	desktop_path.is_file()
+test_desktop_integration.py	results	Results	check	164	"results.check(\n            ""[8] no checkout path, @REPO_DIR@, temp prefix or absolute executable path in the desktop file"",\n            ""@REPO_DIR@"" not in desktop_text\n            and str(REPO_ROOT) not in desktop_text\n            and str(prefix) not in desktop_text\n            and not re.search(r""Exec=/"", desktop_text)\n            and not re.search(r""TryExec=/"", desktop_text),\n            desktop_text,\n        )"
+test_desktop_integration.py	re	<unresolved>	search	169	"re.search(r""Exec=/"", desktop_text)"
+test_desktop_integration.py	re	<unresolved>	search	170	"re.search(r""TryExec=/"", desktop_text)"
+test_desktop_integration.py	shutil	<unresolved>	which	174	"shutil.which(""desktop-file-validate"")"
+test_desktop_integration.py	subprocess	<unresolved>	run	176	"subprocess.run(\n                [""desktop-file-validate"", str(desktop_path)], capture_output=True, text=True,\n            )"
+test_desktop_integration.py	results	Results	check	179	"results.check(\n                ""desktop-file-validate succeeds against the installed desktop file"",\n                dfv.returncode == 0,\n                (dfv.stdout + dfv.stderr).strip(),\n            )"
+test_desktop_integration.py	results	Results	check	190	"results.check(""[9] public SVG exists under the App-ID filename"", svg_path.is_file(), str(svg_path))"
+test_desktop_integration.py	svg_path	<unresolved>	is_file	190	svg_path.is_file()
+test_desktop_integration.py	results	Results	check	192	"results.check(\n            ""[10] no public chickenbutt.svg alias installed"",\n            not alias_path.exists(),\n            str(alias_path),\n        )"
+test_desktop_integration.py	alias_path	<unresolved>	exists	194	alias_path.exists()
+test_desktop_integration.py	results	Results	check	201	"results.check(""[11] metainfo file exists under share/metainfo"", metainfo_path.is_file(), str(metainfo_path))"
+test_desktop_integration.py	metainfo_path	<unresolved>	is_file	201	metainfo_path.is_file()
+test_desktop_integration.py	metainfo_path	<unresolved>	is_file	204	metainfo_path.is_file()
+test_desktop_integration.py	ET	<unresolved>	fromstring	206	"ET.fromstring(metainfo_path.read_text(encoding=""utf-8""))"
+test_desktop_integration.py	metainfo_path	<unresolved>	read_text	206	"metainfo_path.read_text(encoding=""utf-8"")"
+test_desktop_integration.py	results	Results	check	208	"results.check(""metainfo XML parses"", False, str(exc))"
+test_desktop_integration.py	root	<unresolved>	find	213	root.find(tag)
+test_desktop_integration.py	results	Results	check	216	"results.check(""[12] metainfo <id> equals APP_ID"", find_text(""id"") == APP_ID, find_text(""id""))"
+test_desktop_integration.py	root	<unresolved>	find	217	"root.find(""launchable"")"
+test_desktop_integration.py	results	Results	check	218	"results.check(\n            ""[13] launchable equals APP_ID + '.desktop'"",\n            launchable is not None and launchable.text == desktop_filename and launchable.get(""type"") == ""desktop-id"",\n            launchable.text if launchable is not None else None,\n        )"
+test_desktop_integration.py	launchable	<unresolved>	get	220	"launchable.get(""type"")"
+test_desktop_integration.py	root	<unresolved>	find	223	"root.find(""provides/binary"")"
+test_desktop_integration.py	results	Results	check	224	"results.check(\n            ""[14] binary provider is 'chickenbutt'"",\n            binary is not None and binary.text == ""chickenbutt"",\n            binary.text if binary is not None else None,\n        )"
+test_desktop_integration.py	results	Results	check	229	"results.check(\n            ""[15] project_license is GPL-3.0-or-later"",\n            find_text(""project_license"") == ""GPL-3.0-or-later"",\n            find_text(""project_license""),\n        )"
+test_desktop_integration.py	results	Results	check	234	"results.check(\n            ""[15] metadata_license is CC0-1.0"",\n            find_text(""metadata_license"") == ""CC0-1.0"",\n            find_text(""metadata_license""),\n        )"
+test_desktop_integration.py	root	<unresolved>	find	239	"root.find(""developer"")"
+test_desktop_integration.py	results	Results	check	240	"results.check(""[16] contains a <developer> element"", developer is not None)"
+test_desktop_integration.py	u	<unresolved>	get	241	"u.get(""type"")"
+test_desktop_integration.py	root	<unresolved>	findall	241	"root.findall(""url"")"
+test_desktop_integration.py	results	Results	check	242	"results.check(""[16] contains homepage url"", urls.get(""homepage"") == ""https://github.com/scottonanski/ChickenButt"", str(urls))"
+test_desktop_integration.py	urls	<unresolved>	get	242	"urls.get(""homepage"")"
+test_desktop_integration.py	results	Results	check	243	"results.check(""[16] contains vcs-browser url"", ""vcs-browser"" in urls, str(urls))"
+test_desktop_integration.py	results	Results	check	244	"results.check(""[16] contains bugtracker url"", ""bugtracker"" in urls, str(urls))"
+test_desktop_integration.py	results	Results	check	245	"results.check(\n            ""[16] contains OARS content_rating"",\n            root is not None and root.find(""content_rating[@type='oars-1.1']"") is not None,\n        )"
+test_desktop_integration.py	root	<unresolved>	find	247	"root.find(""content_rating[@type='oars-1.1']"")"
+test_desktop_integration.py	results	Results	check	249	"results.check(\n            ""[17] no fabricated <screenshots> element"",\n            root is None or root.find(""screenshots"") is None,\n        )"
+test_desktop_integration.py	root	<unresolved>	find	251	"root.find(""screenshots"")"
+test_desktop_integration.py	results	Results	check	253	"results.check(\n            ""[17] no fabricated <releases> element"",\n            root is None or root.find(""releases"") is None,\n        )"
+test_desktop_integration.py	root	<unresolved>	find	255	"root.find(""releases"")"
+test_desktop_integration.py	shutil	<unresolved>	which	258	"shutil.which(""appstreamcli"")"
+test_desktop_integration.py	subprocess	<unresolved>	run	260	"subprocess.run(\n                [""appstreamcli"", ""validate"", ""--no-net"", str(metainfo_path)],\n                capture_output=True, text=True,\n            )"
+test_desktop_integration.py	results	Results	check	264	"results.check(\n                ""appstreamcli validate succeeds (real schema/errors, not pedantic-only hints)"",\n                validate.returncode == 0,\n                (validate.stdout + validate.stderr).strip(),\n            )"
+test_desktop_integration.py	subprocess	<unresolved>	run	269	"subprocess.run(\n                [""appstreamcli"", ""validate"", ""--no-net"", ""--pedantic"", ""--explain"", str(metainfo_path)],\n                capture_output=True, text=True,\n            )"
+test_desktop_integration.py	pedantic_out	<unresolved>	splitlines	276	pedantic_out.splitlines()
+test_desktop_integration.py	line	<unresolved>	startswith	277	"line.startswith(""P:"")"
+test_desktop_integration.py	results	Results	check	284	"results.check(\n                ""no unexpected pedantic AppStream issues beyond the known pre-Flathub gaps"",\n                unexpected == [],\n                ""\n"".join(unexpected) if unexpected else pedantic_out,\n            )"
+test_desktop_integration.py	results	Results	check	295	"results.check(\n            ""[18] main.py contains no literal 'chickenbutt' icon-theme-name call"",\n            'set_icon_name(""chickenbutt"")' not in main_py_text\n            and 'has_icon(""chickenbutt"")' not in main_py_text,\n            main_py_text,\n        )"
+test_desktop_integration.py	results	Results	check	301	"results.check(\n            ""[18] main.py sets the window icon via APP_ID"",\n            ""set_icon_name(APP_ID)"" in main_py_text,\n        )"
+test_desktop_integration.py	results	Results	check	309	"results.check(""[19] old root desktop file is absent"", not old_desktop.exists(), str(old_desktop))"
+test_desktop_integration.py	old_desktop	<unresolved>	exists	309	old_desktop.exists()
+test_desktop_integration.py	results	Results	check	311	"results.check(""[20] scripts/install-desktop-entry.py is absent"", not old_installer.exists(), str(old_installer))"
+test_desktop_integration.py	old_installer	<unresolved>	exists	311	old_installer.exists()
+test_desktop_integration.py	results	Results	check	316	"results.check(""scripts/generate-icons.py exists"", generate_icons.is_file(), str(generate_icons))"
+test_desktop_integration.py	generate_icons	<unresolved>	is_file	316	generate_icons.is_file()
+test_desktop_integration.py	generate_icons	<unresolved>	read_text	317	"generate_icons.read_text(encoding=""utf-8"")"
+test_desktop_integration.py	generate_icons	<unresolved>	is_file	317	generate_icons.is_file()
+test_desktop_integration.py	results	Results	check	318	"results.check(\n            ""[21] no expanduser('~...') / .local/share/icons write path in generate-icons.py"",\n            ""expanduser"" not in generate_icons_text and "".local/share/icons"" not in generate_icons_text,\n            generate_icons_text,\n        )"
+test_desktop_integration.py	results	Results	check	323	"results.check(\n            ""[21] generate-icons.py never invokes gtk-update-icon-cache"",\n            ""gtk-update-icon-cache"" not in generate_icons_text\n            or ""runs gtk-update-icon-cache there"" in generate_icons_text,  # our own doc comment mentions it\n        )"
+test_desktop_integration.py	results	Results	check	330	"results.check(""resolved a single installed lib*/chickenbutt dir"", pkglibdir is not None, str(list(prefix.glob(""lib*""))))"
+test_desktop_integration.py	prefix	<unresolved>	glob	330	"prefix.glob(""lib*"")"
+test_desktop_integration.py	subprocess	<unresolved>	run	334	"subprocess.run(\n        [sys.executable, str(REPO_ROOT / ""scripts"" / ""test_installed_layout.py"")],\n        capture_output=True, text=True, timeout=180,\n    )"
+test_desktop_integration.py	results	Results	check	338	"results.check(\n        ""[22] scripts/test_installed_layout.py passes in full (independent run)"",\n        layout_test.returncode == 0,\n        layout_test.stdout[-1000:] + layout_test.stderr[-500:],\n    )"
+test_desktop_integration.py	sys	<unresolved>	exit	353	sys.exit(main())
+test_desktop_integration.py	traceback	<unresolved>	print_exc	357	traceback.print_exc()
+test_desktop_integration.py	sys	<unresolved>	exit	358	sys.exit(2)
+test_generation_lifecycle.py	tempfile	<unresolved>	mkdtemp	26	"tempfile.mkdtemp(prefix=""cb-lifecycle-"")"
+test_generation_lifecycle.py	gi	<unresolved>	require_version	35	"gi.require_version(""Gtk"", ""4.0"")"
+test_generation_lifecycle.py	gi	<unresolved>	require_version	36	"gi.require_version(""Adw"", ""1"")"
+test_generation_lifecycle.py	time	<unresolved>	time	60	time.time()
+test_generation_lifecycle.py	GLib	<unresolved>	main_context_default	61	GLib.main_context_default()
+test_generation_lifecycle.py	ctx	<unresolved>	pending	63	ctx.pending()
+test_generation_lifecycle.py	ctx	<unresolved>	iteration	64	ctx.iteration(False)
+test_generation_lifecycle.py	time	<unresolved>	time	65	time.time()
+test_generation_lifecycle.py	time	<unresolved>	sleep	67	time.sleep(0.02)
+test_generation_lifecycle.py	ctx	<unresolved>	pending	68	ctx.pending()
+test_generation_lifecycle.py	ctx	<unresolved>	iteration	69	ctx.iteration(False)
+test_generation_lifecycle.py	time	<unresolved>	time	73	time.time()
+test_generation_lifecycle.py	time	<unresolved>	time	74	time.time()
+test_generation_lifecycle.py	threading	<unresolved>	Event	91	threading.Event()
+test_generation_lifecycle.py	threading	<unresolved>	Event	92	threading.Event()
+test_generation_lifecycle.py	threading	<unresolved>	Event	93	threading.Event()
+test_generation_lifecycle.py	cancel_event	<unresolved>	is_set	104	cancel_event.is_set()
+test_generation_lifecycle.py	win	ChatSidebar	present	117	win.present()
+test_generation_lifecycle.py	Adw	<unresolved>	init	125	Adw.init()
+test_generation_lifecycle.py	Adw	<unresolved>	Application	126	"Adw.Application(\n        application_id=""dev.local.chickenbutt.lifecycle"",\n        flags=Gio.ApplicationFlags.NON_UNIQUE,\n    )"
+test_generation_lifecycle.py	win	ChatSidebar	present	135	win.present()
+test_generation_lifecycle.py	app	<unresolved>	connect	137	"app.connect(""activate"", on_activate)"
+test_generation_lifecycle.py	app	<unresolved>	register	138	app.register()
+test_generation_lifecycle.py	app	<unresolved>	activate	139	app.activate()
+test_generation_lifecycle.py	win	ChatSidebar	_persist_message	154	"win._persist_message(""user"", ""hi"", message_id=uid)"
+test_generation_lifecycle.py	win	ChatSidebar	_start_assistant_stream	155	"win._start_assistant_stream(mode=""new"")"
+test_generation_lifecycle.py	store	ConversationStore	create_conversation	159	"store.create_conversation(model=""model-x"")"
+test_generation_lifecycle.py	store	ConversationStore	create_conversation	160	"store.create_conversation(model=""model-x"")"
+test_generation_lifecycle.py	win	ChatSidebar	switch_conversation	169	win.switch_conversation(conv_b.id)
+test_generation_lifecycle.py	results	Results	check	170	"results.check(""switch clears _streaming immediately"", not win._streaming)"
+test_generation_lifecycle.py	results	Results	check	171	"results.check(""switch cleared active cancel handle"", win._active_stream_cancel is None)"
+test_generation_lifecycle.py	results	Results	check	172	"results.check(""conversation_id now B"", win._conversation_id == conv_b.id)"
+test_generation_lifecycle.py	s1	ScriptedStream	release	174	s1.release()
+test_generation_lifecycle.py	store	ConversationStore	list_messages	178	store.list_messages(conv_b.id)
+test_generation_lifecycle.py	store	ConversationStore	list_messages	179	store.list_messages(conv_a.id)
+test_generation_lifecycle.py	results	Results	check	180	"results.check(""no leaked content in B"", ""stream-A-secret "" not in b_msgs, str(b_msgs))"
+test_generation_lifecycle.py	results	Results	check	181	"results.check(""B has no assistant reply at all"", all(\n        m.role != ""assistant"" for m in store.list_messages(conv_b.id)\n    ))"
+test_generation_lifecycle.py	store	ConversationStore	list_messages	182	store.list_messages(conv_b.id)
+test_generation_lifecycle.py	results	Results	check	184	"results.check(\n        ""A keeps only its persisted user message (partial discarded)"",\n        a_msgs == [""hi""],\n        str(a_msgs),\n    )"
+test_generation_lifecycle.py	results	Results	check	189	"results.check(\n        ""in-memory _messages (now B's) untouched by stale stream"",\n        all(m.get(""content"") != ""stream-A-secret "" for m in win._messages),\n    )"
+test_generation_lifecycle.py	m	<unresolved>	get	191	"m.get(""content"")"
+test_generation_lifecycle.py	store	ConversationStore	create_conversation	196	"store.create_conversation(model=""model-x"")"
+test_generation_lifecycle.py	store	ConversationStore	create_conversation	197	"store.create_conversation(model=""model-x"")"
+test_generation_lifecycle.py	win	ChatSidebar	switch_conversation	205	win.switch_conversation(conv_b2.id)
+test_generation_lifecycle.py	win	ChatSidebar	switch_conversation	206	win.switch_conversation(conv_a2.id)
+test_generation_lifecycle.py	s_old	ScriptedStream	release	212	s_old.release()
+test_generation_lifecycle.py	s_new	ScriptedStream	release	214	s_new.release()
+test_generation_lifecycle.py	store	ConversationStore	list_messages	219	store.list_messages(conv_a2.id)
+test_generation_lifecycle.py	results	Results	check	220	"results.check(""old generation's text never persisted"", ""old-gen-text "" not in a2_msgs, str(a2_msgs))"
+test_generation_lifecycle.py	results	Results	check	221	"results.check(""new generation's text persisted"", ""new-gen-text"" in a2_msgs, str(a2_msgs))"
+test_generation_lifecycle.py	store	ConversationStore	create_conversation	225	"store.create_conversation(model=""model-x"")"
+test_generation_lifecycle.py	store	ConversationStore	create_conversation	226	"store.create_conversation(model=""model-x"")"
+test_generation_lifecycle.py	win	ChatSidebar	switch_conversation	234	win.switch_conversation(conv_d.id)
+test_generation_lifecycle.py	s3_old	ScriptedStream	release	240	s3_old.release()
+test_generation_lifecycle.py	results	Results	check	244	"results.check(\n        ""controls still reflect the CURRENT stream after stale completion"",\n        win._streaming and win.stop_btn.get_visible() and not win.send_btn.get_visible(),\n    )"
+test_generation_lifecycle.py	s3_new	ScriptedStream	release	249	s3_new.release()
+test_generation_lifecycle.py	store	ConversationStore	list_messages	253	store.list_messages(conv_d.id)
+test_generation_lifecycle.py	results	Results	check	254	"results.check(\n        ""current stream still completes and persists normally"",\n        any(""fresh"" in m and ""fresh-more"" in m for m in d_msgs),\n        str(d_msgs),\n    )"
+test_generation_lifecycle.py	store	ConversationStore	create_conversation	262	"store.create_conversation(model=""model-x"")"
+test_generation_lifecycle.py	s4	ScriptedStream	release	270	s4.release()
+test_generation_lifecycle.py	results	Results	check	273	"results.check(""worker called with the model captured at start"", s4.called_model == ""model-x"", s4.called_model)"
+test_generation_lifecycle.py	store	ConversationStore	create_conversation	277	"store.create_conversation(model=""model-x"")"
+test_generation_lifecycle.py	win	ChatSidebar	_request_stop	284	win._request_stop()
+test_generation_lifecycle.py	s5	ScriptedStream	release	285	s5.release()
+test_generation_lifecycle.py	store	ConversationStore	list_messages	290	store.list_messages(conv_f.id)
+test_generation_lifecycle.py	results	Results	check	291	"results.check(""manual stop cut generation short (no 'world')"", not any(""world"" in m for m in f_msgs), str(f_msgs))"
+test_generation_lifecycle.py	results	Results	check	292	"results.check(""manual stop kept the partial as the final message"", any(""Hello"" in m for m in f_msgs), str(f_msgs))"
+test_generation_lifecycle.py	store	ConversationStore	close	294	store.close()
+test_generation_lifecycle.py	os	<unresolved>	_exit	305	os._exit(code)
+test_generation_lifecycle.py	traceback	<unresolved>	print_exc	309	traceback.print_exc()
+test_generation_lifecycle.py	os	<unresolved>	_exit	310	os._exit(2)
+test_installed_layout.py	subprocess	<unresolved>	run	93	"subprocess.run(\n        [""git"", ""write-tree""], cwd=REPO_ROOT, capture_output=True, text=True, check=True\n    )"
+test_installed_layout.py	subprocess	<unresolved>	run	96	"subprocess.run(\n        [""git"", ""archive"", ""--format=tar"", tree],\n        cwd=REPO_ROOT,\n        capture_output=True,\n        check=True,\n    )"
+test_installed_layout.py	tarfile	<unresolved>	open	102	tarfile.open(fileobj=io.BytesIO(archive))
+test_installed_layout.py	io	<unresolved>	BytesIO	102	io.BytesIO(archive)
+test_installed_layout.py	tf	<unresolved>	extractall	103	tf.extractall(dest)
+test_installed_layout.py	prefix	<unresolved>	glob	112	"prefix.glob(""lib*"")"
+test_installed_layout.py	lib_root	<unresolved>	is_dir	113	lib_root.is_dir()
+test_installed_layout.py	lib_root	<unresolved>	rglob	114	"lib_root.rglob(""chickenbutt"")"
+test_installed_layout.py	p	<unresolved>	is_dir	115	p.is_dir()
+test_installed_layout.py	root	<unresolved>	rglob	122	"root.rglob(""*"")"
+test_installed_layout.py	name	<unresolved>	startswith	124	"name.startswith(""test_"")"
+test_installed_layout.py	name	<unresolved>	endswith	124	"name.endswith("".py"")"
+test_installed_layout.py	found	<unresolved>	append	125	found.append(str(p.relative_to(root)))
+test_installed_layout.py	p	<unresolved>	relative_to	125	p.relative_to(root)
+test_installed_layout.py	name	<unresolved>	endswith	126	"name.endswith("".db"")"
+test_installed_layout.py	name	<unresolved>	endswith	126	"name.endswith("".sqlite"")"
+test_installed_layout.py	found	<unresolved>	append	127	found.append(str(p.relative_to(root)))
+test_installed_layout.py	p	<unresolved>	relative_to	127	p.relative_to(root)
+test_installed_layout.py	shutil	<unresolved>	which	134	"shutil.which(""meson"")"
+test_installed_layout.py	tempfile	<unresolved>	TemporaryDirectory	144	"tempfile.TemporaryDirectory(prefix=""cb-installed-layout-"")"
+test_installed_layout.py	src_dir	<unresolved>	mkdir	149	src_dir.mkdir()
+test_installed_layout.py	results	Results	check	153	"results.check(""exported meson.build present"", (src_dir / ""meson.build"").is_file())"
+test_installed_layout.py	results	Results	check	154	"results.check(\n            ""exported main.py has no profiling import (clean commit-shaped tree)"",\n            ""import profiling"" not in (src_dir / ""main.py"").read_text(encoding=""utf-8""),\n        )"
+test_installed_layout.py	results	Results	check	158	"results.check(\n            ""untracked profiling.py did not get exported"",\n            not (src_dir / ""profiling.py"").exists(),\n        )"
+test_installed_layout.py	fake_py3_dir	<unresolved>	mkdir	169	fake_py3_dir.mkdir(parents=True)
+test_installed_layout.py	fake_python3	<unresolved>	write_text	171	"fake_python3.write_text(f""#!/bin/sh\nexec '{sys.executable}' \""$@\""\n"", encoding=""utf-8"")"
+test_installed_layout.py	fake_python3	<unresolved>	chmod	172	fake_python3.chmod(0o755)
+test_installed_layout.py	setup_env	<unresolved>	get	175	setup_env.get('PATH', '')
+test_installed_layout.py	subprocess	<unresolved>	run	177	"subprocess.run(\n            [meson, ""setup"", str(build_dir), f""--prefix={prefix}""],\n            cwd=src_dir,\n            capture_output=True,\n            text=True,\n            env=setup_env,\n        )"
+test_installed_layout.py	results	Results	check	184	"results.check(""meson setup succeeds"", setup.returncode == 0, setup.stderr[-800:])"
+test_installed_layout.py	results	Results	check	185	"results.check(\n            ""meson actually configured using the fake wrapper (the risk this test exercises is real)"",\n            str(fake_python3) in setup.stdout,\n            setup.stdout[-500:],\n        )"
+test_installed_layout.py	subprocess	<unresolved>	run	191	"subprocess.run(\n            [meson, ""install"", ""-C"", str(build_dir)],\n            capture_output=True,\n            text=True,\n        )"
+test_installed_layout.py	results	Results	check	196	"results.check(""meson install succeeds"", install.returncode == 0, install.stderr[-800:])"
+test_installed_layout.py	results	Results	check	199	"results.check(""[1] installed launcher exists"", launcher.is_file())"
+test_installed_layout.py	launcher	<unresolved>	is_file	199	launcher.is_file()
+test_installed_layout.py	results	Results	check	200	"results.check(\n            ""[1] installed launcher is executable"",\n            launcher.is_file() and os.access(launcher, os.X_OK),\n        )"
+test_installed_layout.py	launcher	<unresolved>	is_file	202	launcher.is_file()
+test_installed_layout.py	os	<unresolved>	access	202	os.access(launcher, os.X_OK)
+test_installed_layout.py	launcher	<unresolved>	read_text	206	"launcher.read_text(encoding=""utf-8"")"
+test_installed_layout.py	launcher	<unresolved>	is_file	206	launcher.is_file()
+test_installed_layout.py	results	Results	check	207	"results.check(\n            ""[2] launcher script contains the configured temp prefix"",\n            str(prefix) in launcher_text,\n            launcher_text,\n        )"
+test_installed_layout.py	results	Results	check	212	"results.check(\n            ""[2] launcher script does not contain the ChickenButt checkout path"",\n            str(REPO_ROOT) not in launcher_text,\n            launcher_text,\n        )"
+test_installed_layout.py	results	Results	check	217	"results.check(\n            ""launcher does not embed the fake configure-time python3 wrapper's path"",\n            str(fake_python3) not in launcher_text and str(fake_py3_dir) not in launcher_text,\n            launcher_text,\n        )"
+test_installed_layout.py	results	Results	check	222	"results.check(\n            ""launcher resolves python3 unqualified (via runtime PATH), not any absolute interpreter path"",\n            ""exec python3 "" in launcher_text,\n            launcher_text,\n        )"
+test_installed_layout.py	results	Results	check	229	"results.check(""resolved a single installed lib*/chickenbutt dir"", pkglibdir is not None, str(list(prefix.glob(""lib*""))))"
+test_installed_layout.py	prefix	<unresolved>	glob	229	"prefix.glob(""lib*"")"
+test_installed_layout.py	shutil	<unresolved>	rmtree	232	"shutil.rmtree(tmp_path / ""fake-configure-time-venv"")"
+test_installed_layout.py	tempfile	<unresolved>	gettempdir	237	tempfile.gettempdir()
+test_installed_layout.py	subprocess	<unresolved>	run	238	"subprocess.run(\n            [str(launcher), ""--version""],\n            cwd=unrelated_cwd,\n            capture_output=True,\n            text=True,\n            env=runtime_env,\n        )"
+test_installed_layout.py	results	Results	check	245	"results.check(\n            ""[3] `chickenbutt --version` exits 0 after the configure-time venv is gone"",\n            run.returncode == 0,\n            f""rc={run.returncode} stderr={run.stderr[-500:]}"",\n        )"
+test_installed_layout.py	results	Results	check	250	"results.check(\n            ""[3] `chickenbutt --version` prints exactly 'ChickenButt 0.1.0'"",\n            run.stdout.strip() == ""ChickenButt 0.1.0"",\n            repr(run.stdout),\n        )"
+test_installed_layout.py	results	Results	check	259	"results.check(f""[4] {mod} installed"", (pkglibdir / mod).is_file())"
+test_installed_layout.py	results	Results	check	263	"results.check(f""[5] {res} installed"", (pkglibdir / res).is_file())"
+test_installed_layout.py	compileall	<unresolved>	compile_dir	266	compileall.compile_dir(str(pkglibdir), quiet=1, force=True)
+test_installed_layout.py	results	Results	check	267	"results.check(""[6] compileall succeeds on the installed tree"", bool(compiled_ok))"
+test_installed_layout.py	subprocess	<unresolved>	run	270	"subprocess.run(\n                [\n                    sys.executable,\n                    ""-c"",\n                    ""import sys; sys.path.insert(0, sys.argv[1]); ""\n                    ""import release_info, conversation_store, ollama_client, ""\n                    ""message_widgets, transcript_view; ""\n                    ""print('OK'); ""\n                    ""print(str(transcript_view.WEB_DIR)); ""\n                    ""print((transcript_view.WEB_DIR / 'index.html').is_file())"",\n                    str(pkglibdir),\n                ],\n                capture_output=True,\n                text=True,\n            )"
+test_installed_layout.py	results	Results	check	286	"results.check(\n                ""[7] release_info/conversation_store/ollama_client/message_widgets/transcript_view all import"",\n                import_check.returncode == 0 and out_lines[:1] == [""OK""],\n                import_check.stderr[-500:],\n            )"
+test_installed_layout.py	results	Results	check	292	"results.check(\n                ""[8] transcript_view.WEB_DIR points into the installed prefix"",\n                web_dir_line.startswith(str(prefix)),\n                web_dir_line,\n            )"
+test_installed_layout.py	web_dir_line	<unresolved>	startswith	294	web_dir_line.startswith(str(prefix))
+test_installed_layout.py	results	Results	check	297	"results.check(\n                ""[8] transcript_view.WEB_DIR contains index.html"",\n                (out_lines[2] if len(out_lines) > 2 else """") == ""True"",\n                str(out_lines),\n            )"
+test_installed_layout.py	results	Results	check	305	"results.check(f""[9] {name} not installed anywhere"", not any(prefix.rglob(name)))"
+test_installed_layout.py	prefix	<unresolved>	rglob	305	prefix.rglob(name)
+test_installed_layout.py	results	Results	check	307	"results.check(""[9] no .git, test_*.py, .db/.sqlite files anywhere in prefix"", stray == [], str(stray))"
+test_installed_layout.py	subprocess	<unresolved>	run	310	"subprocess.run(\n        [""./run.sh"", ""--version""], cwd=REPO_ROOT, capture_output=True, text=True\n    )"
+test_installed_layout.py	results	Results	check	313	"results.check(\n        ""[10] ./run.sh --version exits 0 and prints 'ChickenButt 0.1.0'"",\n        run_sh.returncode == 0 and run_sh.stdout.strip() == ""ChickenButt 0.1.0"",\n        f""rc={run_sh.returncode} stdout={run_sh.stdout!r} stderr={run_sh.stderr[-300:]!r}"",\n    )"
+test_installed_layout.py	sys	<unresolved>	exit	328	sys.exit(main())
+test_installed_layout.py	traceback	<unresolved>	print_exc	332	traceback.print_exc()
+test_installed_layout.py	sys	<unresolved>	exit	333	sys.exit(2)
+test_markdown_sanitization.py	tempfile	<unresolved>	mkdtemp	20	"tempfile.mkdtemp(prefix=""cb-md-sanitize-"")"
+test_markdown_sanitization.py	gi	<unresolved>	require_version	28	"gi.require_version(""Gtk"", ""4.0"")"
+test_markdown_sanitization.py	gi	<unresolved>	require_version	29	"gi.require_version(""Adw"", ""1"")"
+test_markdown_sanitization.py	GLib	<unresolved>	main_context_default	52	GLib.main_context_default()
+test_markdown_sanitization.py	time	<unresolved>	time	53	time.time()
+test_markdown_sanitization.py	ctx	<unresolved>	pending	55	ctx.pending()
+test_markdown_sanitization.py	ctx	<unresolved>	iteration	56	ctx.iteration(False)
+test_markdown_sanitization.py	time	<unresolved>	time	57	time.time()
+test_markdown_sanitization.py	time	<unresolved>	sleep	59	time.sleep(0.01)
+test_markdown_sanitization.py	time	<unresolved>	time	63	time.time()
+test_markdown_sanitization.py	time	<unresolved>	time	64	time.time()
+test_markdown_sanitization.py	captured	<unresolved>	pop	179	"captured.pop(""found"", None)"
+test_markdown_sanitization.py	results	<unresolved>	check	186	"results.check(f""[{label}] row found in DOM"", r.get(""found"") is True, str(r)[:200])"
+test_markdown_sanitization.py	r	<unresolved>	get	186	"r.get(""found"")"
+test_markdown_sanitization.py	results	<unresolved>	check	187	"results.check(f""[{label}] no <script> element"", r.get(""scriptTags"") == 0, str(r.get(""scriptTags"")))"
+test_markdown_sanitization.py	r	<unresolved>	get	187	"r.get(""scriptTags"")"
+test_markdown_sanitization.py	r	<unresolved>	get	187	"r.get(""scriptTags"")"
+test_markdown_sanitization.py	results	<unresolved>	check	188	"results.check(f""[{label}] no <iframe> element"", r.get(""iframeTags"") == 0, str(r.get(""iframeTags"")))"
+test_markdown_sanitization.py	r	<unresolved>	get	188	"r.get(""iframeTags"")"
+test_markdown_sanitization.py	r	<unresolved>	get	188	"r.get(""iframeTags"")"
+test_markdown_sanitization.py	results	<unresolved>	check	189	"results.check(f""[{label}] no <svg> element"", r.get(""svgTags"") == 0, str(r.get(""svgTags"")))"
+test_markdown_sanitization.py	r	<unresolved>	get	189	"r.get(""svgTags"")"
+test_markdown_sanitization.py	r	<unresolved>	get	189	"r.get(""svgTags"")"
+test_markdown_sanitization.py	results	<unresolved>	check	190	"results.check(f""[{label}] no <img> element"", r.get(""imgTags"") == 0, str(r.get(""imgTags"")))"
+test_markdown_sanitization.py	r	<unresolved>	get	190	"r.get(""imgTags"")"
+test_markdown_sanitization.py	r	<unresolved>	get	190	"r.get(""imgTags"")"
+test_markdown_sanitization.py	results	<unresolved>	check	191	"results.check(f""[{label}] no <video> element"", r.get(""videoTags"") == 0, str(r.get(""videoTags"")))"
+test_markdown_sanitization.py	r	<unresolved>	get	191	"r.get(""videoTags"")"
+test_markdown_sanitization.py	r	<unresolved>	get	191	"r.get(""videoTags"")"
+test_markdown_sanitization.py	results	<unresolved>	check	192	"results.check(f""[{label}] no <audio> element"", r.get(""audioTags"") == 0, str(r.get(""audioTags"")))"
+test_markdown_sanitization.py	r	<unresolved>	get	192	"r.get(""audioTags"")"
+test_markdown_sanitization.py	r	<unresolved>	get	192	"r.get(""audioTags"")"
+test_markdown_sanitization.py	results	<unresolved>	check	193	"results.check(f""[{label}] no <object> element"", r.get(""objectTags"") == 0, str(r.get(""objectTags"")))"
+test_markdown_sanitization.py	r	<unresolved>	get	193	"r.get(""objectTags"")"
+test_markdown_sanitization.py	r	<unresolved>	get	193	"r.get(""objectTags"")"
+test_markdown_sanitization.py	results	<unresolved>	check	194	"results.check(f""[{label}] no <embed> element"", r.get(""embedTags"") == 0, str(r.get(""embedTags"")))"
+test_markdown_sanitization.py	r	<unresolved>	get	194	"r.get(""embedTags"")"
+test_markdown_sanitization.py	r	<unresolved>	get	194	"r.get(""embedTags"")"
+test_markdown_sanitization.py	results	<unresolved>	check	195	"results.check(f""[{label}] no <picture> element"", r.get(""pictureTags"") == 0, str(r.get(""pictureTags"")))"
+test_markdown_sanitization.py	r	<unresolved>	get	195	"r.get(""pictureTags"")"
+test_markdown_sanitization.py	r	<unresolved>	get	195	"r.get(""pictureTags"")"
+test_markdown_sanitization.py	results	<unresolved>	check	196	"results.check(f""[{label}] no <source> element"", r.get(""sourceTags"") == 0, str(r.get(""sourceTags"")))"
+test_markdown_sanitization.py	r	<unresolved>	get	196	"r.get(""sourceTags"")"
+test_markdown_sanitization.py	r	<unresolved>	get	196	"r.get(""sourceTags"")"
+test_markdown_sanitization.py	results	<unresolved>	check	197	"results.check(f""[{label}] no style attribute survives"", r.get(""styledEls"") == 0, str(r.get(""styledEls"")))"
+test_markdown_sanitization.py	r	<unresolved>	get	197	"r.get(""styledEls"")"
+test_markdown_sanitization.py	r	<unresolved>	get	197	"r.get(""styledEls"")"
+test_markdown_sanitization.py	results	<unresolved>	check	198	"results.check(f""[{label}] no onerror attribute survives"", r.get(""onErrorEls"") == 0, str(r.get(""onErrorEls"")))"
+test_markdown_sanitization.py	r	<unresolved>	get	198	"r.get(""onErrorEls"")"
+test_markdown_sanitization.py	r	<unresolved>	get	198	"r.get(""onErrorEls"")"
+test_markdown_sanitization.py	results	<unresolved>	check	199	"results.check(f""[{label}] no onclick attribute survives"", r.get(""onClickEls"") == 0, str(r.get(""onClickEls"")))"
+test_markdown_sanitization.py	r	<unresolved>	get	199	"r.get(""onClickEls"")"
+test_markdown_sanitization.py	r	<unresolved>	get	199	"r.get(""onClickEls"")"
+test_markdown_sanitization.py	results	<unresolved>	check	200	"results.check(f""[{label}] no onload attribute survives"", r.get(""onLoadEls"") == 0, str(r.get(""onLoadEls"")))"
+test_markdown_sanitization.py	r	<unresolved>	get	200	"r.get(""onLoadEls"")"
+test_markdown_sanitization.py	r	<unresolved>	get	200	"r.get(""onLoadEls"")"
+test_markdown_sanitization.py	results	<unresolved>	check	201	"results.check(\n        f""[{label}] no unsafe URL scheme survives in any href"",\n        r.get(""badHref"") is False,\n        str(r.get(""hrefs"")),\n    )"
+test_markdown_sanitization.py	r	<unresolved>	get	203	"r.get(""badHref"")"
+test_markdown_sanitization.py	r	<unresolved>	get	204	"r.get(""hrefs"")"
+test_markdown_sanitization.py	results	<unresolved>	check	206	"results.check(\n        f""[{label}] malicious HTML inside fenced code stays literal text"",\n        any(""<script>"" in (t or """") for t in (r.get(""codeTexts"") or [])),\n        str(r.get(""codeTexts"")),\n    )"
+test_markdown_sanitization.py	r	<unresolved>	get	208	"r.get(""codeTexts"")"
+test_markdown_sanitization.py	r	<unresolved>	get	209	"r.get(""codeTexts"")"
+test_markdown_sanitization.py	results	<unresolved>	check	214	"results.check(f""[{label}] heading rendered"", r.get(""h2Count"", 0) >= 1, str(r.get(""h2Count"")))"
+test_markdown_sanitization.py	r	<unresolved>	get	214	"r.get(""h2Count"", 0)"
+test_markdown_sanitization.py	r	<unresolved>	get	214	"r.get(""h2Count"")"
+test_markdown_sanitization.py	results	<unresolved>	check	215	"results.check(f""[{label}] emphasis rendered"", r.get(""emCount"", 0) >= 1, str(r.get(""emCount"")))"
+test_markdown_sanitization.py	r	<unresolved>	get	215	"r.get(""emCount"", 0)"
+test_markdown_sanitization.py	r	<unresolved>	get	215	"r.get(""emCount"")"
+test_markdown_sanitization.py	results	<unresolved>	check	216	"results.check(f""[{label}] bold rendered"", r.get(""strongCount"", 0) >= 1, str(r.get(""strongCount"")))"
+test_markdown_sanitization.py	r	<unresolved>	get	216	"r.get(""strongCount"", 0)"
+test_markdown_sanitization.py	r	<unresolved>	get	216	"r.get(""strongCount"")"
+test_markdown_sanitization.py	results	<unresolved>	check	217	"results.check(f""[{label}] list items rendered"", r.get(""listItemCount"", 0) >= 3, str(r.get(""listItemCount"")))"
+test_markdown_sanitization.py	r	<unresolved>	get	217	"r.get(""listItemCount"", 0)"
+test_markdown_sanitization.py	r	<unresolved>	get	217	"r.get(""listItemCount"")"
+test_markdown_sanitization.py	results	<unresolved>	check	218	"results.check(f""[{label}] blockquote rendered"", r.get(""blockquoteCount"", 0) >= 1, str(r.get(""blockquoteCount"")))"
+test_markdown_sanitization.py	r	<unresolved>	get	218	"r.get(""blockquoteCount"", 0)"
+test_markdown_sanitization.py	r	<unresolved>	get	218	"r.get(""blockquoteCount"")"
+test_markdown_sanitization.py	results	<unresolved>	check	219	"results.check(f""[{label}] GFM table still renders"", r.get(""tableCount"", 0) >= 1, str(r.get(""tableCount"")))"
+test_markdown_sanitization.py	r	<unresolved>	get	219	"r.get(""tableCount"", 0)"
+test_markdown_sanitization.py	r	<unresolved>	get	219	"r.get(""tableCount"")"
+test_markdown_sanitization.py	results	<unresolved>	check	220	"results.check(f""[{label}] fenced code is highlighted"", r.get(""hljsCount"", 0) >= 1, str(r.get(""hljsCount"")))"
+test_markdown_sanitization.py	r	<unresolved>	get	220	"r.get(""hljsCount"", 0)"
+test_markdown_sanitization.py	r	<unresolved>	get	220	"r.get(""hljsCount"")"
+test_markdown_sanitization.py	results	<unresolved>	check	221	"results.check(f""[{label}] copy control wired"", r.get(""copyBtns"", 0) >= 1, str(r.get(""copyBtns"")))"
+test_markdown_sanitization.py	r	<unresolved>	get	221	"r.get(""copyBtns"", 0)"
+test_markdown_sanitization.py	r	<unresolved>	get	221	"r.get(""copyBtns"")"
+test_markdown_sanitization.py	results	<unresolved>	check	222	"results.check(f""[{label}] expand control wired"", r.get(""expandBtns"", 0) >= 1, str(r.get(""expandBtns"")))"
+test_markdown_sanitization.py	r	<unresolved>	get	222	"r.get(""expandBtns"", 0)"
+test_markdown_sanitization.py	r	<unresolved>	get	222	"r.get(""expandBtns"")"
+test_markdown_sanitization.py	r	<unresolved>	get	224	"r.get(""hrefs"")"
+test_markdown_sanitization.py	results	<unresolved>	check	226	"results.check(f""[{label}] safe https:// link preserved"", safe_href_present, str(r.get(""hrefs"")))"
+test_markdown_sanitization.py	r	<unresolved>	get	226	"r.get(""hrefs"")"
+test_markdown_sanitization.py	Adw	<unresolved>	init	232	Adw.init()
+test_markdown_sanitization.py	Adw	<unresolved>	Application	233	"Adw.Application(\n        application_id=""dev.local.chickenbutt.mdsanitize"",\n        flags=Gio.ApplicationFlags.NON_UNIQUE,\n    )"
+test_markdown_sanitization.py	holder['w']	ChatSidebar	present	241	"holder[""w""].present()"
+test_markdown_sanitization.py	app	<unresolved>	connect	243	"app.connect(""activate"", on_activate)"
+test_markdown_sanitization.py	app	<unresolved>	register	244	app.register()
+test_markdown_sanitization.py	app	<unresolved>	activate	245	app.activate()
+test_markdown_sanitization.py	payload	<unresolved>	get	256	"payload.get(""type"")"
+test_markdown_sanitization.py	captured	<unresolved>	update	258	captured.update(payload)
+test_markdown_sanitization.py	marker_val	<unresolved>	update	260	marker_val.update(payload)
+test_markdown_sanitization.py	store	ConversationStore	create_conversation	271	"store.create_conversation(model=""m"")"
+test_markdown_sanitization.py	store	ConversationStore	append_message	272	"store.append_message(target.id, role=""user"", content=""hi"", message_id=""u-restore"")"
+test_markdown_sanitization.py	store	ConversationStore	append_message	273	"store.append_message(target.id, role=""assistant"", content=MALICIOUS_MD, message_id=""m-mal-restore"")"
+test_markdown_sanitization.py	store	ConversationStore	append_message	274	"store.append_message(target.id, role=""assistant"", content=SAFE_MD, message_id=""m-safe-restore"")"
+test_markdown_sanitization.py	store	ConversationStore	create_conversation	278	"store.create_conversation(model=""idle"")"
+test_markdown_sanitization.py	win	ChatSidebar	switch_conversation	281	win.switch_conversation(target.id)
+test_markdown_sanitization.py	results	Results	check	284	"results.check(""restore completed (3 messages)"", ok, f""got {len(win._messages)}"")"
+test_markdown_sanitization.py	store	ConversationStore	create_conversation	293	"store.create_conversation(model=""model-x"")"
+test_markdown_sanitization.py	win	ChatSidebar	_persist_message	306	"win._persist_message(""user"", ""trigger"", message_id=""u-live"")"
+test_markdown_sanitization.py	win	ChatSidebar	_start_assistant_stream	307	"win._start_assistant_stream(mode=""new"")"
+test_markdown_sanitization.py	results	Results	check	310	"results.check(""live stream completed"", ok)"
+test_markdown_sanitization.py	m	<unresolved>	get	313	"m.get(""role"")"
+test_markdown_sanitization.py	m	<unresolved>	get	314	"m.get(""id"")"
+test_markdown_sanitization.py	results	Results	check	316	"results.check(""assistant message id captured"", assistant_id is not None, str(win._messages))"
+test_markdown_sanitization.py	results	Results	check	354	"results.check(\n        ""no execution marker triggered across any scenario"",\n        marker_val.get(""n"") == 0,\n        f""marker={marker_val.get('n')}"",\n    )"
+test_markdown_sanitization.py	marker_val	<unresolved>	get	356	"marker_val.get(""n"")"
+test_markdown_sanitization.py	marker_val	<unresolved>	get	357	marker_val.get('n')
+test_markdown_sanitization.py	results	Results	check	359	"results.check(\n        ""code-fenced <script> never executed either"",\n        marker_val.get(""inCode"") is False,\n        f""inCode={marker_val.get('inCode')}"",\n    )"
+test_markdown_sanitization.py	marker_val	<unresolved>	get	361	"marker_val.get(""inCode"")"
+test_markdown_sanitization.py	marker_val	<unresolved>	get	362	marker_val.get('inCode')
+test_markdown_sanitization.py	results	Results	check	382	"results.check(\n        ""fail-closed: no <script> element even without DOMPurify"",\n        r_nopurify.get(""scriptTags"") == 0,\n        str(r_nopurify.get(""scriptTags"")),\n    )"
+test_markdown_sanitization.py	r_nopurify	<unresolved>	get	384	"r_nopurify.get(""scriptTags"")"
+test_markdown_sanitization.py	r_nopurify	<unresolved>	get	385	"r_nopurify.get(""scriptTags"")"
+test_markdown_sanitization.py	results	Results	check	387	"results.check(\n        ""fail-closed: no <iframe>/<svg>/<img> element without DOMPurify"",\n        r_nopurify.get(""iframeTags"") == 0\n        and r_nopurify.get(""svgTags"") == 0\n        and r_nopurify.get(""imgTags"") == 0,\n        str((r_nopurify.get(""iframeTags""), r_nopurify.get(""svgTags""), r_nopurify.get(""imgTags""))),\n    )"
+test_markdown_sanitization.py	r_nopurify	<unresolved>	get	389	"r_nopurify.get(""iframeTags"")"
+test_markdown_sanitization.py	r_nopurify	<unresolved>	get	390	"r_nopurify.get(""svgTags"")"
+test_markdown_sanitization.py	r_nopurify	<unresolved>	get	391	"r_nopurify.get(""imgTags"")"
+test_markdown_sanitization.py	r_nopurify	<unresolved>	get	392	"r_nopurify.get(""iframeTags"")"
+test_markdown_sanitization.py	r_nopurify	<unresolved>	get	392	"r_nopurify.get(""svgTags"")"
+test_markdown_sanitization.py	r_nopurify	<unresolved>	get	392	"r_nopurify.get(""imgTags"")"
+test_markdown_sanitization.py	results	Results	check	394	"results.check(\n        ""fail-closed: raw markdown text is visible as escaped plain text"",\n        ""&lt;script&gt;"" in (r_nopurify.get(""innerHTML"") or """"),\n        (r_nopurify.get(""innerHTML"") or """")[:200],\n    )"
+test_markdown_sanitization.py	r_nopurify	<unresolved>	get	396	"r_nopurify.get(""innerHTML"")"
+test_markdown_sanitization.py	r_nopurify	<unresolved>	get	397	"r_nopurify.get(""innerHTML"")"
+test_markdown_sanitization.py	results	Results	check	427	"results.check(\n        ""fail-closed: no <script> element when DOMPurify.isSupported is false"",\n        r_unsupported.get(""scriptTags"") == 0,\n        str(r_unsupported.get(""scriptTags"")),\n    )"
+test_markdown_sanitization.py	r_unsupported	<unresolved>	get	429	"r_unsupported.get(""scriptTags"")"
+test_markdown_sanitization.py	r_unsupported	<unresolved>	get	430	"r_unsupported.get(""scriptTags"")"
+test_markdown_sanitization.py	results	Results	check	432	"results.check(\n        ""fail-closed: no <iframe>/<svg>/<img> element when DOMPurify.isSupported is false"",\n        r_unsupported.get(""iframeTags"") == 0\n        and r_unsupported.get(""svgTags"") == 0\n        and r_unsupported.get(""imgTags"") == 0,\n        str((r_unsupported.get(""iframeTags""), r_unsupported.get(""svgTags""), r_unsupported.get(""imgTags""))),\n    )"
+test_markdown_sanitization.py	r_unsupported	<unresolved>	get	434	"r_unsupported.get(""iframeTags"")"
+test_markdown_sanitization.py	r_unsupported	<unresolved>	get	435	"r_unsupported.get(""svgTags"")"
+test_markdown_sanitization.py	r_unsupported	<unresolved>	get	436	"r_unsupported.get(""imgTags"")"
+test_markdown_sanitization.py	r_unsupported	<unresolved>	get	437	"r_unsupported.get(""iframeTags"")"
+test_markdown_sanitization.py	r_unsupported	<unresolved>	get	437	"r_unsupported.get(""svgTags"")"
+test_markdown_sanitization.py	r_unsupported	<unresolved>	get	437	"r_unsupported.get(""imgTags"")"
+test_markdown_sanitization.py	results	Results	check	439	"results.check(\n        ""fail-closed: no HTML elements survive other than <p>/<br> (only escaped text)"",\n        r_unsupported.get(""bodyNonPBrElementCount"") == 0,\n        str(r_unsupported.get(""bodyNonPBrElementCount"")),\n    )"
+test_markdown_sanitization.py	r_unsupported	<unresolved>	get	441	"r_unsupported.get(""bodyNonPBrElementCount"")"
+test_markdown_sanitization.py	r_unsupported	<unresolved>	get	442	"r_unsupported.get(""bodyNonPBrElementCount"")"
+test_markdown_sanitization.py	results	Results	check	444	"results.check(\n        ""fail-closed: raw markdown text is visible as escaped plain text (isSupported=false)"",\n        ""&lt;script&gt;"" in (r_unsupported.get(""innerHTML"") or """"),\n        (r_unsupported.get(""innerHTML"") or """")[:200],\n    )"
+test_markdown_sanitization.py	r_unsupported	<unresolved>	get	446	"r_unsupported.get(""innerHTML"")"
+test_markdown_sanitization.py	r_unsupported	<unresolved>	get	447	"r_unsupported.get(""innerHTML"")"
+test_markdown_sanitization.py	results	Results	check	456	"results.check(\n        ""no execution marker triggered by the isSupported=false payload"",\n        marker_val.get(""n"") == 0,\n        f""marker={marker_val.get('n')}"",\n    )"
+test_markdown_sanitization.py	marker_val	<unresolved>	get	458	"marker_val.get(""n"")"
+test_markdown_sanitization.py	marker_val	<unresolved>	get	459	marker_val.get('n')
+test_markdown_sanitization.py	store	ConversationStore	close	464	store.close()
+test_markdown_sanitization.py	os	<unresolved>	_exit	475	os._exit(code)
+test_markdown_sanitization.py	traceback	<unresolved>	print_exc	479	traceback.print_exc()
+test_markdown_sanitization.py	os	<unresolved>	_exit	480	os._exit(2)
+test_message_actions.py	tempfile	<unresolved>	mkdtemp	11	"tempfile.mkdtemp(prefix=""cb-actions-"")"
+test_message_actions.py	attrs_d	<unresolved>	get	76	"attrs_d.get(""class"", """")"
+test_message_actions.py	cls	<unresolved>	split	77	cls.split()
+test_message_actions.py	re	<unresolved>	sub	99	"re.sub(\n        r'<div class=""code-head""[\s\S]*?</div>\s*(?=<code)',\n        """",\n        html,\n        count=1,\n    )"
+test_message_actions.py	re	<unresolved>	sub	105	"re.sub(r""<button[^>]*>[\s\S]*?</button>"", """", cleaned)"
+test_message_actions.py	re	<unresolved>	sub	106	"re.sub(r""<[^>]+>"", ""\n"", cleaned)"
+test_message_actions.py	re	<unresolved>	sub	107	"re.sub(r""\n{3,}"", ""\n\n"", text)"
+test_message_actions.py	text	<unresolved>	strip	108	text.strip()
+test_message_actions.py	text	<unresolved>	count	110	"text.count(""Copy"")"
+test_message_actions.py	re	<unresolved>	search	112	"re.search(r""(?m)^html$"", text)"
+test_message_actions.py	s	ConversationStore	create_conversation	123	"s.create_conversation(model=""test:1"")"
+test_message_actions.py	s	ConversationStore	append_message	124	"s.append_message(c.id, role=""user"", content=""hello"", message_id=""u1"")"
+test_message_actions.py	s	ConversationStore	append_message	125	"s.append_message(\n        c.id, role=""assistant"", content=""first answer"", message_id=""a1""\n    )"
+test_message_actions.py	s	ConversationStore	update_message	133	"s.update_message(""a1"", continued)"
+test_message_actions.py	s	ConversationStore	get_message	134	"s.get_message(""a1"")"
+test_message_actions.py	s	ConversationStore	delete_message	139	"s.delete_message(""a1"", conversation_id=c.id)"
+test_message_actions.py	s	ConversationStore	get_message	140	"s.get_message(""a1"")"
+test_message_actions.py	s	ConversationStore	list_messages	141	s.list_messages(c.id)
+test_message_actions.py	s	ConversationStore	append_message	144	"s.append_message(c.id, role=""assistant"", content=""regen"", message_id=""a1"")"
+test_message_actions.py	s	ConversationStore	list_messages	145	s.list_messages(c.id)
+test_multichat.py	tempfile	<unresolved>	mkdtemp	11	"tempfile.mkdtemp(prefix=""cb-multichat-"")"
+test_multichat.py	s	ConversationStore	create_conversation	24	"s.create_conversation(model=""model-a:1"")"
+test_multichat.py	s	ConversationStore	append_message	25	"s.append_message(a.id, role=""user"", content=""alpha topic"", message_id=""au1"")"
+test_multichat.py	s	ConversationStore	append_message	26	"s.append_message(a.id, role=""assistant"", content=""alpha reply"", message_id=""aa1"")"
+test_multichat.py	s	ConversationStore	get_conversation	27	s.get_conversation(a.id)
+test_multichat.py	s	ConversationStore	create_conversation	30	"s.create_conversation(model=""model-b:2"")"
+test_multichat.py	s	ConversationStore	get_meta	31	"s.get_meta(""active_conversation_id"")"
+test_multichat.py	s	ConversationStore	append_message	32	"s.append_message(b.id, role=""user"", content=""beta topic"", message_id=""bu1"")"
+test_multichat.py	s	ConversationStore	append_message	33	"s.append_message(b.id, role=""assistant"", content=""beta reply"", message_id=""ba1"")"
+test_multichat.py	s	ConversationStore	list_conversations	36	s.list_conversations(limit=10)
+test_multichat.py	s	ConversationStore	set_active	42	s.set_active(a.id)
+test_multichat.py	s	ConversationStore	get_active_conversation	43	s.get_active_conversation()
+test_multichat.py	s	ConversationStore	list_messages	45	s.list_messages(a.id)
+test_multichat.py	s	ConversationStore	create_conversation	50	"s.create_conversation(model=""model-a:1"")"
+test_multichat.py	s	ConversationStore	message_count	51	s.message_count(c.id)
+test_multichat.py	s	ConversationStore	get_meta	52	"s.get_meta(""active_conversation_id"")"
+test_multichat.py	s	ConversationStore	close	55	s.close()
+test_multichat.py	s2	ConversationStore	get_active_conversation	58	s2.get_active_conversation()
+test_multichat.py	s2	ConversationStore	list_messages	60	s2.list_messages(act.id)
+test_multichat.py	s2	ConversationStore	set_active	63	s2.set_active(b.id)
+test_multichat.py	s2	ConversationStore	list_messages	64	s2.list_messages(b.id)
+test_multichat.py	s2	ConversationStore	get_conversation	66	s2.get_conversation(b.id)
+test_multichat.py	s2	ConversationStore	list_messages	70	s2.list_messages(a.id)
+test_multichat.py	s2	ConversationStore	get_conversation	74	s2.get_conversation(a.id)
+test_multichat.py	s2	ConversationStore	get_conversation	75	s2.get_conversation(b.id)
+test_multichat.py	s2	ConversationStore	export_markdown	78	s2.export_markdown(b.id)
+test_multichat.py	md	<unresolved>	startswith	81	"md.startswith(""#"")"
+test_multichat.py	s2	ConversationStore	export_dict	82	s2.export_dict(b.id)
+test_multichat.py	data['title']	<unresolved>	startswith	84	"data[""title""].startswith(""beta"")"
+test_multichat.py	s2	ConversationStore	create_conversation	89	"s2.create_conversation(model=""m"")"
+test_multichat.py	s2	ConversationStore	is_empty	90	s2.is_empty(empty.id)
+test_multichat.py	s2	ConversationStore	list_conversations	91	s2.list_conversations(limit=50)
+test_multichat.py	s2	ConversationStore	list_conversations	94	s2.list_conversations(limit=50, nonempty_only=False)
+test_multichat.py	s2	ConversationStore	set_active	98	s2.set_active(a.id)
+test_multichat.py	s2	ConversationStore	prune_empty_conversations	99	s2.prune_empty_conversations(keep_id=a.id)
+test_multichat.py	s2	ConversationStore	get_conversation	101	s2.get_conversation(empty.id)
+test_multichat.py	s2	ConversationStore	create_conversation	104	"s2.create_conversation(model=""m"")"
+test_multichat.py	s2	ConversationStore	prune_empty_conversations	105	s2.prune_empty_conversations(keep_id=empty2.id)
+test_multichat.py	s2	ConversationStore	get_conversation	106	s2.get_conversation(empty2.id)
+test_multichat.py	s2	ConversationStore	get_conversation	108	s2.get_conversation(a.id)
+test_multichat.py	s2	ConversationStore	set_active	111	s2.set_active(b.id)
+test_multichat.py	s2	ConversationStore	delete_conversation	112	s2.delete_conversation(b.id)
+test_multichat.py	s2	ConversationStore	get_conversation	113	s2.get_conversation(b.id)
+test_multichat.py	s2	ConversationStore	list_messages	114	s2.list_messages(b.id)
+test_multichat.py	s2	ConversationStore	get_conversation	115	s2.get_conversation(a.id)
+test_multichat.py	s2	ConversationStore	get_active_conversation	116	s2.get_active_conversation()
+test_multichat.py	s2	ConversationStore	list_conversations	120	s2.list_conversations(limit=50, nonempty_only=False)
+test_multichat.py	s2	ConversationStore	delete_conversation	121	s2.delete_conversation(conv.id)
+test_multichat.py	s2	ConversationStore	list_conversations	122	s2.list_conversations(limit=10, nonempty_only=False)
+test_multichat.py	s2	ConversationStore	get_active_conversation	123	s2.get_active_conversation()
+test_release_identity.py	gi	<unresolved>	require_version	25	"gi.require_version(""Gtk"", ""4.0"")"
+test_release_identity.py	gi	<unresolved>	require_version	26	"gi.require_version(""Adw"", ""1"")"
+test_release_identity.py	re	<unresolved>	compile	46	"re.compile(r""^[A-Za-z][A-Za-z0-9]*(\.[A-Za-z][A-Za-z0-9]*){2,}$"")"
+test_release_identity.py	re	<unresolved>	compile	47	"re.compile(r""^\d+\.\d+\.\d+$"")"
+test_release_identity.py	results	Results	check	54	"results.check(\n        ""APP_ID looks like a reverse-DNS identifier"",\n        bool(REVERSE_DNS_RE.match(release_info.APP_ID)),\n        release_info.APP_ID,\n    )"
+test_release_identity.py	REVERSE_DNS_RE	<unresolved>	match	56	REVERSE_DNS_RE.match(release_info.APP_ID)
+test_release_identity.py	results	Results	check	59	"results.check(\n        ""APP_ID is not the old dev.local placeholder"",\n        ""dev.local"" not in release_info.APP_ID.lower(),\n        release_info.APP_ID,\n    )"
+test_release_identity.py	results	Results	check	64	"results.check(""APP_NAME is 'ChickenButt'"", release_info.APP_NAME == ""ChickenButt"")"
+test_release_identity.py	results	Results	check	65	"results.check(\n        ""VERSION is a valid semver-shaped string"",\n        bool(SEMVER_RE.match(release_info.VERSION)),\n        release_info.VERSION,\n    )"
+test_release_identity.py	SEMVER_RE	<unresolved>	match	67	SEMVER_RE.match(release_info.VERSION)
+test_release_identity.py	results	Results	check	74	"results.check(\n        ""main.APP_ID is exactly release_info.APP_ID (single source, not a copy)"",\n        main_module.APP_ID == release_info.APP_ID,\n        main_module.APP_ID,\n    )"
+test_release_identity.py	Adw	<unresolved>	init	79	Adw.init()
+test_release_identity.py	main_module	<unresolved>	ChickenButtApp	80	main_module.ChickenButtApp()
+test_release_identity.py	results	Results	check	81	"results.check(\n        ""constructed ChickenButtApp's real application_id matches release_info.APP_ID"",\n        app.get_application_id() == release_info.APP_ID,\n        app.get_application_id(),\n    )"
+test_release_identity.py	app	<unresolved>	get_application_id	83	app.get_application_id()
+test_release_identity.py	app	<unresolved>	get_application_id	84	app.get_application_id()
+test_release_identity.py	results	Results	check	95	"results.check(\n        ""old root .desktop file is absent (superseded by Meson-installed entry)"",\n        not old_desktop.exists(),\n        str(old_desktop),\n    )"
+test_release_identity.py	old_desktop	<unresolved>	exists	97	old_desktop.exists()
+test_release_identity.py	results	Results	check	101	"results.check(\n        ""old scripts/install-desktop-entry.py is absent (superseded by Meson)"",\n        not old_installer.exists(),\n        str(old_installer),\n    )"
+test_release_identity.py	old_installer	<unresolved>	exists	103	old_installer.exists()
+test_release_identity.py	os	<unresolved>	_exit	117	os._exit(code)
+test_release_identity.py	traceback	<unresolved>	print_exc	121	traceback.print_exc()
+test_release_identity.py	os	<unresolved>	_exit	122	os._exit(2)
+test_restore_scroll.py	tempfile	<unresolved>	mkdtemp	17	"tempfile.mkdtemp(prefix=""cb-restore-scroll-"")"
+test_restore_scroll.py	gi	<unresolved>	require_version	25	"gi.require_version(""Gtk"", ""4.0"")"
+test_restore_scroll.py	gi	<unresolved>	require_version	26	"gi.require_version(""Adw"", ""1"")"
+test_restore_scroll.py	GLib	<unresolved>	main_context_default	49	GLib.main_context_default()
+test_restore_scroll.py	time	<unresolved>	time	50	time.time()
+test_restore_scroll.py	ctx	<unresolved>	pending	52	ctx.pending()
+test_restore_scroll.py	ctx	<unresolved>	iteration	53	ctx.iteration(False)
+test_restore_scroll.py	time	<unresolved>	time	54	time.time()
+test_restore_scroll.py	time	<unresolved>	sleep	56	time.sleep(0.01)
+test_restore_scroll.py	time	<unresolved>	time	60	time.time()
+test_restore_scroll.py	time	<unresolved>	time	61	time.time()
+test_restore_scroll.py	captured	<unresolved>	pop	87	"captured.pop(""n"", None)"
+test_restore_scroll.py	captured	<unresolved>	get	94	"captured.get(""n"")"
+test_restore_scroll.py	Adw	<unresolved>	init	100	Adw.init()
+test_restore_scroll.py	Adw	<unresolved>	Application	101	"Adw.Application(\n        application_id=""dev.local.chickenbutt.restorescroll"",\n        flags=Gio.ApplicationFlags.NON_UNIQUE,\n    )"
+test_restore_scroll.py	holder['w']	ChatSidebar	present	109	"holder[""w""].present()"
+test_restore_scroll.py	app	<unresolved>	connect	111	"app.connect(""activate"", on_activate)"
+test_restore_scroll.py	app	<unresolved>	register	112	app.register()
+test_restore_scroll.py	app	<unresolved>	activate	113	app.activate()
+test_restore_scroll.py	store	ConversationStore	create_conversation	120	"store.create_conversation(model=""m"")"
+test_restore_scroll.py	store	ConversationStore	append_message	129	"store.append_message(target.id, role=role, content=content, message_id=f""t{i}"")"
+test_restore_scroll.py	store	ConversationStore	create_conversation	132	"store.create_conversation(model=""idle"")"
+test_restore_scroll.py	captured	<unresolved>	update	135	"captured.update(\n        {""n"": payload.get(""n"")}\n    )"
+test_restore_scroll.py	payload	<unresolved>	get	136	"payload.get(""n"")"
+test_restore_scroll.py	payload	<unresolved>	get	137	"payload.get(""type"")"
+test_restore_scroll.py	win	ChatSidebar	switch_conversation	144	win.switch_conversation(target.id)
+test_restore_scroll.py	results	Results	check	147	"results.check(f""restore completed ({N} messages)"", ok, f""got {len(win._messages)}"")"
+test_restore_scroll.py	results	Results	check	150	"results.check(\n        ""restore scrolls a small constant number of times, not once per message"",\n        n_scrolls is not None and n_scrolls <= 3,\n        f""scroll calls = {n_scrolls}"",\n    )"
+test_restore_scroll.py	results	Results	check	155	"results.check(\n        ""message count correct after restore"",\n        len(win._messages) == N,\n    )"
+test_restore_scroll.py	results	Results	check	159	"results.check(\n        ""message order preserved (first/last content)"",\n        win._messages[0][""content""] == ""msg 0""\n        and win._messages[-1][""content""].startswith(""## Reply 999""),\n        str(win._messages[0]) + "" / "" + str(win._messages[-1]),\n    )"
+test_restore_scroll.py	dom_captured	<unresolved>	update	178	dom_captured.update(payload)
+test_restore_scroll.py	payload	<unresolved>	get	178	"payload.get(\n        ""type""\n    )"
+test_restore_scroll.py	results	Results	check	183	"results.check(""all rows rendered"", dom_captured.get(""rows"") == N, str(dom_captured))"
+test_restore_scroll.py	dom_captured	<unresolved>	get	183	"dom_captured.get(""rows"")"
+test_restore_scroll.py	results	Results	check	184	"results.check(\n        ""assistant code blocks highlighted"",\n        dom_captured.get(""hljs"", 0) == N // 2,\n        str(dom_captured),\n    )"
+test_restore_scroll.py	dom_captured	<unresolved>	get	186	"dom_captured.get(""hljs"", 0)"
+test_restore_scroll.py	results	Results	check	189	"results.check(\n        ""copy controls wired for every code block"",\n        dom_captured.get(""copyBtns"", 0) == N // 2,\n        str(dom_captured),\n    )"
+test_restore_scroll.py	dom_captured	<unresolved>	get	191	"dom_captured.get(""copyBtns"", 0)"
+test_restore_scroll.py	plain_captured	<unresolved>	update	197	"plain_captured.update(\n        {""n"": payload.get(""n"")}\n    )"
+test_restore_scroll.py	payload	<unresolved>	get	198	"payload.get(""n"")"
+test_restore_scroll.py	payload	<unresolved>	get	199	"payload.get(""type"")"
+test_restore_scroll.py	results	Results	check	213	"results.check(\n        ""a normal live message still triggers scrollIfPinned"",\n        n_live is not None and n_live >= 1,\n        f""scroll calls = {n_live}"",\n    )"
+test_restore_scroll.py	store	ConversationStore	close	219	store.close()
+test_restore_scroll.py	os	<unresolved>	_exit	230	os._exit(code)
+test_restore_scroll.py	traceback	<unresolved>	print_exc	234	traceback.print_exc()
+test_restore_scroll.py	os	<unresolved>	_exit	235	os._exit(2)
+test_sidebar_interactions.py	gi	<unresolved>	require_version	27	"gi.require_version(""Gtk"", ""4.0"")"
+test_sidebar_interactions.py	gi	<unresolved>	require_version	28	"gi.require_version(""Adw"", ""1"")"
+test_sidebar_interactions.py	GLib	<unresolved>	main_context_default	50	GLib.main_context_default()
+test_sidebar_interactions.py	time	<unresolved>	time	51	time.time()
+test_sidebar_interactions.py	ctx	<unresolved>	pending	53	ctx.pending()
+test_sidebar_interactions.py	ctx	<unresolved>	iteration	54	ctx.iteration(False)
+test_sidebar_interactions.py	time	<unresolved>	time	55	time.time()
+test_sidebar_interactions.py	time	<unresolved>	sleep	57	time.sleep(0.01)
+test_sidebar_interactions.py	time	<unresolved>	time	61	time.time()
+test_sidebar_interactions.py	time	<unresolved>	time	62	time.time()
+test_sidebar_interactions.py	widget	<unresolved>	get_cursor	70	widget.get_cursor()
+test_sidebar_interactions.py	cur	<unresolved>	get_name	71	cur.get_name()
+test_sidebar_interactions.py	widget	<unresolved>	get_parent	75	widget.get_parent()
+test_sidebar_interactions.py	p	<unresolved>	get_parent	79	p.get_parent()
+test_sidebar_interactions.py	container	<unresolved>	get_first_child	86	container.get_first_child()
+test_sidebar_interactions.py	child	<unresolved>	get_next_sibling	90	child.get_next_sibling()
+test_sidebar_interactions.py	w	<unresolved>	get_parent	101	w.get_parent()
+test_sidebar_interactions.py	val	<unresolved>	to_json	116	val.to_json(0)
+test_sidebar_interactions.py	captured	<unresolved>	pop	120	"captured.pop(""json"", None)"
+test_sidebar_interactions.py	captured	<unresolved>	pop	121	"captured.pop(""error"", None)"
+test_sidebar_interactions.py	json	<unresolved>	loads	128	json.loads(json.loads(raw))
+test_sidebar_interactions.py	json	<unresolved>	loads	128	json.loads(raw)
+test_sidebar_interactions.py	json	<unresolved>	loads	130	json.loads(raw)
+test_sidebar_interactions.py	tempfile	<unresolved>	mkdtemp	137	"tempfile.mkdtemp(prefix=""cb-sidebar-interactions-"")"
+test_sidebar_interactions.py	settings_dir	<unresolved>	mkdir	146	settings_dir.mkdir(parents=True, exist_ok=True)
+test_sidebar_interactions.py	json	<unresolved>	dumps	148	"json.dumps({""sidebar_open"": True})"
+test_sidebar_interactions.py	Adw	<unresolved>	init	151	Adw.init()
+test_sidebar_interactions.py	Adw	<unresolved>	Application	152	"Adw.Application(\n        application_id=""dev.local.chickenbutt.sidebarinteractions"",\n        flags=Gio.ApplicationFlags.NON_UNIQUE,\n    )"
+test_sidebar_interactions.py	holder['win']	ChatSidebar	present	160	"holder[""win""].present()"
+test_sidebar_interactions.py	app	<unresolved>	connect	162	"app.connect(""activate"", on_activate)"
+test_sidebar_interactions.py	app	<unresolved>	register	163	app.register()
+test_sidebar_interactions.py	app	<unresolved>	activate	164	app.activate()
+test_sidebar_interactions.py	results	Results	check	171	"results.check(""sidebar hidden on startup"", win._sidebar.get_visible() is False)"
+test_sidebar_interactions.py	results	Results	check	172	"results.check(\n        ""stale sidebar_open=true in settings.json was ignored"",\n        win._sidebar.get_visible() is False,\n    )"
+test_sidebar_interactions.py	results	Results	check	176	"results.check(""sidebar toggle button inactive on startup"", win._sidebar_btn.get_active() is False)"
+test_sidebar_interactions.py	win	ChatSidebar	toggle_sidebar	180	win.toggle_sidebar(True)
+test_sidebar_interactions.py	results	Results	check	182	"results.check(""toggle_sidebar(True) opens it"", win._sidebar.get_visible() is True)"
+test_sidebar_interactions.py	results	Results	check	183	"results.check(""toggle button reflects open state"", win._sidebar_btn.get_active() is True)"
+test_sidebar_interactions.py	win	ChatSidebar	toggle_sidebar	184	win.toggle_sidebar(False)
+test_sidebar_interactions.py	results	Results	check	186	"results.check(""toggle_sidebar(False) closes it"", win._sidebar.get_visible() is False)"
+test_sidebar_interactions.py	results	Results	check	187	"results.check(""toggle button reflects closed state"", win._sidebar_btn.get_active() is False)"
+test_sidebar_interactions.py	results	Results	check	191	"results.check(\n        ""exactly one model dropdown, a descendant of the sidebar"",\n        win.model_combo is not None and is_descendant(win.model_combo, win._sidebar),\n    )"
+test_sidebar_interactions.py	results	Results	check	201	"results.check(\n        ""model section appears after the conversation list"",\n        -1 not in (idx_scroller, idx_model) and idx_model > idx_scroller,\n        f""scroller={idx_scroller} model={idx_model}"",\n    )"
+test_sidebar_interactions.py	results	Results	check	206	"results.check(\n        ""model section appears before the Settings footer"",\n        -1 not in (idx_model, idx_foot) and idx_model < idx_foot,\n        f""model={idx_model} foot={idx_foot}"",\n    )"
+test_sidebar_interactions.py	results	Results	check	212	"results.check(""model dropdown is no longer fixed to 320px wide"", w != 320, f""size_request={(w, h)}"")"
+test_sidebar_interactions.py	results	Results	check	213	"results.check(""model dropdown keeps its 38px height"", h == 38, f""size_request={(w, h)}"")"
+test_sidebar_interactions.py	chat_column	<unresolved>	get_parent	218	chat_column.get_parent()
+test_sidebar_interactions.py	results	Results	check	219	"results.check(\n        ""health banner is not a descendant of the sidebar"",\n        not is_descendant(win._health_banner, win._sidebar),\n    )"
+test_sidebar_interactions.py	results	Results	check	223	"results.check(\n        ""health banner shares the main-content container with the transcript"",\n        win._health_banner.get_parent() is outer,\n    )"
+test_sidebar_interactions.py	win	ChatSidebar	_refresh_models	239	win._refresh_models()
+test_sidebar_interactions.py	results	Results	check	242	"results.check(""initial refresh selects and loads the first fake model"", ok, str(win._model))"
+test_sidebar_interactions.py	results	Results	check	245	"results.check(\n        ""last-model persisted after initial load"",\n        _load_last_model() == ""fake-model-a"",\n        str(_load_last_model()),\n    )"
+test_sidebar_interactions.py	results	Results	check	253	"results.check(""selecting a different model in the dropdown still loads it"", ok, str(win._model))"
+test_sidebar_interactions.py	results	Results	check	254	"results.check(\n        ""last-model persistence follows the new selection"",\n        _load_last_model() == ""fake-model-b"",\n        str(_load_last_model()),\n    )"
+test_sidebar_interactions.py	results	Results	check	273	"results.check(f""{label} reports pointer cursor"", cursor_name(widget) == ""pointer"", str(cursor_name(widget)))"
+test_sidebar_interactions.py	win	ChatSidebar	_rebuild_history_list	280	win._rebuild_history_list()
+test_sidebar_interactions.py	row	<unresolved>	get_name	285	row.get_name()
+test_sidebar_interactions.py	row	<unresolved>	get_next_sibling	288	row.get_next_sibling()
+test_sidebar_interactions.py	results	Results	check	289	"results.check(""generated conversation row found"", found_row is not None)"
+test_sidebar_interactions.py	results	Results	check	291	"results.check(""conversation row reports pointer cursor"", cursor_name(found_row) == ""pointer"")"
+test_sidebar_interactions.py	found_row	<unresolved>	get_child	292	found_row.get_child()
+test_sidebar_interactions.py	outer_box	<unresolved>	get_last_child	293	outer_box.get_last_child()
+test_sidebar_interactions.py	results	Results	check	294	"results.check(\n            ""row's overflow (more) button reports pointer cursor"",\n            more_btn is not None and cursor_name(more_btn) == ""pointer"",\n        )"
+test_sidebar_interactions.py	results	Results	check	334	"results.check(""link computed cursor is pointer"", (report or {}).get(""link"") == ""pointer"", str(report))"
+test_sidebar_interactions.py	results	Results	check	335	"results.check(""code copy control computed cursor is pointer"", (report or {}).get(""copyBtn"") == ""pointer"", str(report))"
+test_sidebar_interactions.py	results	Results	check	336	"results.check(""code expand control computed cursor is pointer"", (report or {}).get(""expandBtn"") == ""pointer"", str(report))"
+test_sidebar_interactions.py	results	Results	check	337	"results.check(\n            ""message-action control computed cursor is pointer"",\n            (report or {}).get(""actionBtn"") == ""pointer"",\n            str(report),\n        )"
+test_sidebar_interactions.py	results	Results	check	342	"results.check(\n            ""noninteractive prose text does NOT compute to pointer"",\n            (report or {}).get(""prose"") not in (""pointer"", None),\n            str(report),\n        )"
+test_sidebar_interactions.py	json	<unresolved>	loads	355	"json.loads(settings_path.read_text(encoding=""utf-8""))"
+test_sidebar_interactions.py	settings_path	<unresolved>	read_text	355	"settings_path.read_text(encoding=""utf-8"")"
+test_sidebar_interactions.py	settings_path	<unresolved>	is_file	355	settings_path.is_file()
+test_sidebar_interactions.py	settings_path	<unresolved>	write_text	357	"settings_path.write_text(json.dumps(data), encoding=""utf-8"")"
+test_sidebar_interactions.py	json	<unresolved>	dumps	357	json.dumps(data)
+test_sidebar_interactions.py	Adw	<unresolved>	Application	359	"Adw.Application(\n        application_id=""dev.local.chickenbutt.sidebarinteractions2"",\n        flags=Gio.ApplicationFlags.NON_UNIQUE,\n    )"
+test_sidebar_interactions.py	holder2['win']	ChatSidebar	present	367	"holder2[""win""].present()"
+test_sidebar_interactions.py	app2	<unresolved>	connect	369	"app2.connect(""activate"", on_activate2)"
+test_sidebar_interactions.py	app2	<unresolved>	register	370	app2.register()
+test_sidebar_interactions.py	app2	<unresolved>	activate	371	app2.activate()
+test_sidebar_interactions.py	results	Results	check	375	"results.check(\n        ""a freshly constructed second window also starts with the sidebar hidden"",\n        win2._sidebar.get_visible() is False,\n    )"
+test_sidebar_interactions.py	results	Results	check	379	"results.check(\n        ""its sidebar toggle button is also inactive"",\n        win2._sidebar_btn.get_active() is False,\n    )"
+test_sidebar_interactions.py	os	<unresolved>	_exit	394	os._exit(code)
+test_sidebar_interactions.py	traceback	<unresolved>	print_exc	398	traceback.print_exc()
+test_sidebar_interactions.py	os	<unresolved>	_exit	399	os._exit(2)
+test_stream_cancellation.py	socket	<unresolved>	socket	55	socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+test_stream_cancellation.py	threading	<unresolved>	Event	61	threading.Event()
+test_stream_cancellation.py	conn	<unresolved>	settimeout	70	conn.settimeout(5)
+test_stream_cancellation.py	conn	<unresolved>	recv	73	conn.recv(4096)
+test_stream_cancellation.py	conn	<unresolved>	settimeout	78	conn.settimeout(0.2)
+test_stream_cancellation.py	conn	<unresolved>	recv	80	conn.recv(4096)
+test_stream_cancellation.py	conn	<unresolved>	settimeout	84	conn.settimeout(None)
+test_stream_cancellation.py	json	<unresolved>	dumps	97	json.dumps(obj)
+test_stream_cancellation.py	self	<unresolved>	_accept_and_read_request	110	self._accept_and_read_request()
+test_stream_cancellation.py	time	<unresolved>	sleep	111	time.sleep(delay_before_headers)
+test_stream_cancellation.py	self	<unresolved>	_send_headers	112	self._send_headers()
+test_stream_cancellation.py	threading	<unresolved>	Thread	120	threading.Thread(target=run, daemon=True)
+test_stream_cancellation.py	self	<unresolved>	_accept_and_read_request	128	self._accept_and_read_request()
+test_stream_cancellation.py	self	<unresolved>	_send_headers	129	self._send_headers()
+test_stream_cancellation.py	self	<unresolved>	_send_chunk	131	"self._send_chunk({""message"": {""content"": text}, ""done"": False})"
+test_stream_cancellation.py	threading	<unresolved>	Thread	134	threading.Thread(target=run, daemon=True)
+test_stream_cancellation.py	self	<unresolved>	_accept_and_read_request	141	self._accept_and_read_request()
+test_stream_cancellation.py	json	<unresolved>	dumps	142	json.dumps(error_body)
+test_stream_cancellation.py	threading	<unresolved>	Thread	153	threading.Thread(target=run, daemon=True)
+test_stream_cancellation.py	self	<unresolved>	_accept_and_read_request	161	self._accept_and_read_request()
+test_stream_cancellation.py	self	<unresolved>	_send_headers	162	self._send_headers()
+test_stream_cancellation.py	self	<unresolved>	_send_chunk	164	"self._send_chunk({""message"": {""content"": text}, ""done"": False})"
+test_stream_cancellation.py	threading	<unresolved>	Thread	172	threading.Thread(target=run, daemon=True)
+test_stream_cancellation.py	self	<unresolved>	_accept_and_read_request	178	self._accept_and_read_request()
+test_stream_cancellation.py	self	<unresolved>	_send_headers	179	self._send_headers()
+test_stream_cancellation.py	self	<unresolved>	_send_chunk	181	"self._send_chunk({""message"": {""content"": text}, ""done"": False})"
+test_stream_cancellation.py	time	<unresolved>	sleep	182	time.sleep(pause_seconds)
+test_stream_cancellation.py	self	<unresolved>	_send_chunk	183	"self._send_chunk({""message"": {""content"": resume_text}, ""done"": True})"
+test_stream_cancellation.py	self	<unresolved>	_end_chunked	184	self._end_chunked()
+test_stream_cancellation.py	threading	<unresolved>	Thread	186	threading.Thread(target=run, daemon=True)
+test_stream_cancellation.py	self	<unresolved>	_accept_and_read_request	190	self._accept_and_read_request()
+test_stream_cancellation.py	self	<unresolved>	_send_headers	191	self._send_headers()
+test_stream_cancellation.py	self	<unresolved>	_send_chunk	193	"self._send_chunk({""message"": {""content"": text}, ""done"": False})"
+test_stream_cancellation.py	self	<unresolved>	_send_chunk	194	"self._send_chunk({""message"": {""content"": """"}, ""done"": True})"
+test_stream_cancellation.py	self	<unresolved>	_end_chunked	195	self._end_chunked()
+test_stream_cancellation.py	threading	<unresolved>	Thread	197	threading.Thread(target=run, daemon=True)
+test_stream_cancellation.py	self	<unresolved>	_accept_and_read_request	204	self._accept_and_read_request()
+test_stream_cancellation.py	self	<unresolved>	_send_headers	205	self._send_headers()
+test_stream_cancellation.py	self	<unresolved>	_send_chunk	207	"self._send_chunk({""message"": {""content"": text}, ""done"": False})"
+test_stream_cancellation.py	time	<unresolved>	sleep	208	time.sleep(delay)
+test_stream_cancellation.py	struct	<unresolved>	pack	210	"struct.pack(""ii"", 1, 0)"
+test_stream_cancellation.py	threading	<unresolved>	Thread	214	threading.Thread(target=run, daemon=True)
+test_stream_cancellation.py	threading	<unresolved>	enumerate	229	threading.enumerate()
+test_stream_cancellation.py	t	<unresolved>	is_alive	229	t.is_alive()
+test_stream_cancellation.py	srv	StubServer	serve_then_hang	238	"srv.serve_then_hang([""hello ""])"
+test_stream_cancellation.py	threading	<unresolved>	Event	240	threading.Event()
+test_stream_cancellation.py	client	OllamaClient	chat_stream	247	"client.chat_stream(""m"", [], cancel_event=cancel)"
+test_stream_cancellation.py	collected	<unresolved>	append	248	collected.append(piece)
+test_stream_cancellation.py	threading	<unresolved>	Thread	252	threading.Thread(target=run_stream, daemon=True)
+test_stream_cancellation.py	t	<unresolved>	start	253	t.start()
+test_stream_cancellation.py	time	<unresolved>	sleep	255	time.sleep(0.3)
+test_stream_cancellation.py	time	<unresolved>	time	256	time.time()
+test_stream_cancellation.py	cancel	<unresolved>	set	257	cancel.set()
+test_stream_cancellation.py	t	<unresolved>	join	258	t.join(timeout=5)
+test_stream_cancellation.py	time	<unresolved>	time	259	time.time()
+test_stream_cancellation.py	results	Results	check	260	"results.check(""chat_stream returns within ~1s of cancel"", elapsed < 2.0, f""{elapsed:.2f}s"")"
+test_stream_cancellation.py	results	Results	check	261	"results.check(""worker thread actually finished"", not t.is_alive())"
+test_stream_cancellation.py	t	<unresolved>	is_alive	261	t.is_alive()
+test_stream_cancellation.py	results	Results	check	262	"results.check(""content received before Stop was yielded"", collected == [""hello ""], str(collected))"
+test_stream_cancellation.py	results	Results	check	263	"results.check(""cancellation does not raise OllamaError"", err is None, repr(err))"
+test_stream_cancellation.py	srv	StubServer	close	264	srv.close()
+test_stream_cancellation.py	srv1b	StubServer	serve_delay_then_hang	269	srv1b.serve_delay_then_hang(delay_before_headers=2.0)
+test_stream_cancellation.py	threading	<unresolved>	Event	271	threading.Event()
+test_stream_cancellation.py	client1b	OllamaClient	chat_stream	278	"client1b.chat_stream(""m"", [], cancel_event=cancel1b)"
+test_stream_cancellation.py	got1b	<unresolved>	append	279	got1b.append(piece)
+test_stream_cancellation.py	threading	<unresolved>	Thread	283	threading.Thread(target=run_stream_1b, daemon=True)
+test_stream_cancellation.py	t1b	<unresolved>	start	284	t1b.start()
+test_stream_cancellation.py	time	<unresolved>	sleep	286	time.sleep(0.3)
+test_stream_cancellation.py	time	<unresolved>	time	287	time.time()
+test_stream_cancellation.py	cancel1b	<unresolved>	set	288	cancel1b.set()
+test_stream_cancellation.py	t1b	<unresolved>	join	289	t1b.join(timeout=5)
+test_stream_cancellation.py	time	<unresolved>	time	290	time.time()
+test_stream_cancellation.py	results	Results	check	291	"results.check(""returns fast while blocked before headers"", elapsed1b < 2.0, f""{elapsed1b:.2f}s"")"
+test_stream_cancellation.py	results	Results	check	292	"results.check(""no error when cancelled before headers"", err1b is None, repr(err1b))"
+test_stream_cancellation.py	results	Results	check	293	"results.check(""no content yielded"", got1b == [], str(got1b))"
+test_stream_cancellation.py	srv1b	StubServer	close	294	srv1b.close()
+test_stream_cancellation.py	srv2	StubServer	serve_pause_then_resume	299	"srv2.serve_pause_then_resume([""part-one ""], pause_seconds=2.0, resume_text=""part-two"")"
+test_stream_cancellation.py	threading	<unresolved>	Event	301	threading.Event()
+test_stream_cancellation.py	time	<unresolved>	time	302	time.time()
+test_stream_cancellation.py	client2	OllamaClient	chat_stream	303	"client2.chat_stream(""m"", [], cancel_event=cancel2)"
+test_stream_cancellation.py	time	<unresolved>	time	304	time.time()
+test_stream_cancellation.py	results	Results	check	305	"results.check(\n        ""full content received across the pause"",\n        pieces == [""part-one "", ""part-two""],\n        str(pieces),\n    )"
+test_stream_cancellation.py	results	Results	check	310	"results.check(""actually waited out the pause (>= ~2s)"", elapsed2 >= 1.8, f""{elapsed2:.2f}s"")"
+test_stream_cancellation.py	srv2	StubServer	close	311	srv2.close()
+test_stream_cancellation.py	srv3	StubServer	serve_normal	316	"srv3.serve_normal([""a"", ""b"", ""c""])"
+test_stream_cancellation.py	client3	OllamaClient	chat_stream	318	"client3.chat_stream(""m"", [])"
+test_stream_cancellation.py	results	Results	check	319	"results.check(""all chunks received in order"", pieces3 == [""a"", ""b"", ""c""], str(pieces3))"
+test_stream_cancellation.py	srv3	StubServer	close	320	srv3.close()
+test_stream_cancellation.py	srv4	StubServer	serve_then_abort	325	"srv4.serve_then_abort([""only-part ""], delay=0.3)"
+test_stream_cancellation.py	client4	OllamaClient	chat_stream	330	"client4.chat_stream(""m"", [])"
+test_stream_cancellation.py	got	<unresolved>	append	331	got.append(piece)
+test_stream_cancellation.py	results	Results	check	334	"results.check(""raises OllamaError"", isinstance(raised, OllamaError), repr(raised))"
+test_stream_cancellation.py	results	Results	check	335	"results.check(""got the partial content before the drop"", got == [""only-part ""], str(got))"
+test_stream_cancellation.py	srv4	StubServer	close	336	srv4.close()
+test_stream_cancellation.py	srv4b	StubServer	serve_graceful_close_no_done	341	"srv4b.serve_graceful_close_no_done([""partial-answer ""])"
+test_stream_cancellation.py	client4b	OllamaClient	chat_stream	346	"client4b.chat_stream(""m"", [])"
+test_stream_cancellation.py	got4b	<unresolved>	append	347	got4b.append(piece)
+test_stream_cancellation.py	results	Results	check	350	"results.check(\n        ""graceful premature EOF still raises OllamaError (not silently accepted)"",\n        isinstance(raised4b, OllamaError),\n        repr(raised4b),\n    )"
+test_stream_cancellation.py	results	Results	check	355	"results.check(""got the partial content before the drop"", got4b == [""partial-answer ""], str(got4b))"
+test_stream_cancellation.py	srv4b	StubServer	close	356	srv4b.close()
+test_stream_cancellation.py	srv4c	StubServer	serve_http_error	361	"srv4c.serve_http_error(500, {""error"": ""model runner crashed""})"
+test_stream_cancellation.py	client4c	OllamaClient	chat_stream	365	"client4c.chat_stream(""m"", [])"
+test_stream_cancellation.py	results	Results	check	368	"results.check(\n        ""raises OllamaError with Ollama's error detail (not a generic status)"",\n        isinstance(raised4c, OllamaError) and str(raised4c) == ""model runner crashed"",\n        repr(raised4c),\n    )"
+test_stream_cancellation.py	srv4c	StubServer	close	373	srv4c.close()
+test_stream_cancellation.py	threading	<unresolved>	enumerate	377	threading.enumerate()
+test_stream_cancellation.py	srv5	StubServer	serve_then_hang	380	"srv5.serve_then_hang([f""cycle-{i} ""])"
+test_stream_cancellation.py	threading	<unresolved>	Event	382	threading.Event()
+test_stream_cancellation.py	client5	OllamaClient	chat_stream	386	"client5.chat_stream(""m"", [], cancel_event=cancel5)"
+test_stream_cancellation.py	got5	<unresolved>	append	387	got5.append(piece)
+test_stream_cancellation.py	threading	<unresolved>	Thread	389	threading.Thread(target=run5, daemon=True)
+test_stream_cancellation.py	th	<unresolved>	start	390	th.start()
+test_stream_cancellation.py	time	<unresolved>	sleep	392	time.sleep(0.15)
+test_stream_cancellation.py	cancel5	<unresolved>	set	393	cancel5.set()
+test_stream_cancellation.py	th	<unresolved>	join	394	th.join(timeout=5)
+test_stream_cancellation.py	srv5	StubServer	close	395	srv5.close()
+test_stream_cancellation.py	time	<unresolved>	sleep	396	time.sleep(0.05)
+test_stream_cancellation.py	results	Results	check	402	"results.check(\n            f""no surviving named watcher thread after cycle {i}"",\n            not surviving,\n            str(surviving),\n        )"
+test_stream_cancellation.py	threading	<unresolved>	enumerate	407	threading.enumerate()
+test_stream_cancellation.py	results	Results	check	408	"results.check(\n        ""no accumulated worker/watcher threads after 5 cancel cycles"",\n        after <= before,\n        f""before={before} after={after}"",\n    )"
+test_web_content_security_policy.py	gi	<unresolved>	require_version	28	"gi.require_version(""Gtk"", ""4.0"")"
+test_web_content_security_policy.py	gi	<unresolved>	require_version	29	"gi.require_version(""Adw"", ""1"")"
+test_web_content_security_policy.py	gi	<unresolved>	require_version	30	"gi.require_version(""WebKit"", ""6.0"")"
+test_web_content_security_policy.py	GLib	<unresolved>	main_context_default	51	GLib.main_context_default()
+test_web_content_security_policy.py	time	<unresolved>	time	52	time.time()
+test_web_content_security_policy.py	ctx	<unresolved>	pending	54	ctx.pending()
+test_web_content_security_policy.py	ctx	<unresolved>	iteration	55	ctx.iteration(False)
+test_web_content_security_policy.py	time	<unresolved>	time	56	time.time()
+test_web_content_security_policy.py	time	<unresolved>	sleep	58	time.sleep(0.01)
+test_web_content_security_policy.py	time	<unresolved>	time	62	time.time()
+test_web_content_security_policy.py	time	<unresolved>	time	63	time.time()
+test_web_content_security_policy.py	self	<unresolved>	send_response	94	self.send_response(200)
+test_web_content_security_policy.py	self	<unresolved>	send_header	95	"self.send_header(""Content-Type"", ctype)"
+test_web_content_security_policy.py	self	<unresolved>	send_header	96	"self.send_header(""Content-Length"", str(len(body)))"
+test_web_content_security_policy.py	self	<unresolved>	send_header	97	"self.send_header(""Access-Control-Allow-Origin"", ""*"")"
+test_web_content_security_policy.py	self	<unresolved>	end_headers	98	self.end_headers()
+test_web_content_security_policy.py	self	<unresolved>	_serve	102	self._serve()
+test_web_content_security_policy.py	threading	<unresolved>	Thread	113	threading.Thread(target=stub.serve_forever, daemon=True)
+test_web_content_security_policy.py	stub_thread	<unresolved>	start	114	stub_thread.start()
+test_web_content_security_policy.py	Adw	<unresolved>	init	116	Adw.init()
+test_web_content_security_policy.py	Adw	<unresolved>	Application	117	"Adw.Application(\n        application_id=""dev.local.chickenbutt.csp"",\n        flags=Gio.ApplicationFlags.NON_UNIQUE,\n    )"
+test_web_content_security_policy.py	Adw	<unresolved>	ApplicationWindow	125	Adw.ApplicationWindow(application=a)
+test_web_content_security_policy.py	win	<unresolved>	set_content	126	win.set_content(web)
+test_web_content_security_policy.py	win	<unresolved>	present	127	win.present()
+test_web_content_security_policy.py	app	<unresolved>	connect	131	"app.connect(""activate"", on_activate)"
+test_web_content_security_policy.py	app	<unresolved>	register	132	app.register()
+test_web_content_security_policy.py	app	<unresolved>	activate	133	app.activate()
+test_web_content_security_policy.py	results	Results	check	139	"results.check(""CSP property is set"", bool(configured))"
+test_web_content_security_policy.py	results	Results	check	140	"results.check(\n        ""module-level TRANSCRIPT_CSP matches what was configured on the WebView"",\n        configured == TRANSCRIPT_CSP,\n        configured,\n    )"
+test_web_content_security_policy.py	part	<unresolved>	strip	147	part.strip()
+test_web_content_security_policy.py	part	<unresolved>	partition	150	"part.partition("" "")"
+test_web_content_security_policy.py	value	<unresolved>	strip	151	value.strip()
+test_web_content_security_policy.py	expected	<unresolved>	items	171	expected.items()
+test_web_content_security_policy.py	results	Results	check	172	"results.check(\n            f""directive present and exact: {name} {value}"",\n            directives.get(name) == value,\n            f""got {directives.get(name)!r}"",\n        )"
+test_web_content_security_policy.py	directives	<unresolved>	get	174	directives.get(name)
+test_web_content_security_policy.py	directives	<unresolved>	get	175	directives.get(name)
+test_web_content_security_policy.py	results	Results	check	177	"results.check(""no extra/unexpected directives"", set(directives) == set(expected), str(directives))"
+test_web_content_security_policy.py	results	Results	check	185	"results.check(f""policy does not contain {tok!r}"", tok not in (configured or """"), configured)"
+test_web_content_security_policy.py	results	Results	check	190	"results.check(""WebView reports ready after load"", ok)"
+test_web_content_security_policy.py	results	Results	check	192	"results.check(""WebView URI is the trusted local transcript"", web._view.get_uri() == trusted_uri)"
+test_web_content_security_policy.py	val	<unresolved>	to_json	200	val.to_json(0)
+test_web_content_security_policy.py	json	<unresolved>	loads	220	"json.loads(json.loads(captured.get(""json"") or ""null""))"
+test_web_content_security_policy.py	json	<unresolved>	loads	220	"json.loads(captured.get(""json"") or ""null"")"
+test_web_content_security_policy.py	captured	<unresolved>	get	220	"captured.get(""json"")"
+test_web_content_security_policy.py	captured	<unresolved>	get	220	"captured.get(""json"")"
+test_web_content_security_policy.py	results	Results	check	221	"results.check(""marked loaded (script-src 'self')"", res.get(""markedDefined"") is True, str(res))"
+test_web_content_security_policy.py	res	<unresolved>	get	221	"res.get(""markedDefined"")"
+test_web_content_security_policy.py	results	Results	check	222	"results.check(""DOMPurify loaded (script-src 'self')"", res.get(""domPurifyDefined"") is True, str(res))"
+test_web_content_security_policy.py	res	<unresolved>	get	222	"res.get(""domPurifyDefined"")"
+test_web_content_security_policy.py	results	Results	check	223	"results.check(""hljs loaded (script-src 'self')"", res.get(""hljsDefined"") is True, str(res))"
+test_web_content_security_policy.py	res	<unresolved>	get	223	"res.get(""hljsDefined"")"
+test_web_content_security_policy.py	results	Results	check	224	"results.check(""app.js ran (script-src 'self')"", res.get(""appJsRan"") is True, str(res))"
+test_web_content_security_policy.py	res	<unresolved>	get	224	"res.get(""appJsRan"")"
+test_web_content_security_policy.py	results	Results	check	225	"results.check(""transcript CSS applied (style-src 'self')"", res.get(""bodyBg"") not in (None, """", ""rgba(0, 0, 0, 0)""), str(res))"
+test_web_content_security_policy.py	res	<unresolved>	get	225	"res.get(""bodyBg"")"
+test_web_content_security_policy.py	results	Results	check	226	"results.check(\n        ""empty-state chicken icon loaded with nonzero natural size (img-src 'self')"",\n        (res.get(""iconNaturalWidth"") or 0) > 0,\n        str(res),\n    )"
+test_web_content_security_policy.py	res	<unresolved>	get	228	"res.get(""iconNaturalWidth"")"
+test_web_content_security_policy.py	res	<unresolved>	get	231	"res.get(""bodyBg"")"
+test_web_content_security_policy.py	dom_captured	<unresolved>	update	235	dom_captured.update(payload)
+test_web_content_security_policy.py	payload	<unresolved>	get	235	"payload.get(\n        ""type""\n    )"
+test_web_content_security_policy.py	web	WebTranscriptView	post	238	"web.post(\n        {\n            ""type"": ""message_added"",\n            ""id"": ""csp-post-check"",\n            ""role"": ""user"",\n            ""text"": ""still alive under CSP"",\n            ""streaming"": False,\n        }\n    )"
+test_web_content_security_policy.py	results	Results	check	256	"results.check(""DOM updates normally via Python->page bridge"", dom_captured.get(""hasRow"") is True, str(dom_captured))"
+test_web_content_security_policy.py	dom_captured	<unresolved>	get	256	"dom_captured.get(""hasRow"")"
+test_web_content_security_policy.py	val	<unresolved>	to_json	264	val.to_json(0)
+test_web_content_security_policy.py	results	Results	check	270	"results.check(\n        ""evaluate_javascript() executes a harmless expression without 'unsafe-eval'"",\n        eval_captured.get(""value"") == ""42"",\n        str(eval_captured),\n    )"
+test_web_content_security_policy.py	eval_captured	<unresolved>	get	272	"eval_captured.get(""value"")"
+test_web_content_security_policy.py	val	<unresolved>	to_json	342	val.to_json(0)
+test_web_content_security_policy.py	json	<unresolved>	loads	380	"json.loads(json.loads(gather_captured[""json""]))"
+test_web_content_security_policy.py	json	<unresolved>	loads	380	"json.loads(gather_captured[""json""])"
+test_web_content_security_policy.py	gather_captured	<unresolved>	get	380	"gather_captured.get(""json"")"
+test_web_content_security_policy.py	results	Results	check	382	"results.check(""stub server received zero requests"", _CountingStubHandler.hits == [], str(_CountingStubHandler.hits))"
+test_web_content_security_policy.py	results	Results	check	383	"results.check(""no external script executed"", probe.get(""externalScriptRan"") is False, str(probe))"
+test_web_content_security_policy.py	probe	<unresolved>	get	383	"probe.get(""externalScriptRan"")"
+test_web_content_security_policy.py	results	Results	check	384	"results.check(""no dynamically-appended inline <script> executed"", probe.get(""inlineScriptRan"") is False, str(probe))"
+test_web_content_security_policy.py	probe	<unresolved>	get	384	"probe.get(""inlineScriptRan"")"
+test_web_content_security_policy.py	results	Results	check	385	"results.check(\n        ""dynamically-appended inline <style> had no effect on computed styling"",\n        probe.get(""bodyBg"") == baseline_body_bg,\n        f""{probe.get('bodyBg')!r} != baseline {baseline_body_bg!r}"",\n    )"
+test_web_content_security_policy.py	probe	<unresolved>	get	387	"probe.get(""bodyBg"")"
+test_web_content_security_policy.py	probe	<unresolved>	get	388	probe.get('bodyBg')
+test_web_content_security_policy.py	results	Results	check	390	"results.check(""external <img> never loaded (naturalWidth 0)"", (probe.get(""imgNaturalWidth"") or 0) == 0, str(probe))"
+test_web_content_security_policy.py	probe	<unresolved>	get	390	"probe.get(""imgNaturalWidth"")"
+test_web_content_security_policy.py	results	Results	check	391	"results.check(\n        ""external <iframe> never actually loaded the blocked page's content"",\n        probe.get(""iframeHasExternalContent"") is False\n        and probe.get(""iframeHref"") in (""about:blank"", None),\n        str(probe),\n    )"
+test_web_content_security_policy.py	probe	<unresolved>	get	393	"probe.get(""iframeHasExternalContent"")"
+test_web_content_security_policy.py	probe	<unresolved>	get	394	"probe.get(""iframeHref"")"
+test_web_content_security_policy.py	results	Results	check	397	"results.check(\n        ""external worker never delivered a message"",\n        probe.get(""workerMessage"") is None,\n        str(probe),\n    )"
+test_web_content_security_policy.py	probe	<unresolved>	get	399	"probe.get(""workerMessage"")"
+test_web_content_security_policy.py	results	Results	check	402	"results.check(\n        ""<base> injection did not change document.baseURI"",\n        probe.get(""baseURIBefore"") == probe.get(""baseURIAfter""),\n        str(probe),\n    )"
+test_web_content_security_policy.py	probe	<unresolved>	get	404	"probe.get(""baseURIBefore"")"
+test_web_content_security_policy.py	probe	<unresolved>	get	404	"probe.get(""baseURIAfter"")"
+test_web_content_security_policy.py	results	Results	check	407	"results.check(\n        ""transcript stayed on its trusted local URI throughout"",\n        web._view.get_uri() == trusted_uri,\n        web._view.get_uri(),\n    )"
+test_web_content_security_policy.py	probe	<unresolved>	get	412	"probe.get(""cspViolations"")"
+test_web_content_security_policy.py	results	Results	check	413	"results.check(\n        ""CSP violations were reported for the blocked vectors"",\n        len(violations) > 0,\n        str(violations),\n    )"
+test_web_content_security_policy.py	dom_captured	<unresolved>	update	420	dom_captured.update(payload)
+test_web_content_security_policy.py	payload	<unresolved>	get	420	"payload.get(\n        ""type""\n    )"
+test_web_content_security_policy.py	dom_captured	<unresolved>	pop	434	"dom_captured.pop(""found"", None)"
+test_web_content_security_policy.py	results	Results	check	450	"results.check(""markdown row rendered"", dom_captured.get(""found"") is True, str(dom_captured))"
+test_web_content_security_policy.py	dom_captured	<unresolved>	get	450	"dom_captured.get(""found"")"
+test_web_content_security_policy.py	results	Results	check	451	"results.check(""GFM table still renders"", dom_captured.get(""tableCount"", 0) >= 1, str(dom_captured))"
+test_web_content_security_policy.py	dom_captured	<unresolved>	get	451	"dom_captured.get(""tableCount"", 0)"
+test_web_content_security_policy.py	results	Results	check	452	"results.check(""fenced code still highlighted"", dom_captured.get(""hljsCount"", 0) >= 1, str(dom_captured))"
+test_web_content_security_policy.py	dom_captured	<unresolved>	get	452	"dom_captured.get(""hljsCount"", 0)"
+test_web_content_security_policy.py	results	Results	check	453	"results.check(""copy control still wired"", dom_captured.get(""copyBtns"", 0) >= 1, str(dom_captured))"
+test_web_content_security_policy.py	dom_captured	<unresolved>	get	453	"dom_captured.get(""copyBtns"", 0)"
+test_web_content_security_policy.py	results	Results	check	454	"results.check(""expand control still wired"", dom_captured.get(""expandBtns"", 0) >= 1, str(dom_captured))"
+test_web_content_security_policy.py	dom_captured	<unresolved>	get	454	"dom_captured.get(""expandBtns"", 0)"
+test_web_content_security_policy.py	stub	<unresolved>	shutdown	456	stub.shutdown()
+test_web_content_security_policy.py	stub	<unresolved>	server_close	457	stub.server_close()
+test_web_content_security_policy.py	os	<unresolved>	_exit	469	os._exit(code)
+test_web_content_security_policy.py	traceback	<unresolved>	print_exc	473	traceback.print_exc()
+test_web_content_security_policy.py	os	<unresolved>	_exit	474	os._exit(2)
+test_web_navigation_policy.py	tempfile	<unresolved>	mkdtemp	27	"tempfile.mkdtemp(prefix=""cb-navpolicy-"")"
+test_web_navigation_policy.py	gi	<unresolved>	require_version	35	"gi.require_version(""Gtk"", ""4.0"")"
+test_web_navigation_policy.py	gi	<unresolved>	require_version	36	"gi.require_version(""Adw"", ""1"")"
+test_web_navigation_policy.py	gi	<unresolved>	require_version	37	"gi.require_version(""WebKit"", ""6.0"")"
+test_web_navigation_policy.py	GLib	<unresolved>	main_context_default	58	GLib.main_context_default()
+test_web_navigation_policy.py	time	<unresolved>	time	59	time.time()
+test_web_navigation_policy.py	ctx	<unresolved>	pending	61	ctx.pending()
+test_web_navigation_policy.py	ctx	<unresolved>	iteration	62	ctx.iteration(False)
+test_web_navigation_policy.py	time	<unresolved>	time	63	time.time()
+test_web_navigation_policy.py	time	<unresolved>	sleep	65	time.sleep(0.01)
+test_web_navigation_policy.py	time	<unresolved>	time	69	time.time()
+test_web_navigation_policy.py	time	<unresolved>	time	70	time.time()
+test_web_navigation_policy.py	Adw	<unresolved>	init	129	Adw.init()
+test_web_navigation_policy.py	Adw	<unresolved>	Application	130	"Adw.Application(\n        application_id=""dev.local.chickenbutt.navpolicy"",\n        flags=Gio.ApplicationFlags.NON_UNIQUE,\n    )"
+test_web_navigation_policy.py	launched	<unresolved>	append	140	launched.append(uri)
+test_web_navigation_policy.py	Adw	<unresolved>	ApplicationWindow	142	Adw.ApplicationWindow(application=a)
+test_web_navigation_policy.py	win	<unresolved>	set_content	143	win.set_content(web)
+test_web_navigation_policy.py	win	<unresolved>	present	144	win.present()
+test_web_navigation_policy.py	app	<unresolved>	connect	148	"app.connect(""activate"", on_activate)"
+test_web_navigation_policy.py	app	<unresolved>	register	149	app.register()
+test_web_navigation_policy.py	app	<unresolved>	activate	150	app.activate()
+test_web_navigation_policy.py	results	Results	check	159	"results.check(""local transcript finished loading"", ok)"
+test_web_navigation_policy.py	results	Results	check	160	"results.check(\n        ""WebView URI is the trusted local transcript"",\n        web._view.get_uri() == trusted_uri,\n        f""{web._view.get_uri()!r} != {trusted_uri!r}"",\n    )"
+test_web_navigation_policy.py	results	Results	check	170	"results.check(""reload of the exact trusted URI succeeds"", ok, web._view.get_uri())"
+test_web_navigation_policy.py	results	Results	check	177	"results.check(""fragment navigation on the trusted URI succeeds"", ok, web._view.get_uri())"
+test_web_navigation_policy.py	launched	<unresolved>	clear	184	launched.clear()
+test_web_navigation_policy.py	web	WebTranscriptView	_on_decide_policy	187	web._on_decide_policy(web._view, decision, WebKit.PolicyDecisionType.NAVIGATION_ACTION)
+test_web_navigation_policy.py	results	Results	check	188	"results.check(f""decide-policy handled NAVIGATION_ACTION for {uri}"", handled is True)"
+test_web_navigation_policy.py	results	Results	check	189	"results.check(f""{uri} sent to external launcher exactly once"", launched.count(uri) == 1, str(launched))"
+test_web_navigation_policy.py	launched	<unresolved>	count	189	launched.count(uri)
+test_web_navigation_policy.py	results	Results	check	190	"results.check(f""{uri} never used() by the embedded WebView"", decision.used is False)"
+test_web_navigation_policy.py	results	Results	check	191	"results.check(f""{uri} ignore()d by the embedded WebView"", decision.ignored is True)"
+test_web_navigation_policy.py	results	Results	check	192	"results.check(\n        ""WebView URI is unaffected by the fake user-gesture decisions"",\n        web._view.get_uri() == trusted_uri,\n        web._view.get_uri(),\n    )"
+test_web_navigation_policy.py	launched	<unresolved>	clear	199	launched.clear()
+test_web_navigation_policy.py	web	WebTranscriptView	_on_decide_policy	201	web._on_decide_policy(web._view, new_window_decision, WebKit.PolicyDecisionType.NEW_WINDOW_ACTION)
+test_web_navigation_policy.py	results	Results	check	202	"results.check(""decide-policy handled NEW_WINDOW_ACTION"", handled is True)"
+test_web_navigation_policy.py	results	Results	check	203	"results.check(""NEW_WINDOW_ACTION link sent to external launcher"", launched == [""https://example.com/blank""], str(launched))"
+test_web_navigation_policy.py	results	Results	check	204	"results.check(""NEW_WINDOW_ACTION never use()d (no new WebView created)"", new_window_decision.used is False)"
+test_web_navigation_policy.py	results	Results	check	205	"results.check(""NEW_WINDOW_ACTION ignore()d"", new_window_decision.ignored is True)"
+test_web_navigation_policy.py	launched	<unresolved>	clear	208	launched.clear()
+test_web_navigation_policy.py	web	WebTranscriptView	_on_decide_policy	210	web._on_decide_policy(web._view, trusted_new_window, WebKit.PolicyDecisionType.NEW_WINDOW_ACTION)
+test_web_navigation_policy.py	results	Results	check	211	"results.check(\n        ""trusted URI as a NEW_WINDOW_ACTION is still ignore()d, not use()d"",\n        trusted_new_window.used is False and trusted_new_window.ignored is True,\n    )"
+test_web_navigation_policy.py	launched	<unresolved>	clear	217	launched.clear()
+test_web_navigation_policy.py	results	Results	check	220	"results.check(\n        ""WebView URI still the trusted transcript after programmatic external load_uri"",\n        web._view.get_uri() == trusted_uri,\n        web._view.get_uri(),\n    )"
+test_web_navigation_policy.py	results	Results	check	225	"results.check(""no external launch for programmatic navigation"", launched == [], str(launched))"
+test_web_navigation_policy.py	launched	<unresolved>	clear	242	launched.clear()
+test_web_navigation_policy.py	web	WebTranscriptView	_on_decide_policy	244	web._on_decide_policy(web._view, decision, WebKit.PolicyDecisionType.NAVIGATION_ACTION)
+test_web_navigation_policy.py	results	Results	check	245	"results.check(f""blocked/never used(): {uri!r}"", decision.used is False)"
+test_web_navigation_policy.py	results	Results	check	246	"results.check(f""blocked/ignore()d: {uri!r}"", decision.ignored is True)"
+test_web_navigation_policy.py	results	Results	check	247	"results.check(f""not externally launched: {uri!r}"", launched == [], str(launched))"
+test_web_navigation_policy.py	results	Results	check	253	"results.check(\n            f""load_uri({bad!r}) did not navigate the WebView away from the transcript"",\n            web._view.get_uri() == trusted_uri,\n            web._view.get_uri(),\n        )"
+test_web_navigation_policy.py	web	WebTranscriptView	post	261	"web.post(\n        {\n            ""type"": ""message_added"",\n            ""id"": ""post-nav-block"",\n            ""role"": ""user"",\n            ""text"": ""still alive after blocked navigation"",\n            ""streaming"": False,\n        }\n    )"
+test_web_navigation_policy.py	captured	<unresolved>	update	272	captured.update(payload)
+test_web_navigation_policy.py	payload	<unresolved>	get	272	"payload.get(\n        ""type""\n    )"
+test_web_navigation_policy.py	results	Results	check	284	"results.check(\n        ""DOM still updates normally after every blocked navigation attempt"",\n        captured.get(""hasRow"") is True,\n        str(captured),\n    )"
+test_web_navigation_policy.py	captured	<unresolved>	get	286	"captured.get(""hasRow"")"
+test_web_navigation_policy.py	os	<unresolved>	_exit	300	os._exit(code)
+test_web_navigation_policy.py	traceback	<unresolved>	print_exc	304	traceback.print_exc()
+test_web_navigation_policy.py	os	<unresolved>	_exit	305	os._exit(2)
+test_wire_code_ui_batch.py	tempfile	<unresolved>	mkdtemp	19	"tempfile.mkdtemp(prefix=""cb-wire-code-ui-"")"
+test_wire_code_ui_batch.py	gi	<unresolved>	require_version	27	"gi.require_version(""Gtk"", ""4.0"")"
+test_wire_code_ui_batch.py	gi	<unresolved>	require_version	28	"gi.require_version(""Adw"", ""1"")"
+test_wire_code_ui_batch.py	GLib	<unresolved>	main_context_default	51	GLib.main_context_default()
+test_wire_code_ui_batch.py	time	<unresolved>	time	52	time.time()
+test_wire_code_ui_batch.py	ctx	<unresolved>	pending	54	ctx.pending()
+test_wire_code_ui_batch.py	ctx	<unresolved>	iteration	55	ctx.iteration(False)
+test_wire_code_ui_batch.py	time	<unresolved>	time	56	time.time()
+test_wire_code_ui_batch.py	time	<unresolved>	sleep	58	time.sleep(0.01)
+test_wire_code_ui_batch.py	time	<unresolved>	time	62	time.time()
+test_wire_code_ui_batch.py	time	<unresolved>	time	63	time.time()
+test_wire_code_ui_batch.py	captured	<unresolved>	pop	87	"captured.pop(""n"", None)"
+test_wire_code_ui_batch.py	captured	<unresolved>	get	94	"captured.get(""n"")"
+test_wire_code_ui_batch.py	Adw	<unresolved>	init	100	Adw.init()
+test_wire_code_ui_batch.py	Adw	<unresolved>	Application	101	"Adw.Application(\n        application_id=""dev.local.chickenbutt.wirecodeuibatch"",\n        flags=Gio.ApplicationFlags.NON_UNIQUE,\n    )"
+test_wire_code_ui_batch.py	holder['w']	ChatSidebar	present	109	"holder[""w""].present()"
+test_wire_code_ui_batch.py	app	<unresolved>	connect	111	"app.connect(""activate"", on_activate)"
+test_wire_code_ui_batch.py	app	<unresolved>	register	112	app.register()
+test_wire_code_ui_batch.py	app	<unresolved>	activate	113	app.activate()
+test_wire_code_ui_batch.py	store	ConversationStore	create_conversation	120	"store.create_conversation(model=""m"")"
+test_wire_code_ui_batch.py	store	ConversationStore	append_message	129	"store.append_message(target.id, role=role, content=content, message_id=f""t{i}"")"
+test_wire_code_ui_batch.py	store	ConversationStore	create_conversation	132	"store.create_conversation(model=""idle"")"
+test_wire_code_ui_batch.py	captured	<unresolved>	update	135	"captured.update(\n        {""n"": payload.get(""n"")}\n    )"
+test_wire_code_ui_batch.py	payload	<unresolved>	get	136	"payload.get(""n"")"
+test_wire_code_ui_batch.py	payload	<unresolved>	get	137	"payload.get(""type"")"
+test_wire_code_ui_batch.py	win	ChatSidebar	switch_conversation	144	win.switch_conversation(target.id)
+test_wire_code_ui_batch.py	results	Results	check	147	"results.check(f""restore completed ({N} messages)"", ok, f""got {len(win._messages)}"")"
+test_wire_code_ui_batch.py	results	Results	check	150	"results.check(\n        ""restore wires code UI a small constant number of times, not once per message"",\n        n_rafs is not None and n_rafs <= 3,\n        f""rAF calls = {n_rafs}"",\n    )"
+test_wire_code_ui_batch.py	results	Results	check	155	"results.check(\n        ""message count correct after restore"",\n        len(win._messages) == N,\n    )"
+test_wire_code_ui_batch.py	dom_captured	<unresolved>	update	172	dom_captured.update(payload)
+test_wire_code_ui_batch.py	payload	<unresolved>	get	172	"payload.get(\n        ""type""\n    )"
+test_wire_code_ui_batch.py	results	Results	check	177	"results.check(""all rows rendered"", dom_captured.get(""rows"") == N, str(dom_captured))"
+test_wire_code_ui_batch.py	dom_captured	<unresolved>	get	177	"dom_captured.get(""rows"")"
+test_wire_code_ui_batch.py	results	Results	check	178	"results.check(\n        ""assistant code blocks highlighted"",\n        dom_captured.get(""hljs"", 0) == N // 2,\n        str(dom_captured),\n    )"
+test_wire_code_ui_batch.py	dom_captured	<unresolved>	get	180	"dom_captured.get(""hljs"", 0)"
+test_wire_code_ui_batch.py	results	Results	check	183	"results.check(\n        ""copy controls wired for every code block"",\n        dom_captured.get(""copyBtns"", 0) == N // 2,\n        str(dom_captured),\n    )"
+test_wire_code_ui_batch.py	dom_captured	<unresolved>	get	185	"dom_captured.get(""copyBtns"", 0)"
+test_wire_code_ui_batch.py	results	Results	check	188	"results.check(\n        ""expand controls wired for every code block"",\n        dom_captured.get(""expandBtns"", 0) == N // 2,\n        str(dom_captured),\n    )"
+test_wire_code_ui_batch.py	dom_captured	<unresolved>	get	190	"dom_captured.get(""expandBtns"", 0)"
+test_wire_code_ui_batch.py	plain_captured	<unresolved>	update	196	"plain_captured.update(\n        {""n"": payload.get(""n"")}\n    )"
+test_wire_code_ui_batch.py	payload	<unresolved>	get	197	"payload.get(""n"")"
+test_wire_code_ui_batch.py	payload	<unresolved>	get	198	"payload.get(""type"")"
+test_wire_code_ui_batch.py	results	Results	check	212	"results.check(\n        ""a normal live assistant message still wires its own code UI"",\n        n_live is not None and n_live >= 1,\n        f""rAF calls = {n_live}"",\n    )"
+test_wire_code_ui_batch.py	store	ConversationStore	close	218	store.close()
+test_wire_code_ui_batch.py	os	<unresolved>	_exit	229	os._exit(code)
+test_wire_code_ui_batch.py	traceback	<unresolved>	print_exc	233	traceback.print_exc()
+test_wire_code_ui_batch.py	os	<unresolved>	_exit	234	os._exit(2)

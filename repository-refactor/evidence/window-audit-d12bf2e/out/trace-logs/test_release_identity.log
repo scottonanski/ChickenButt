@@ -1,0 +1,17 @@
+
+[1] release_info is well-formed
+  PASS  APP_ID looks like a reverse-DNS identifier — io.github.scottonanski.ChickenButt
+  PASS  APP_ID is not the old dev.local placeholder — io.github.scottonanski.ChickenButt
+  PASS  APP_NAME is 'ChickenButt'
+  PASS  VERSION is a valid semver-shaped string — 0.1.0
+
+[2] main.py's real GApplication uses release_info.APP_ID
+  PASS  main.APP_ID is exactly release_info.APP_ID (single source, not a copy) — io.github.scottonanski.ChickenButt
+  PASS  constructed ChickenButtApp's real application_id matches release_info.APP_ID — io.github.scottonanski.ChickenButt
+
+[3] Old clone-bound desktop install path is retired, not duplicated
+  PASS  old root .desktop file is absent (superseded by Meson-installed entry) — /home/scott/Development/ChickenButt/io.github.scottonanski.ChickenButt.desktop
+  PASS  old scripts/install-desktop-entry.py is absent (superseded by Meson) — /home/scott/Development/ChickenButt/scripts/install-desktop-entry.py
+
+=== Summary ===
+Passed: 8  Failed: 0

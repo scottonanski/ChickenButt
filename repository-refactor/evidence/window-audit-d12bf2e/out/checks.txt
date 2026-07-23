@@ -1,0 +1,15 @@
+[PASS] Every ChatSidebar method appears exactly once in methods.tsv -- tsv_count=99 unique=99 ast_count=99 missing_from_tsv=[] extra_in_tsv=[]
+[PASS] Every methods.tsv start_line contains the method's def statement; line_count is start/end derived -- []
+[PASS] Every attributes.tsv reported line exists and plausibly contains the attribute name -- []
+[PASS] Every attributes.tsv enclosing_method is a real ChatSidebar method -- []
+[PASS] Initialized-in-__init__ attrs + first-assigned-elsewhere attrs + never-written attrs == unique attribute union -- init=59 dynamic=9 never_written=116 union=184
+[PASS] No attribute is classified as both initialized-in-__init__ and first-assigned-elsewhere -- []
+[PASS] Reader and writer sets are not treated as mutually exclusive: exactly 66 attrs have both a read (Load/mutation-call/getattr) and a write occurrence row; getattr counts as a read -- 66 attributes have both read and write occurrence rows (expected exactly 66), e.g. ['_active_stream_cancel', '_chat_title_label', '_clear_btn', '_composer_char_label', '_composer_hint']
+[PASS] setattr(self, ...) site count is zero at this SHA (so setattr absence cannot skew the write partition) -- setattr attrs=[]
+[PASS] Exactly these 3 attrs are written and read ONLY via getattr (excluding getattr from reads would have dropped them from the overlap) -- got ['_composer_layout_hooked', '_empty_icon', '_ollama_cli_busy'], expected ['_composer_layout_hooked', '_empty_icon', '_ollama_cli_busy']
+[PASS] Every internal-calls.tsv caller_method is a real ChatSidebar method -- []
+[PASS] Every internal-calls.tsv callee_method names a real ChatSidebar method -- []
+[PASS] Every internal-calls.tsv line exists and contains a call to the reported callee -- []
+[PASS] counts-manifest.tsv counts recomputed directly from TSV row counts (not manually entered)
+
+TOTAL: ALL CHECKS PASSED

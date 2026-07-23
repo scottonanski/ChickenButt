@@ -1,0 +1,40 @@
+
+[1] Stalled-open response: Stop returns fast, no error
+  PASS  chat_stream returns within ~1s of cancel — 0.00s
+  PASS  worker thread actually finished
+  PASS  content received before Stop was yielded — ['hello ']
+  PASS  cancellation does not raise OllamaError — None
+
+[1b] Cancel while blocked before headers arrive
+  PASS  returns fast while blocked before headers — 0.00s
+  PASS  no error when cancelled before headers — None
+  PASS  no content yielded — []
+
+[2] Long pause then resume: stays connected, completes
+  PASS  full content received across the pause — ['part-one ', 'part-two']
+  PASS  actually waited out the pause (>= ~2s) — 2.20s
+
+[3] Normal completion unchanged
+  PASS  all chunks received in order — ['a', 'b', 'c']
+
+[4] Abrupt reset (no cancel) raises OllamaError
+  PASS  raises OllamaError — OllamaError('Connection to Ollama was lost during streaming')
+  PASS  got the partial content before the drop — ['only-part ']
+
+[4b] Graceful premature close (no done:true) raises OllamaError
+  PASS  graceful premature EOF still raises OllamaError (not silently accepted) — OllamaError('Ollama closed the response before generation completed')
+  PASS  got the partial content before the drop — ['partial-answer ']
+
+[4c] HTTP error response preserves Ollama's JSON error detail
+  PASS  raises OllamaError with Ollama's error detail (not a generic status) — OllamaError('model runner crashed')
+
+[5] Repeated cancel cycles: no thread leak
+  PASS  no surviving named watcher thread after cycle 0 — []
+  PASS  no surviving named watcher thread after cycle 1 — []
+  PASS  no surviving named watcher thread after cycle 2 — []
+  PASS  no surviving named watcher thread after cycle 3 — []
+  PASS  no surviving named watcher thread after cycle 4 — []
+  PASS  no accumulated worker/watcher threads after 5 cancel cycles — before=1 after=1
+
+=== Summary ===
+Passed: 21  Failed: 0

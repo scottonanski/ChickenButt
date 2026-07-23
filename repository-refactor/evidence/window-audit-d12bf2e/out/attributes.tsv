@@ -1,0 +1,1106 @@
+attribute	line	enclosing_method	enclosing_closure	ast_context	exact_operation	exact_source_text	matches_chatsidebar_method_name
+client	498	__init__		Store	self.client = client or OllamaClient()	self.client	False
+_store	499	__init__		Store	self._store = ConversationStore()	self._store	False
+_conversation_id	500	__init__		AnnAssign	self._conversation_id: str | None = None	self._conversation_id	False
+_messages	501	__init__		AnnAssign	self._messages: list[dict[str, str]] = []	self._messages	False
+_streaming	502	__init__		Store	self._streaming = False	self._streaming	False
+_stream_generation	503	__init__		Store	self._stream_generation = 0	self._stream_generation	False
+_active_stream_cancel	504	__init__		AnnAssign	self._active_stream_cancel: threading.Event | None = None	self._active_stream_cancel	False
+_model	505	__init__		AnnAssign	self._model: str | None = None	self._model	False
+_on_close_request	506	__init__		AnnAssign	self._on_close_request: Callable[[], bool] | None = None	self._on_close_request	False
+_empty_box	507	__init__		AnnAssign	self._empty_box: Gtk.Widget | None = None	self._empty_box	False
+_status_label	508	__init__		AnnAssign	self._status_label: Gtk.Label | None = None	self._status_label	False
+_transcript_mode	509	__init__		Store	self._transcript_mode = _transcript_mode()	self._transcript_mode	False
+_web	510	__init__		AnnAssign	self._web: object | None = None	self._web	False
+_msg_counter	511	__init__		Store	self._msg_counter = 0	self._msg_counter	False
+_loading_model	512	__init__		Store	self._loading_model = False	self._loading_model	False
+_stop_load	513	__init__		Store	self._stop_load = False	self._stop_load	False
+_load_pulse_id	514	__init__		AnnAssign	self._load_pulse_id: int = 0	self._load_pulse_id	False
+_load_indeterminate	515	__init__		Store	self._load_indeterminate = True	self._load_indeterminate	False
+_greeted_models	516	__init__		AnnAssign	self._greeted_models: set[str] = set()	self._greeted_models	False
+_suppress_model_select	517	__init__		Store	self._suppress_model_select = False	self._suppress_model_select	False
+_history_restored	518	__init__		Store	self._history_restored = False	self._history_restored	False
+_load_overlay	519	__init__		AnnAssign	self._load_overlay: Gtk.Widget | None = None	self._load_overlay	False
+_load_title	520	__init__		AnnAssign	self._load_title: Gtk.Label | None = None	self._load_title	False
+_load_model_label	521	__init__		AnnAssign	self._load_model_label: Gtk.Label | None = None	self._load_model_label	False
+_load_status	522	__init__		AnnAssign	self._load_status: Gtk.Label | None = None	self._load_status	False
+_load_progress	523	__init__		AnnAssign	self._load_progress: Gtk.ProgressBar | None = None	self._load_progress	False
+_load_spinner	524	__init__		AnnAssign	self._load_spinner: Gtk.Spinner | None = None	self._load_spinner	False
+_root_overlay	525	__init__		AnnAssign	self._root_overlay: Gtk.Overlay | None = None	self._root_overlay	False
+model_combo	526	__init__		AnnAssign	self.model_combo: Gtk.DropDown | None = None	self.model_combo	False
+send_btn	527	__init__		AnnAssign	self.send_btn: Gtk.Button | None = None	self.send_btn	False
+stop_btn	528	__init__		AnnAssign	self.stop_btn: Gtk.Button | None = None	self.stop_btn	False
+input	529	__init__		AnnAssign	self.input: Gtk.TextView | None = None	self.input	False
+_input_scroll	530	__init__		AnnAssign	self._input_scroll: Gtk.ScrolledWindow | None = None	self._input_scroll	False
+_composer_char_label	531	__init__		AnnAssign	self._composer_char_label: Gtk.Label | None = None	self._composer_char_label	False
+_composer_hint	532	__init__		AnnAssign	self._composer_hint: Gtk.Label | None = None	self._composer_hint	False
+_composer_hint_fade_id	533	__init__		AnnAssign	self._composer_hint_fade_id: int = 0	self._composer_hint_fade_id	False
+_composer_truncating	534	__init__		Store	self._composer_truncating = False	self._composer_truncating	False
+_empty_icon	535	__init__		AnnAssign	self._empty_icon: Gtk.Widget | None = None	self._empty_icon	False
+_refresh_btn	536	__init__		AnnAssign	self._refresh_btn: Gtk.Button | None = None	self._refresh_btn	False
+_clear_btn	537	__init__		AnnAssign	self._clear_btn: Gtk.Button | None = None	self._clear_btn	False
+_new_chat_btn	538	__init__		AnnAssign	self._new_chat_btn: Gtk.Button | None = None	self._new_chat_btn	False
+_sidebar_new_btn	539	__init__		AnnAssign	self._sidebar_new_btn: Gtk.Button | None = None	self._sidebar_new_btn	False
+_settings_btn	540	__init__		AnnAssign	self._settings_btn: Gtk.Button | None = None	self._settings_btn	False
+_sidebar_btn	541	__init__		AnnAssign	self._sidebar_btn: Gtk.ToggleButton | None = None	self._sidebar_btn	False
+_sidebar	542	__init__		AnnAssign	self._sidebar: Gtk.Widget | None = None	self._sidebar	False
+_history_list	543	__init__		AnnAssign	self._history_list: Gtk.ListBox | None = None	self._history_list	False
+_sidebar_syncing	544	__init__		Store	self._sidebar_syncing = False	self._sidebar_syncing	False
+_history_dirty	545	__init__		Store	self._history_dirty = True	self._history_dirty	False
+_chat_title_label	546	__init__		AnnAssign	self._chat_title_label: Gtk.Label | None = None	self._chat_title_label	False
+_load_failed	547	__init__		Store	self._load_failed = False	self._load_failed	False
+_load_generation	548	__init__		Store	self._load_generation = 0	self._load_generation	False
+_health	549	__init__		AnnAssign	self._health: HealthState = checking_state()	self._health	False
+_health_banner	550	__init__		AnnAssign	self._health_banner: Gtk.Widget | None = None	self._health_banner	False
+_health_title	551	__init__		AnnAssign	self._health_title: Gtk.Label | None = None	self._health_title	False
+_health_detail	552	__init__		AnnAssign	self._health_detail: Gtk.Label | None = None	self._health_detail	False
+_health_action_btn	553	__init__		AnnAssign	self._health_action_btn: Gtk.Button | None = None	self._health_action_btn	False
+_health_action_id	554	__init__		AnnAssign	self._health_action_id: str | None = None	self._health_action_id	False
+_health_action_model	555	__init__		AnnAssign	self._health_action_model: str | None = None	self._health_action_model	False
+_native_rows	557	__init__		AnnAssign	self._native_rows: dict[str, Gtk.Widget] = {}	self._native_rows	False
+set_default_size	560	__init__		Load	self.set_default_size	self.set_default_size	False
+set_resizable	561	__init__		Load	self.set_resizable	self.set_resizable	False
+set_decorated	562	__init__		Load	self.set_decorated	self.set_decorated	False
+set_hide_on_close	563	__init__		Load	self.set_hide_on_close	self.set_hide_on_close	False
+set_size_request	564	__init__		Load	self.set_size_request	self.set_size_request	False
+_install_css	566	__init__		Load	self._install_css	self._install_css	True
+_transcript_mode	567	__init__		Load	self._transcript_mode	self._transcript_mode	False
+_build_ui	569	__init__		Load	self._build_ui	self._build_ui	True
+_handle_close_request	570	__init__		Load	self._handle_close_request	self._handle_close_request	True
+connect	570	__init__		Load	self.connect	self.connect	False
+_sync_empty_brand_icon	573	__init__		Load	self._sync_empty_brand_icon	self._sync_empty_brand_icon	True
+_on_key	579	__init__		Load	self._on_key	self._on_key	True
+add_controller	580	__init__		Load	self.add_controller	self.add_controller	False
+_restore_history	583	__init__		Load	self._restore_history	self._restore_history	True
+_refresh_models	584	__init__		Load	self._refresh_models	self._refresh_models	True
+_on_close_request	587	set_close_handler		Store	self._on_close_request = handler	self._on_close_request	False
+_on_close_request	590	_handle_close_request		Load	self._on_close_request	self._on_close_request	False
+_on_close_request	591	_handle_close_request		Load	self._on_close_request	self._on_close_request	False
+set_visible	592	_handle_close_request		Load	self.set_visible	self.set_visible	False
+set_visible	597	_on_key		Load	self.set_visible	self.set_visible	False
+set_content	615	_build_ui		Load	self.set_content	self.set_content	False
+_build_history_sidebar	617	_build_ui		Load	self._build_history_sidebar	self._build_history_sidebar	True
+_sidebar	619	_build_ui		Store	self._sidebar = sidebar	self._sidebar	False
+_chat_title_label	639	_build_ui		Store	"self._chat_title_label = Gtk.Label(label=""New conversation"")"	self._chat_title_label	False
+_chat_title_label	640	_build_ui		mutation-call	"self._chat_title_label.add_css_class(""header-sub"")"	self._chat_title_label	False
+_chat_title_label	641	_build_ui		mutation-call	self._chat_title_label.set_halign(Gtk.Align.CENTER)	self._chat_title_label	False
+_chat_title_label	642	_build_ui		mutation-call	self._chat_title_label.set_ellipsize(Pango.EllipsizeMode.END)	self._chat_title_label	False
+_chat_title_label	643	_build_ui		mutation-call	self._chat_title_label.set_max_width_chars(36)	self._chat_title_label	False
+_chat_title_label	644	_build_ui		Load	self._chat_title_label	self._chat_title_label	False
+_status_label	644	_build_ui		Store	self._status_label = self._chat_title_label	self._status_label	False
+_chat_title_label	646	_build_ui		Load	self._chat_title_label	self._chat_title_label	False
+_on_sidebar_toggled	658	_build_ui		Load	self._on_sidebar_toggled	self._on_sidebar_toggled	True
+_sidebar_btn	661	_build_ui		Store	self._sidebar_btn = sidebar_btn	self._sidebar_btn	False
+clear_chat	668	_build_ui	<lambda:L668>	Load	self.clear_chat	self.clear_chat	True
+_clear_btn	671	_build_ui		Store	self._clear_btn = clear_btn	self._clear_btn	False
+_new_chat_btn	673	_build_ui		Store	self._new_chat_btn = None	self._new_chat_btn	False
+_refresh_btn	705	_build_ui		Store	self._refresh_btn = refresh_btn	self._refresh_btn	False
+new_chat	709	_build_ui	<lambda:L709>	Load	self.new_chat	self.new_chat	True
+add_action	710	_build_ui		Load	self.add_action	self.add_action	False
+toggle_sidebar	712	_build_ui	<lambda:L712>	Load	self.toggle_sidebar	self.toggle_sidebar	True
+add_action	713	_build_ui		Load	self.add_action	self.add_action	False
+open_settings	715	_build_ui	<lambda:L715>	Load	self.open_settings	self.open_settings	True
+add_action	716	_build_ui		Load	self.add_action	self.add_action	False
+_conversation_id	720	_build_ui	<lambda:L720>	Load	self._conversation_id	self._conversation_id	False
+export_conversation	720	_build_ui	<lambda:L720>	Load	self.export_conversation	self.export_conversation	True
+add_action	722	_build_ui		Load	self.add_action	self.add_action	False
+_conversation_id	726	_build_ui	<lambda:L726>	Load	self._conversation_id	self._conversation_id	False
+export_conversation	726	_build_ui	<lambda:L726>	Load	self.export_conversation	self.export_conversation	True
+add_action	728	_build_ui		Load	self.add_action	self.add_action	False
+hide_to_tray	731	_build_ui	<lambda:L731>	Load	self.hide_to_tray	self.hide_to_tray	True
+add_action	732	_build_ui		Load	self.add_action	self.add_action	False
+toggle_maximize	734	_build_ui	<lambda:L734>	Load	self.toggle_maximize	self.toggle_maximize	True
+add_action	735	_build_ui		Load	self.add_action	self.add_action	False
+hide_to_tray	737	_build_ui	<lambda:L737>	Load	self.hide_to_tray	self.hide_to_tray	True
+add_action	738	_build_ui		Load	self.add_action	self.add_action	False
+_refresh_models	740	_build_ui	<lambda:L740>	Load	self._refresh_models	self._refresh_models	True
+add_action	741	_build_ui		Load	self.add_action	self.add_action	False
+_refresh_action	742	_build_ui		Store	self._refresh_action = refresh_action	self._refresh_action	False
+get_application	745	_build_ui		Load	self.get_application	self.get_application	False
+_health_title	768	_build_ui		Store	"self._health_title = Gtk.Label(label="""")"	self._health_title	False
+_health_title	769	_build_ui		mutation-call	"self._health_title.add_css_class(""health-banner-title"")"	self._health_title	False
+_health_title	770	_build_ui		mutation-call	self._health_title.set_halign(Gtk.Align.START)	self._health_title	False
+_health_title	771	_build_ui		mutation-call	self._health_title.set_wrap(True)	self._health_title	False
+_health_title	772	_build_ui		mutation-call	self._health_title.set_xalign(0)	self._health_title	False
+_health_detail	773	_build_ui		Store	"self._health_detail = Gtk.Label(label="""")"	self._health_detail	False
+_health_detail	774	_build_ui		mutation-call	"self._health_detail.add_css_class(""health-banner-detail"")"	self._health_detail	False
+_health_detail	775	_build_ui		mutation-call	self._health_detail.set_halign(Gtk.Align.START)	self._health_detail	False
+_health_detail	776	_build_ui		mutation-call	self._health_detail.set_wrap(True)	self._health_detail	False
+_health_detail	777	_build_ui		mutation-call	self._health_detail.set_xalign(0)	self._health_detail	False
+_health_title	778	_build_ui		Load	self._health_title	self._health_title	False
+_health_detail	779	_build_ui		Load	self._health_detail	self._health_detail	False
+_health_action_btn	781	_build_ui		Store	"self._health_action_btn = Gtk.Button(label=""Retry"")"	self._health_action_btn	False
+_health_action_btn	782	_build_ui		mutation-call	"self._health_action_btn.add_css_class(""suggested-action"")"	self._health_action_btn	False
+_health_action_btn	783	_build_ui		mutation-call	self._health_action_btn.set_valign(Gtk.Align.CENTER)	self._health_action_btn	False
+_health_action_btn	784	_build_ui		mutation-call	"self._health_action_btn.connect(""clicked"", self._on_health_action)"	self._health_action_btn	False
+_on_health_action	784	_build_ui		Load	self._on_health_action	self._on_health_action	True
+_health_action_btn	785	_build_ui		Load	self._health_action_btn	self._health_action_btn	False
+_health_action_btn	786	_build_ui		Load	self._health_action_btn	self._health_action_btn	False
+_health_banner	788	_build_ui		Store	self._health_banner = health_clamp	self._health_banner	False
+_health_banner	789	_build_ui		mutation-call	self._health_banner.set_visible(False)	self._health_banner	False
+scroller	792	_build_ui		AnnAssign	self.scroller: Gtk.ScrolledWindow | None = None	self.scroller	False
+chat_box	793	_build_ui		AnnAssign	self.chat_box: Gtk.Box | None = None	self.chat_box	False
+_transcript_widget	794	_build_ui		AnnAssign	self._transcript_widget: Gtk.Widget	self._transcript_widget	False
+_transcript_mode	796	_build_ui		Load	self._transcript_mode	self._transcript_mode	False
+_on_web_intent	800	_build_ui		Load	self._on_web_intent	self._on_web_intent	True
+_web	800	_build_ui		Store	self._web = WebTranscriptView(on_intent=self._on_web_intent)	self._web	False
+_transcript_widget	801	_build_ui		Store	self._transcript_widget = self._web	self._transcript_widget	False
+_web	801	_build_ui		Load	self._web	self._web	False
+_transcript_mode	805	_build_ui		Store	"self._transcript_mode = ""native"""	self._transcript_mode	False
+_web	806	_build_ui		Store	self._web = None	self._web	False
+_transcript_mode	808	_build_ui		Load	self._transcript_mode	self._transcript_mode	False
+scroller	809	_build_ui		Store	self.scroller = Gtk.ScrolledWindow()	self.scroller	False
+scroller	810	_build_ui		mutation-call	self.scroller.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)	self.scroller	False
+scroller	811	_build_ui		mutation-call	self.scroller.set_vexpand(True)	self.scroller	False
+scroller	812	_build_ui		mutation-call	self.scroller.set_hexpand(True)	self.scroller	False
+scroller	813	_build_ui		mutation-call	self.scroller.set_propagate_natural_height(False)	self.scroller	False
+scroller	814	_build_ui		mutation-call	self.scroller.set_propagate_natural_width(False)	self.scroller	False
+scroller	815	_build_ui		mutation-call	self.scroller.set_min_content_height(80)	self.scroller	False
+scroller	816	_build_ui		mutation-call	"self.scroller.add_css_class(""chat-surface"")"	self.scroller	False
+chat_box	818	_build_ui		Store	self.chat_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)	self.chat_box	False
+chat_box	819	_build_ui		mutation-call	"self.chat_box.add_css_class(""chat-list"")"	self.chat_box	False
+chat_box	820	_build_ui		mutation-call	self.chat_box.set_margin_start(12)	self.chat_box	False
+chat_box	821	_build_ui		mutation-call	self.chat_box.set_margin_end(12)	self.chat_box	False
+chat_box	822	_build_ui		mutation-call	self.chat_box.set_margin_top(8)	self.chat_box	False
+chat_box	823	_build_ui		mutation-call	self.chat_box.set_margin_bottom(16)	self.chat_box	False
+chat_box	824	_build_ui		mutation-call	self.chat_box.set_valign(Gtk.Align.START)	self.chat_box	False
+chat_box	825	_build_ui		mutation-call	self.chat_box.set_vexpand(False)	self.chat_box	False
+chat_box	826	_build_ui		mutation-call	self.chat_box.set_hexpand(True)	self.chat_box	False
+chat_box	827	_build_ui		Load	self.chat_box	self.chat_box	False
+scroller	827	_build_ui		mutation-call	self.scroller.set_child(self.chat_box)	self.scroller	False
+_transcript_widget	828	_build_ui		Store	self._transcript_widget = self.scroller	self._transcript_widget	False
+scroller	828	_build_ui		Load	self.scroller	self.scroller	False
+_show_empty_state	829	_build_ui		Load	self._show_empty_state	self._show_empty_state	True
+input	840	_build_ui		Store	self.input = Gtk.TextView()	self.input	False
+input	841	_build_ui		mutation-call	self.input.set_wrap_mode(Gtk.WrapMode.WORD_CHAR)	self.input	False
+input	842	_build_ui		mutation-call	self.input.set_accepts_tab(False)	self.input	False
+input	843	_build_ui		mutation-call	self.input.set_top_margin(8)	self.input	False
+input	844	_build_ui		mutation-call	self.input.set_bottom_margin(8)	self.input	False
+input	845	_build_ui		mutation-call	self.input.set_left_margin(2)	self.input	False
+input	846	_build_ui		mutation-call	self.input.set_right_margin(4)	self.input	False
+input	847	_build_ui		mutation-call	self.input.set_pixels_above_lines(1)	self.input	False
+input	848	_build_ui		mutation-call	self.input.set_pixels_below_lines(1)	self.input	False
+input	849	_build_ui		mutation-call	self.input.set_hexpand(True)	self.input	False
+input	850	_build_ui		mutation-call	self.input.set_vexpand(False)	self.input	False
+input	851	_build_ui		mutation-call	"self.input.add_css_class(""composer-input"")"	self.input	False
+_input_scroll	856	_build_ui		Store	self._input_scroll = Gtk.ScrolledWindow()	self._input_scroll	False
+_input_scroll	857	_build_ui		mutation-call	self._input_scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER)	self._input_scroll	False
+_input_scroll	858	_build_ui		mutation-call	self._input_scroll.set_propagate_natural_height(True)	self._input_scroll	False
+_input_scroll	859	_build_ui		mutation-call	self._input_scroll.set_propagate_natural_width(True)	self._input_scroll	False
+_input_scroll	860	_build_ui		mutation-call	self._input_scroll.set_hexpand(True)	self._input_scroll	False
+_input_scroll	861	_build_ui		mutation-call	self._input_scroll.set_vexpand(False)	self._input_scroll	False
+_input_scroll	862	_build_ui		mutation-call	self._input_scroll.set_valign(Gtk.Align.CENTER)	self._input_scroll	False
+_input_scroll	863	_build_ui		mutation-call	"self._input_scroll.add_css_class(""composer-scroll"")"	self._input_scroll	False
+_input_scroll	864	_build_ui		mutation-call	self._input_scroll.set_child(self.input)	self._input_scroll	False
+input	864	_build_ui		Load	self.input	self.input	False
+_apply_composer_height	865	_build_ui		Load	self._apply_composer_height	self._apply_composer_height	True
+_placeholder	868	_build_ui		Store	"self._placeholder = Gtk.Label(label=""Message…"")"	self._placeholder	False
+_placeholder	869	_build_ui		mutation-call	"self._placeholder.add_css_class(""dim-label"")"	self._placeholder	False
+_placeholder	870	_build_ui		mutation-call	self._placeholder.set_halign(Gtk.Align.START)	self._placeholder	False
+_placeholder	871	_build_ui		mutation-call	self._placeholder.set_valign(Gtk.Align.CENTER)	self._placeholder	False
+_placeholder	872	_build_ui		mutation-call	self._placeholder.set_margin_start(4)	self._placeholder	False
+_placeholder	873	_build_ui		mutation-call	self._placeholder.set_can_target(False)	self._placeholder	False
+_input_scroll	876	_build_ui		Load	self._input_scroll	self._input_scroll	False
+_placeholder	877	_build_ui		Load	self._placeholder	self._placeholder	False
+input	882	_build_ui		mutation-call	self.input.get_buffer()	self.input	False
+_on_buffer_changed	883	_build_ui		Load	self._on_buffer_changed	self._on_buffer_changed	True
+_on_composer_insert_text	884	_build_ui		Load	self._on_composer_insert_text	self._on_composer_insert_text	True
+_on_input_key	887	_build_ui		Load	self._on_input_key	self._on_input_key	True
+input	888	_build_ui		mutation-call	self.input.add_controller(input_key)	self.input	False
+stop_btn	890	_build_ui		Store	"self.stop_btn = Gtk.Button.new_from_icon_name(""media-playback-stop-symbolic"")"	self.stop_btn	False
+stop_btn	891	_build_ui		mutation-call	"self.stop_btn.add_css_class(""circular"")"	self.stop_btn	False
+stop_btn	892	_build_ui		mutation-call	"self.stop_btn.add_css_class(""stop-btn"")"	self.stop_btn	False
+stop_btn	893	_build_ui		mutation-call	"self.stop_btn.add_css_class(""destructive-action"")"	self.stop_btn	False
+stop_btn	894	_build_ui		mutation-call	"self.stop_btn.set_tooltip_text(""Stop generating"")"	self.stop_btn	False
+stop_btn	896	_build_ui		mutation-call	self.stop_btn.set_valign(Gtk.Align.CENTER)	self.stop_btn	False
+stop_btn	897	_build_ui		mutation-call	self.stop_btn.set_visible(False)	self.stop_btn	False
+_request_stop	898	_build_ui	<lambda:L898>	Load	self._request_stop	self._request_stop	True
+stop_btn	898	_build_ui		mutation-call	"self.stop_btn.connect(""clicked"", lambda *_: self._request_stop())"	self.stop_btn	False
+stop_btn	899	_build_ui		Load	self.stop_btn	self.stop_btn	False
+send_btn	918	_build_ui		Store	self.send_btn = Gtk.Button.new_from_icon_name(send_icon)	self.send_btn	False
+send_btn	919	_build_ui		mutation-call	"self.send_btn.add_css_class(""circular"")"	self.send_btn	False
+send_btn	920	_build_ui		mutation-call	"self.send_btn.add_css_class(""send-btn"")"	self.send_btn	False
+send_btn	921	_build_ui		mutation-call	"self.send_btn.add_css_class(""suggested-action"")"	self.send_btn	False
+send_btn	922	_build_ui		mutation-call	"self.send_btn.set_tooltip_text(""Send message (Enter)"")"	self.send_btn	False
+send_btn	923	_build_ui		mutation-call	self.send_btn.set_valign(Gtk.Align.CENTER)	self.send_btn	False
+_send	924	_build_ui	<lambda:L924>	Load	self._send	self._send	True
+send_btn	924	_build_ui		mutation-call	"self.send_btn.connect(""clicked"", lambda *_: self._send())"	self.send_btn	False
+send_btn	925	_build_ui		Load	self.send_btn	self.send_btn	False
+stop_btn	928	_build_ui		Load	self.stop_btn	self.stop_btn	False
+send_btn	929	_build_ui		Load	self.send_btn	self.send_btn	False
+_composer_hint	932	_build_ui		Store	"self._composer_hint = Gtk.Label(\n            label=""Enter to send · Shift+Enter for newline · Esc to minimize to tray""\n        )"	self._composer_hint	False
+_composer_hint	935	_build_ui		mutation-call	"self._composer_hint.add_css_class(""composer-hint"")"	self._composer_hint	False
+_composer_hint	936	_build_ui		mutation-call	self._composer_hint.set_halign(Gtk.Align.CENTER)	self._composer_hint	False
+_composer_hint	937	_build_ui		mutation-call	self._composer_hint.set_hexpand(True)	self._composer_hint	False
+_composer_hint	938	_build_ui		mutation-call	self._composer_hint.set_justify(Gtk.Justification.CENTER)	self._composer_hint	False
+_composer_hint	939	_build_ui		mutation-call	self._composer_hint.set_wrap(True)	self._composer_hint	False
+_composer_hint	940	_build_ui		mutation-call	self._composer_hint.set_xalign(0.5)	self._composer_hint	False
+_composer_char_label	942	_build_ui		Store	"self._composer_char_label = Gtk.Label(label="""")"	self._composer_char_label	False
+_composer_char_label	943	_build_ui		mutation-call	"self._composer_char_label.add_css_class(""composer-char-count"")"	self._composer_char_label	False
+_composer_char_label	944	_build_ui		mutation-call	self._composer_char_label.set_halign(Gtk.Align.END)	self._composer_char_label	False
+_composer_char_label	945	_build_ui		mutation-call	self._composer_char_label.set_hexpand(True)	self._composer_char_label	False
+_composer_char_label	946	_build_ui		mutation-call	self._composer_char_label.set_visible(False)	self._composer_char_label	False
+_composer_char_label	947	_build_ui		mutation-call	"self._composer_char_label.set_tooltip_text(\n            f""Hard safety limit is {COMPOSER_CHAR_LIMIT:,} characters""\n        )"	self._composer_char_label	False
+_composer_char_label	953	_build_ui		Load	self._composer_char_label	self._composer_char_label	False
+_composer_hint	955	_build_ui		Load	self._composer_hint	self._composer_hint	False
+_hook_composer_surface_layout	960	_build_ui		Load	self._hook_composer_surface_layout	self._hook_composer_surface_layout	True
+connect	960	_build_ui		Load	self.connect	self.connect	False
+_apply_composer_height	961	_build_ui	<lambda:L961>	Load	self._apply_composer_height	self._apply_composer_height	True
+connect	961	_build_ui		Load	self.connect	self.connect	False
+_transcript_widget	983	_build_ui		Load	self._transcript_widget	self._transcript_widget	False
+_health_banner	989	_build_ui		mutation-call	self._health_banner.set_vexpand(False)	self._health_banner	False
+_health_banner	990	_build_ui		Load	self._health_banner	self._health_banner	False
+_root_overlay	994	_build_ui		Store	self._root_overlay = Gtk.Overlay()	self._root_overlay	False
+_root_overlay	995	_build_ui		mutation-call	self._root_overlay.set_hexpand(True)	self._root_overlay	False
+_root_overlay	996	_build_ui		mutation-call	self._root_overlay.set_vexpand(True)	self._root_overlay	False
+_root_overlay	997	_build_ui		mutation-call	self._root_overlay.set_child(outer)	self._root_overlay	False
+_build_load_overlay	998	_build_ui		Load	self._build_load_overlay	self._build_load_overlay	True
+_load_overlay	999	_build_ui		Load	self._load_overlay	self._load_overlay	False
+_load_overlay	1000	_build_ui		Load	self._load_overlay	self._load_overlay	False
+_root_overlay	1000	_build_ui		mutation-call	self._root_overlay.add_overlay(self._load_overlay)	self._root_overlay	False
+_root_overlay	1001	_build_ui		Load	self._root_overlay	self._root_overlay	False
+_history_dirty	1003	_build_ui		Store	self._history_dirty = True	self._history_dirty	False
+_rebuild_history_list	1004	_build_ui		Load	self._rebuild_history_list	self._rebuild_history_list	True
+_refresh_chat_title	1005	_build_ui		Load	self._refresh_chat_title	self._refresh_chat_title	True
+new_chat	1029	_build_history_sidebar	<lambda:L1029>	Load	self.new_chat	self.new_chat	True
+_sidebar_new_btn	1032	_build_history_sidebar		Store	self._sidebar_new_btn = new_btn	self._sidebar_new_btn	False
+_history_list	1041	_build_history_sidebar		Store	self._history_list = Gtk.ListBox()	self._history_list	False
+_history_list	1042	_build_history_sidebar		mutation-call	"self._history_list.add_css_class(""navigation-sidebar"")"	self._history_list	False
+_history_list	1043	_build_history_sidebar		mutation-call	self._history_list.set_selection_mode(Gtk.SelectionMode.SINGLE)	self._history_list	False
+_history_list	1044	_build_history_sidebar		mutation-call	self._history_list.set_activate_on_single_click(True)	self._history_list	False
+_history_list	1045	_build_history_sidebar		mutation-call	"self._history_list.connect(""row-activated"", self._on_history_row_activated)"	self._history_list	False
+_on_history_row_activated	1045	_build_history_sidebar		Load	self._on_history_row_activated	self._on_history_row_activated	True
+_history_list	1051	_build_history_sidebar		Load	self._history_list	self._history_list	False
+model_combo	1066	_build_history_sidebar		Store	"self.model_combo = Gtk.DropDown.new_from_strings([""Loading models…""])"	self.model_combo	False
+model_combo	1067	_build_history_sidebar		mutation-call	self.model_combo.set_hexpand(True)	self.model_combo	False
+model_combo	1068	_build_history_sidebar		mutation-call	self.model_combo.set_halign(Gtk.Align.FILL)	self.model_combo	False
+model_combo	1069	_build_history_sidebar		mutation-call	self.model_combo.set_valign(Gtk.Align.CENTER)	self.model_combo	False
+model_combo	1070	_build_history_sidebar		mutation-call	self.model_combo.set_size_request(-1, 38)	self.model_combo	False
+_on_model_selected	1071	_build_history_sidebar		Load	self._on_model_selected	self._on_model_selected	True
+model_combo	1071	_build_history_sidebar		mutation-call	"self.model_combo.connect(""notify::selected"", self._on_model_selected)"	self.model_combo	False
+model_combo	1072	_build_history_sidebar		Load	self.model_combo	self.model_combo	False
+model_combo	1073	_build_history_sidebar		Load	self.model_combo	self.model_combo	False
+open_settings	1093	_build_history_sidebar	<lambda:L1093>	Load	self.open_settings	self.open_settings	True
+_settings_btn	1096	_build_history_sidebar		Store	self._settings_btn = settings_btn	self._settings_btn	False
+_sidebar	1101	toggle_sidebar		Load	self._sidebar	self._sidebar	False
+_sidebar	1104	toggle_sidebar		mutation-call	self._sidebar.get_visible()	self._sidebar	False
+_sidebar	1106	toggle_sidebar		mutation-call	self._sidebar.get_visible()	self._sidebar	False
+_sidebar	1107	toggle_sidebar		mutation-call	self._sidebar.set_visible(show)	self._sidebar	False
+_rebuild_history_list	1109	toggle_sidebar		Load	self._rebuild_history_list	self._rebuild_history_list	True
+_sidebar_btn	1110	toggle_sidebar		Load	self._sidebar_btn	self._sidebar_btn	False
+_sidebar_btn	1110	toggle_sidebar		mutation-call	self._sidebar_btn.get_active()	self._sidebar_btn	False
+_sidebar_syncing	1111	toggle_sidebar		Store	self._sidebar_syncing = True	self._sidebar_syncing	False
+_sidebar_btn	1112	toggle_sidebar		mutation-call	self._sidebar_btn.set_active(show)	self._sidebar_btn	False
+_sidebar_syncing	1113	toggle_sidebar		Store	self._sidebar_syncing = False	self._sidebar_syncing	False
+_sidebar_syncing	1152	_on_sidebar_toggled		Load	self._sidebar_syncing	self._sidebar_syncing	False
+toggle_sidebar	1154	_on_sidebar_toggled		Load	self.toggle_sidebar	self.toggle_sidebar	True
+_history_dirty	1157	_mark_history_dirty		Store	self._history_dirty = True	self._history_dirty	False
+_chat_title_label	1161	_refresh_chat_title		Load	self._chat_title_label	self._chat_title_label	False
+_loading_model	1164	_refresh_chat_title		Load	self._loading_model	self._loading_model	False
+_streaming	1164	_refresh_chat_title		Load	self._streaming	self._streaming	False
+_conversation_id	1167	_refresh_chat_title		Load	self._conversation_id	self._conversation_id	False
+_conversation_id	1169	_refresh_chat_title		Load	self._conversation_id	self._conversation_id	False
+_store	1169	_refresh_chat_title		mutation-call	self._store.get_conversation(self._conversation_id)	self._store	False
+_chat_title_label	1176	_refresh_chat_title		mutation-call	self._chat_title_label.set_text(title)	self._chat_title_label	False
+_load_title	1205	_build_load_overlay		Store	"self._load_title = Gtk.Label(label=""Loading model"")"	self._load_title	False
+_load_title	1206	_build_load_overlay		mutation-call	"self._load_title.add_css_class(""load-title"")"	self._load_title	False
+_load_title	1207	_build_load_overlay		mutation-call	self._load_title.set_halign(Gtk.Align.CENTER)	self._load_title	False
+_load_title	1208	_build_load_overlay		mutation-call	self._load_title.set_margin_top(16)	self._load_title	False
+_load_title	1209	_build_load_overlay		Load	self._load_title	self._load_title	False
+_load_model_label	1211	_build_load_overlay		Store	"self._load_model_label = Gtk.Label(label="""")"	self._load_model_label	False
+_load_model_label	1212	_build_load_overlay		mutation-call	"self._load_model_label.add_css_class(""load-model"")"	self._load_model_label	False
+_load_model_label	1213	_build_load_overlay		mutation-call	self._load_model_label.set_halign(Gtk.Align.CENTER)	self._load_model_label	False
+_load_model_label	1214	_build_load_overlay		mutation-call	self._load_model_label.set_ellipsize(Pango.EllipsizeMode.MIDDLE)	self._load_model_label	False
+_load_model_label	1215	_build_load_overlay		mutation-call	self._load_model_label.set_max_width_chars(36)	self._load_model_label	False
+_load_model_label	1216	_build_load_overlay		Load	self._load_model_label	self._load_model_label	False
+_load_progress	1218	_build_load_overlay		Store	self._load_progress = Gtk.ProgressBar()	self._load_progress	False
+_load_progress	1219	_build_load_overlay		mutation-call	"self._load_progress.add_css_class(""load-progress"")"	self._load_progress	False
+_load_progress	1220	_build_load_overlay		mutation-call	self._load_progress.set_show_text(False)	self._load_progress	False
+_load_progress	1221	_build_load_overlay		mutation-call	self._load_progress.set_fraction(0.0)	self._load_progress	False
+_load_progress	1222	_build_load_overlay		mutation-call	self._load_progress.pulse()	self._load_progress	False
+_load_progress	1223	_build_load_overlay		Load	self._load_progress	self._load_progress	False
+_load_status	1225	_build_load_overlay		Store	"self._load_status = Gtk.Label(label=""Connecting to Ollama…"")"	self._load_status	False
+_load_status	1226	_build_load_overlay		mutation-call	"self._load_status.add_css_class(""load-status"")"	self._load_status	False
+_load_status	1227	_build_load_overlay		mutation-call	self._load_status.set_halign(Gtk.Align.CENTER)	self._load_status	False
+_load_status	1228	_build_load_overlay		mutation-call	self._load_status.set_wrap(True)	self._load_status	False
+_load_status	1229	_build_load_overlay		mutation-call	self._load_status.set_justify(Gtk.Justification.CENTER)	self._load_status	False
+_load_status	1230	_build_load_overlay		mutation-call	self._load_status.set_max_width_chars(40)	self._load_status	False
+_load_status	1231	_build_load_overlay		Load	self._load_status	self._load_status	False
+_load_overlay	1236	_build_load_overlay		Store	self._load_overlay = veil	self._load_overlay	False
+_load_spinner	1237	_build_load_overlay		Store	self._load_spinner = spinner	self._load_spinner	False
+_composer_layout_hooked	1241	_hook_composer_surface_layout		getattr	"getattr(self, ""_composer_layout_hooked"", False)"	"getattr(self, ""_composer_layout_hooked"", False)"	False
+get_surface	1243	_hook_composer_surface_layout		Load	self.get_surface	self.get_surface	False
+_apply_composer_height	1246	_hook_composer_surface_layout	<lambda:L1246>	Load	self._apply_composer_height	self._apply_composer_height	True
+_composer_layout_hooked	1247	_hook_composer_surface_layout		Store	self._composer_layout_hooked = True	self._composer_layout_hooked	False
+_apply_composer_height	1248	_hook_composer_surface_layout		Load	self._apply_composer_height	self._apply_composer_height	True
+input	1252	_composer_line_height_px		Load	self.input	self.input	False
+input	1255	_composer_line_height_px		mutation-call	"self.input.create_pango_layout(""Mg"")"	self.input	False
+input	1258	_composer_line_height_px		mutation-call	self.input.get_pixels_above_lines()	self.input	False
+input	1259	_composer_line_height_px		mutation-call	self.input.get_pixels_below_lines()	self.input	False
+get_height	1268	_composer_max_visible_lines		Load	self.get_height	self.get_height	False
+get_default_size	1273	_composer_max_visible_lines		Load	self.get_default_size	self.get_default_size	False
+input	1282	_composer_content_height_px		Load	self.input	self.input	False
+input	1284	_composer_content_height_px		mutation-call	self.input.get_width()	self.input	False
+_input_scroll	1285	_composer_content_height_px		Load	self._input_scroll	self._input_scroll	False
+_input_scroll	1286	_composer_content_height_px		mutation-call	self._input_scroll.get_width()	self._input_scroll	False
+input	1290	_composer_content_height_px		mutation-call	self.input.measure(Gtk.Orientation.VERTICAL, w)	self.input	False
+_input_scroll	1297	_apply_composer_height		Load	self._input_scroll	self._input_scroll	False
+input	1297	_apply_composer_height		Load	self.input	self.input	False
+_composer_line_height_px	1299	_apply_composer_height		Load	self._composer_line_height_px	self._composer_line_height_px	True
+input	1300	_apply_composer_height		mutation-call	self.input.get_top_margin()	self.input	False
+input	1300	_apply_composer_height		mutation-call	self.input.get_bottom_margin()	self.input	False
+_composer_max_visible_lines	1303	_apply_composer_height		Load	self._composer_max_visible_lines	self._composer_max_visible_lines	True
+_composer_content_height_px	1304	_apply_composer_height		Load	self._composer_content_height_px	self._composer_content_height_px	True
+_input_scroll	1309	_apply_composer_height		mutation-call	self._input_scroll.set_policy(\n            Gtk.PolicyType.NEVER,\n            Gtk.PolicyType.AUTOMATIC if needs_scroll else Gtk.PolicyType.NEVER,\n        )	self._input_scroll	False
+_input_scroll	1313	_apply_composer_height		mutation-call	self._input_scroll.set_min_content_height(target)	self._input_scroll	False
+_input_scroll	1314	_apply_composer_height		mutation-call	self._input_scroll.set_max_content_height(max_h)	self._input_scroll	False
+_input_scroll	1315	_apply_composer_height		mutation-call	self._input_scroll.set_size_request(-1, target)	self._input_scroll	False
+_input_scroll	1316	_apply_composer_height		mutation-call	self._input_scroll.get_parent()	self._input_scroll	False
+_sync_composer_action_valign	1319	_apply_composer_height		Load	self._sync_composer_action_valign	self._sync_composer_action_valign	True
+_composer_content_height_px	1326	_sync_composer_action_valign		Load	self._composer_content_height_px	self._composer_content_height_px	True
+_input_scroll	1327	_sync_composer_action_valign		Load	self._input_scroll	self._input_scroll	False
+_input_scroll	1328	_sync_composer_action_valign		mutation-call	self._input_scroll.get_min_content_height()	self._input_scroll	False
+send_btn	1333	_sync_composer_action_valign		Load	self.send_btn	self.send_btn	False
+stop_btn	1333	_sync_composer_action_valign		Load	self.stop_btn	self.stop_btn	False
+_composer_char_label	1338	_update_composer_char_counter		Load	self._composer_char_label	self._composer_char_label	False
+_messages	1357	_composer_hint_should_show		Load	self._messages	self._messages	False
+_composer_hint	1365	_sync_composer_hint		Load	self._composer_hint	self._composer_hint	False
+_composer_hint_should_show	1368	_sync_composer_hint		Load	self._composer_hint_should_show	self._composer_hint_should_show	True
+_composer_hint_fade_id	1369	_sync_composer_hint		Load	self._composer_hint_fade_id	self._composer_hint_fade_id	False
+_composer_hint_fade_id	1371	_sync_composer_hint		Load	self._composer_hint_fade_id	self._composer_hint_fade_id	False
+_composer_hint_fade_id	1374	_sync_composer_hint		Store	self._composer_hint_fade_id = 0	self._composer_hint_fade_id	False
+_composer_hint_fade_id	1385	_sync_composer_hint	_hide	Store	self._composer_hint_fade_id = 0	self._composer_hint_fade_id	False
+_composer_hint	1386	_sync_composer_hint	_hide	Load	self._composer_hint	self._composer_hint	False
+_composer_hint_should_show	1386	_sync_composer_hint	_hide	Load	self._composer_hint_should_show	self._composer_hint_should_show	True
+_composer_hint	1387	_sync_composer_hint	_hide	mutation-call	self._composer_hint.set_visible(False)	self._composer_hint	False
+_composer_hint_fade_id	1390	_sync_composer_hint		Store	self._composer_hint_fade_id = GLib.timeout_add(300, _hide)	self._composer_hint_fade_id	False
+_composer_truncating	1396	_on_composer_insert_text		Load	self._composer_truncating	self._composer_truncating	False
+_update_composer_char_counter	1402	_on_composer_insert_text		Load	self._update_composer_char_counter	self._update_composer_char_counter	True
+_composer_truncating	1407	_on_composer_insert_text		Store	self._composer_truncating = True	self._composer_truncating	False
+_composer_truncating	1411	_on_composer_insert_text		Store	self._composer_truncating = False	self._composer_truncating	False
+_composer_truncating	1414	_on_buffer_changed		Load	self._composer_truncating	self._composer_truncating	False
+_composer_truncating	1418	_on_buffer_changed		Store	self._composer_truncating = True	self._composer_truncating	False
+_composer_truncating	1425	_on_buffer_changed		Store	self._composer_truncating = False	self._composer_truncating	False
+_placeholder	1427	_on_buffer_changed		Load	self._placeholder	self._placeholder	False
+_placeholder	1428	_on_buffer_changed		mutation-call	self._placeholder.set_visible(len(text) == 0)	self._placeholder	False
+_update_composer_char_counter	1429	_on_buffer_changed		Load	self._update_composer_char_counter	self._update_composer_char_counter	True
+_apply_composer_height	1431	_on_buffer_changed		Load	self._apply_composer_height	self._apply_composer_height	True
+_sync_composer_action_valign	1433	_on_buffer_changed		Load	self._sync_composer_action_valign	self._sync_composer_action_valign	True
+_brand_icon_path	1453	_make_empty_brand_icon		Load	self._brand_icon_path	self._brand_icon_path	True
+_empty_icon	1461	_make_empty_brand_icon		Store	self._empty_icon = pic	self._empty_icon	False
+_empty_icon	1467	_make_empty_brand_icon		Store	self._empty_icon = fallback	self._empty_icon	False
+_empty_icon	1472	_sync_empty_brand_icon		getattr	"getattr(self, ""_empty_icon"", None)"	"getattr(self, ""_empty_icon"", None)"	False
+_brand_icon_path	1475	_sync_empty_brand_icon		Load	self._brand_icon_path	self._brand_icon_path	True
+chat_box	1482	_show_empty_state		Load	self.chat_box	self.chat_box	False
+_make_empty_brand_icon	1494	_show_empty_state		Load	self._make_empty_brand_icon	self._make_empty_brand_icon	True
+_empty_title	1499	_show_empty_state		Store	self._empty_title = title	self._empty_title	False
+_empty_sub	1513	_show_empty_state		Store	self._empty_sub = sub	self._empty_sub	False
+chat_box	1518	_show_empty_state		mutation-call	self.chat_box.set_valign(Gtk.Align.START)	self.chat_box	False
+chat_box	1519	_show_empty_state		mutation-call	self.chat_box.append(box)	self.chat_box	False
+_empty_box	1520	_show_empty_state		Store	self._empty_box = box	self._empty_box	False
+is_visible	1523	toggle		Load	self.is_visible	self.is_visible	False
+set_visible	1524	toggle		Load	self.set_visible	self.set_visible	False
+present	1526	toggle		Load	self.present	self.present	False
+input	1527	toggle		mutation-call	self.input.grab_focus()	self.input	False
+set_visible	1531	hide_to_tray		Load	self.set_visible	self.set_visible	False
+is_maximized	1534	toggle_maximize		Load	self.is_maximized	self.is_maximized	False
+unmaximize	1535	toggle_maximize		Load	self.unmaximize	self.unmaximize	False
+maximize	1537	toggle_maximize		Load	self.maximize	self.maximize	False
+_streaming	1540	clear_chat		Load	self._streaming	self._streaming	False
+_request_stop	1541	clear_chat		Load	self._request_stop	self._request_stop	True
+_messages	1542	clear_chat		mutation-call	self._messages.clear()	self._messages	False
+_greeted_models	1543	clear_chat		mutation-call	self._greeted_models.clear()	self._greeted_models	False
+_native_rows	1544	clear_chat		mutation-call	self._native_rows.clear()	self._native_rows	False
+_conversation_id	1547	clear_chat		Load	self._conversation_id	self._conversation_id	False
+_conversation_id	1548	clear_chat		Load	self._conversation_id	self._conversation_id	False
+_store	1548	clear_chat		mutation-call	self._store.clear_messages(self._conversation_id)	self._store	False
+_model	1550	clear_chat		Load	self._model	self._model	False
+_store	1550	clear_chat		mutation-call	self._store.create_conversation(model=self._model)	self._store	False
+_conversation_id	1551	clear_chat		Store	self._conversation_id = conv.id	self._conversation_id	False
+_mark_history_dirty	1555	clear_chat		Load	self._mark_history_dirty	self._mark_history_dirty	True
+_rebuild_history_list	1556	clear_chat		Load	self._rebuild_history_list	self._rebuild_history_list	True
+_render_empty_transcript	1557	clear_chat		Load	self._render_empty_transcript	self._render_empty_transcript	True
+_model	1558	clear_chat		Load	self._model	self._model	False
+_set_status	1558	clear_chat		Load	self._set_status	self._set_status	True
+_load_failed	1560	clear_chat		Load	self._load_failed	self._load_failed	False
+_loading_model	1560	clear_chat		Load	self._loading_model	self._loading_model	False
+_model	1560	clear_chat		Load	self._model	self._model	False
+_show_ephemeral_greeting	1561	clear_chat		Load	self._show_ephemeral_greeting	self._show_ephemeral_greeting	True
+_refresh_chat_title	1562	clear_chat		Load	self._refresh_chat_title	self._refresh_chat_title	True
+_sync_composer_hint	1563	clear_chat		Load	self._sync_composer_hint	self._sync_composer_hint	True
+_messages	1567	_active_chat_is_empty		Load	self._messages	self._messages	False
+_conversation_id	1569	_active_chat_is_empty		Load	self._conversation_id	self._conversation_id	False
+_conversation_id	1572	_active_chat_is_empty		Load	self._conversation_id	self._conversation_id	False
+_store	1572	_active_chat_is_empty		mutation-call	self._store.is_empty(self._conversation_id)	self._store	False
+_messages	1574	_active_chat_is_empty		Load	self._messages	self._messages	False
+_streaming	1582	new_chat		Load	self._streaming	self._streaming	False
+_invalidate_active_stream	1583	new_chat		Load	self._invalidate_active_stream	self._invalidate_active_stream	True
+_loading_model	1584	new_chat		Load	self._loading_model	self._loading_model	False
+_active_chat_is_empty	1588	new_chat		Load	self._active_chat_is_empty	self._active_chat_is_empty	True
+_load_failed	1589	new_chat		Load	self._load_failed	self._load_failed	False
+_messages	1589	new_chat		Load	self._messages	self._messages	False
+_model	1589	new_chat		Load	self._model	self._model	False
+_show_ephemeral_greeting	1590	new_chat		Load	self._show_ephemeral_greeting	self._show_ephemeral_greeting	True
+input	1591	new_chat		Load	self.input	self.input	False
+input	1593	new_chat		mutation-call	self.input.grab_focus()	self.input	False
+_store	1600	new_chat		mutation-call	self._store.prune_empty_conversations(keep_id=None)	self._store	False
+_model	1605	new_chat		Load	self._model	self._model	False
+_store	1605	new_chat		mutation-call	self._store.create_conversation(model=self._model)	self._store	False
+_conversation_id	1606	new_chat		Store	self._conversation_id = conv.id	self._conversation_id	False
+_messages	1610	new_chat		mutation-call	self._messages.clear()	self._messages	False
+_greeted_models	1611	new_chat		mutation-call	self._greeted_models.clear()	self._greeted_models	False
+_native_rows	1612	new_chat		mutation-call	self._native_rows.clear()	self._native_rows	False
+_history_restored	1613	new_chat		Store	self._history_restored = False	self._history_restored	False
+_render_empty_transcript	1614	new_chat		Load	self._render_empty_transcript	self._render_empty_transcript	True
+_model	1615	new_chat		Load	self._model	self._model	False
+_set_status	1615	new_chat		Load	self._set_status	self._set_status	True
+_load_failed	1616	new_chat		Load	self._load_failed	self._load_failed	False
+_model	1616	new_chat		Load	self._model	self._model	False
+_show_ephemeral_greeting	1617	new_chat		Load	self._show_ephemeral_greeting	self._show_ephemeral_greeting	True
+_mark_history_dirty	1618	new_chat		Load	self._mark_history_dirty	self._mark_history_dirty	True
+_rebuild_history_list	1619	new_chat		Load	self._rebuild_history_list	self._rebuild_history_list	True
+_refresh_chat_title	1620	new_chat		Load	self._refresh_chat_title	self._refresh_chat_title	True
+_sync_composer_hint	1621	new_chat		Load	self._sync_composer_hint	self._sync_composer_hint	True
+input	1622	new_chat		Load	self.input	self.input	False
+input	1624	new_chat		mutation-call	self.input.grab_focus()	self.input	False
+_transcript_mode	1630	_render_empty_transcript		Load	self._transcript_mode	self._transcript_mode	False
+_web	1630	_render_empty_transcript		Load	self._web	self._web	False
+_web	1631	_render_empty_transcript		mutation-call	self._web.reset([])	self._web	False
+chat_box	1632	_render_empty_transcript		Load	self.chat_box	self.chat_box	False
+chat_box	1633	_render_empty_transcript		mutation-call	self.chat_box.get_first_child()	self.chat_box	False
+chat_box	1634	_render_empty_transcript		mutation-call	self.chat_box.remove(child)	self.chat_box	False
+_show_empty_state	1635	_render_empty_transcript		Load	self._show_empty_state	self._show_empty_state	True
+_history_list	1639	_rebuild_history_list		Load	self._history_list	self._history_list	False
+_history_dirty	1641	_rebuild_history_list		Load	self._history_dirty	self._history_dirty	False
+_history_list	1641	_rebuild_history_list		mutation-call	self._history_list.get_first_child()	self._history_list	False
+_select_active_history_row	1642	_rebuild_history_list		Load	self._select_active_history_row	self._select_active_history_row	True
+_history_list	1645	_rebuild_history_list		mutation-call	self._history_list.get_first_child()	self._history_list	False
+_history_list	1648	_rebuild_history_list		mutation-call	self._history_list.remove(child)	self._history_list	False
+_store	1651	_rebuild_history_list		mutation-call	self._store.list_conversations(limit=40)	self._store	False
+_history_list	1663	_rebuild_history_list		mutation-call	self._history_list.append(placeholder)	self._history_list	False
+_history_dirty	1664	_rebuild_history_list		Store	self._history_dirty = False	self._history_dirty	False
+_conversation_id	1688	_rebuild_history_list		Load	self._conversation_id	self._conversation_id	False
+_make_chat_actions_popover	1712	_rebuild_history_list		Load	self._make_chat_actions_popover	self._make_chat_actions_popover	True
+_history_list	1718	_rebuild_history_list		mutation-call	self._history_list.append(row)	self._history_list	False
+_history_list	1720	_rebuild_history_list		mutation-call	self._history_list.select_row(active_row)	self._history_list	False
+_history_dirty	1721	_rebuild_history_list		Store	self._history_dirty = False	self._history_dirty	False
+_refresh_chat_title	1722	_rebuild_history_list		Load	self._refresh_chat_title	self._refresh_chat_title	True
+_conversation_id	1726	_select_active_history_row		Load	self._conversation_id	self._conversation_id	False
+_history_list	1726	_select_active_history_row		Load	self._history_list	self._history_list	False
+_history_list	1728	_select_active_history_row		mutation-call	self._history_list.get_first_child()	self._history_list	False
+_conversation_id	1730	_select_active_history_row		Load	self._conversation_id	self._conversation_id	False
+_history_list	1731	_select_active_history_row		mutation-call	self._history_list.select_row(row)	self._history_list	False
+switch_conversation	1739	_on_history_row_activated		Load	self.switch_conversation	self.switch_conversation	True
+get_display	1755	_make_chat_actions_popover	add_icon	Load	self.get_display	self.get_display	False
+export_conversation	1782	_make_chat_actions_popover	<lambda:L1782>	Load	self.export_conversation	self.export_conversation	True
+export_conversation	1787	_make_chat_actions_popover	<lambda:L1787>	Load	self.export_conversation	self.export_conversation	True
+_confirm_delete_conversation	1792	_make_chat_actions_popover	<lambda:L1792>	Load	self._confirm_delete_conversation	self._confirm_delete_conversation	True
+_store	1801	_conversation_display_title		mutation-call	self._store.get_conversation(conversation_id)	self._store	False
+_store	1804	_conversation_display_title		mutation-call	self._store.list_messages(conversation_id)	self._store	False
+_conversation_id	1809	_conversation_display_title		Load	self._conversation_id	self._conversation_id	False
+_messages	1810	_conversation_display_title		Load	self._messages	self._messages	False
+_conversation_display_title	1816	_safe_export_basename		Load	self._conversation_display_title	self._conversation_display_title	True
+_store	1833	export_conversation		mutation-call	self._store.export_dict(conversation_id)	self._store	False
+_store	1841	export_conversation		mutation-call	self._store.export_markdown(conversation_id)	self._store	False
+_safe_export_basename	1848	export_conversation		Load	self._safe_export_basename	self._safe_export_basename	True
+_conversation_display_title	1897	_confirm_delete_conversation		Load	self._conversation_display_title	self._conversation_display_title	True
+delete_conversation	1913	_confirm_delete_conversation	on_response	Load	self.delete_conversation	self.delete_conversation	True
+_conversation_id	1922	delete_conversation		Load	self._conversation_id	self._conversation_id	False
+_streaming	1922	delete_conversation		Load	self._streaming	self._streaming	False
+_invalidate_active_stream	1923	delete_conversation		Load	self._invalidate_active_stream	self._invalidate_active_stream	True
+_conversation_id	1924	delete_conversation		Load	self._conversation_id	self._conversation_id	False
+_store	1926	delete_conversation		mutation-call	self._store.delete_conversation(conversation_id)	self._store	False
+_mark_history_dirty	1930	delete_conversation		Load	self._mark_history_dirty	self._mark_history_dirty	True
+_store	1933	delete_conversation		mutation-call	self._store.get_active_conversation()	self._store	False
+_conversation_id	1936	delete_conversation		Store	self._conversation_id = None	self._conversation_id	False
+switch_conversation	1937	delete_conversation		Load	self.switch_conversation	self.switch_conversation	True
+new_chat	1939	delete_conversation		Load	self.new_chat	self.new_chat	True
+_rebuild_history_list	1941	delete_conversation		Load	self._rebuild_history_list	self._rebuild_history_list	True
+_conversation_id	1946	switch_conversation		Load	self._conversation_id	self._conversation_id	False
+_streaming	1948	switch_conversation		Load	self._streaming	self._streaming	False
+_invalidate_active_stream	1949	switch_conversation		Load	self._invalidate_active_stream	self._invalidate_active_stream	True
+_loading_model	1950	switch_conversation		Load	self._loading_model	self._loading_model	False
+_conversation_id	1953	switch_conversation		Load	self._conversation_id	self._conversation_id	False
+_store	1956	switch_conversation		mutation-call	self._store.is_empty(prev)	self._store	False
+_store	1957	switch_conversation		mutation-call	self._store.delete_conversation(prev)	self._store	False
+_mark_history_dirty	1958	switch_conversation		Load	self._mark_history_dirty	self._mark_history_dirty	True
+_store	1961	switch_conversation		mutation-call	self._store.get_conversation(conversation_id)	self._store	False
+_store	1966	switch_conversation		mutation-call	self._store.set_active(conversation_id)	self._store	False
+_conversation_id	1969	switch_conversation		Store	self._conversation_id = conversation_id	self._conversation_id	False
+_greeted_models	1970	switch_conversation		mutation-call	self._greeted_models.clear()	self._greeted_models	False
+_native_rows	1971	switch_conversation		mutation-call	self._native_rows.clear()	self._native_rows	False
+_store	1974	switch_conversation		mutation-call	self._store.list_messages(conversation_id)	self._store	False
+_messages	1983	switch_conversation		Store	"self._messages = [\n            {""id"": m.id, ""role"": m.role, ""content"": m.content} for m in real\n        ]"	self._messages	False
+_history_restored	1986	switch_conversation		Store	self._history_restored = bool(real)	self._history_restored	False
+_apply_restored_transcript	1991	switch_conversation		Load	self._apply_restored_transcript	self._apply_restored_transcript	True
+_render_empty_transcript	1993	switch_conversation		Load	self._render_empty_transcript	self._render_empty_transcript	True
+_load_failed	1994	switch_conversation		Load	self._load_failed	self._load_failed	False
+_model	1994	switch_conversation		Load	self._model	self._model	False
+_show_ephemeral_greeting	1995	switch_conversation		Load	self._show_ephemeral_greeting	self._show_ephemeral_greeting	True
+_sync_composer_hint	1996	switch_conversation		Load	self._sync_composer_hint	self._sync_composer_hint	True
+_select_model_name	2000	switch_conversation		Load	self._select_model_name	self._select_model_name	True
+_model	2002	switch_conversation		Load	self._model	self._model	False
+_set_status	2002	switch_conversation		Load	self._set_status	self._set_status	True
+_mark_history_dirty	2003	switch_conversation		Load	self._mark_history_dirty	self._mark_history_dirty	True
+_rebuild_history_list	2004	switch_conversation		Load	self._rebuild_history_list	self._rebuild_history_list	True
+_refresh_chat_title	2005	switch_conversation		Load	self._refresh_chat_title	self._refresh_chat_title	True
+model_combo	2016	_select_model_name		Load	self.model_combo	self.model_combo	False
+model_combo	2018	_select_model_name		mutation-call	self.model_combo.get_model()	self.model_combo	False
+_model	2020	_select_model_name		Store	self._model = name	self._model	False
+_begin_model_load	2022	_select_model_name		Load	self._begin_model_load	self._begin_model_load	True
+_suppress_model_select	2035	_select_model_name		Store	self._suppress_model_select = True	self._suppress_model_select	False
+model_combo	2037	_select_model_name		mutation-call	self.model_combo.set_selected(found)	self.model_combo	False
+_model	2039	_select_model_name		Store	self._model = item.get_string() if item else name	self._model	False
+_model	2041	_select_model_name		Store	self._model = name	self._model	False
+_suppress_model_select	2042	_select_model_name		Store	self._suppress_model_select = False	self._suppress_model_select	False
+_loading_model	2043	_select_model_name		Load	self._loading_model	self._loading_model	False
+_model	2043	_select_model_name		Load	self._model	self._model	False
+_begin_model_load	2044	_select_model_name		Load	self._begin_model_load	self._begin_model_load	True
+_messages	2045	_select_model_name		Load	self._messages	self._messages	False
+_model	2045	_select_model_name		Load	self._model	self._model	False
+_regenerate_message	2059	_on_web_intent		Load	self._regenerate_message	self._regenerate_message	True
+_continue_message	2061	_on_web_intent		Load	self._continue_message	self._continue_message	True
+_delete_message	2063	_on_web_intent		Load	self._delete_message	self._delete_message	True
+_edit_resend_message	2065	_on_web_intent		Load	self._edit_resend_message	self._edit_resend_message	True
+_msg_counter	2072	_next_msg_id		AugAssign	self._msg_counter += 1	self._msg_counter	False
+_msg_counter	2073	_next_msg_id		Load	self._msg_counter	self._msg_counter	False
+_conversation_id	2076	_ensure_conversation		Load	self._conversation_id	self._conversation_id	False
+_conversation_id	2077	_ensure_conversation		Load	self._conversation_id	self._conversation_id	False
+_model	2078	_ensure_conversation		Load	self._model	self._model	False
+_store	2078	_ensure_conversation		mutation-call	self._store.ensure_active(model=self._model)	self._store	False
+_conversation_id	2079	_ensure_conversation		Store	self._conversation_id = conv.id	self._conversation_id	False
+_ensure_conversation	2084	_persist_message		Load	self._ensure_conversation	self._ensure_conversation	True
+_store	2085	_persist_message		mutation-call	self._store.append_message(\n                cid,\n                role=role,\n                content=content,\n                message_id=message_id,\n            )	self._store	False
+_mark_history_dirty	2093	_persist_message		Load	self._mark_history_dirty	self._mark_history_dirty	True
+_refresh_chat_title	2094	_persist_message		Load	self._refresh_chat_title	self._refresh_chat_title	True
+_store	2101	_restore_history		mutation-call	self._store.get_active_conversation()	self._store	False
+_model	2103	_restore_history		Load	self._model	self._model	False
+_store	2103	_restore_history		mutation-call	self._store.create_conversation(model=self._model)	self._store	False
+_conversation_id	2104	_restore_history		Store	self._conversation_id = conv.id	self._conversation_id	False
+_store	2107	_restore_history		mutation-call	self._store.prune_empty_conversations(keep_id=conv.id)	self._store	False
+_mark_history_dirty	2110	_restore_history		Load	self._mark_history_dirty	self._mark_history_dirty	True
+_store	2113	_restore_history		mutation-call	self._store.list_messages(conv.id)	self._store	False
+_store	2123	_restore_history		mutation-call	self._store.delete_message(m.id)	self._store	False
+_store	2128	_restore_history		mutation-call	self._store.touch(conv.id)	self._store	False
+_history_restored	2132	_restore_history		Store	self._history_restored = False	self._history_restored	False
+_messages	2133	_restore_history		Store	self._messages = []	self._messages	False
+_messages	2143	_restore_history		Store	"self._messages = [\n                {""id"": m.id, ""role"": m.role, ""content"": m.content} for m in real\n            ]"	self._messages	False
+_history_restored	2146	_restore_history		Store	self._history_restored = True	self._history_restored	False
+_apply_restored_transcript	2149	_restore_history		Load	self._apply_restored_transcript	self._apply_restored_transcript	True
+_sync_composer_hint	2150	_restore_history		Load	self._sync_composer_hint	self._sync_composer_hint	True
+_history_restored	2158	_restore_history		Store	self._history_restored = False	self._history_restored	False
+_transcript_mode	2161	_apply_restored_transcript		Load	self._transcript_mode	self._transcript_mode	False
+_web	2161	_apply_restored_transcript		Load	self._web	self._web	False
+_web	2163	_apply_restored_transcript		mutation-call	self._web.reset(messages)	self._web	False
+chat_box	2165	_apply_restored_transcript		Load	self.chat_box	self.chat_box	False
+chat_box	2167	_apply_restored_transcript		mutation-call	self.chat_box.get_first_child()	self.chat_box	False
+chat_box	2168	_apply_restored_transcript		mutation-call	self.chat_box.remove(child)	self.chat_box	False
+_empty_box	2169	_apply_restored_transcript		Store	self._empty_box = None	self._empty_box	False
+_native_rows	2170	_apply_restored_transcript		mutation-call	self._native_rows.clear()	self._native_rows	False
+_show_empty_state	2172	_apply_restored_transcript		Load	self._show_empty_state	self._show_empty_state	True
+_next_msg_id	2177	_apply_restored_transcript		Load	self._next_msg_id	self._next_msg_id	True
+_append_message	2179	_apply_restored_transcript		Load	self._append_message	self._append_message	True
+_append_message	2181	_apply_restored_transcript		Load	self._append_message	self._append_message	True
+_messages	2186	_find_message_index		Load	self._messages	self._messages	False
+_messages	2192	_api_messages		Load	self._messages	self._messages	False
+_loading_model	2205	_delete_message		Load	self._loading_model	self._loading_model	False
+_streaming	2205	_delete_message		Load	self._streaming	self._streaming	False
+_find_message_index	2207	_delete_message		Load	self._find_message_index	self._find_message_index	True
+_messages	2211	_delete_message		Load	self._messages	self._messages	False
+_messages	2212	_delete_message		Store	self._messages = self._messages[:idx]	self._messages	False
+_messages	2212	_delete_message		Load	self._messages	self._messages	False
+_conversation_id	2218	_delete_message		Load	self._conversation_id	self._conversation_id	False
+_store	2218	_delete_message		mutation-call	self._store.delete_message(mid, conversation_id=self._conversation_id)	self._store	False
+_transcript_mode	2221	_delete_message		Load	self._transcript_mode	self._transcript_mode	False
+_web	2221	_delete_message		Load	self._web	self._web	False
+_web	2222	_delete_message		mutation-call	"self._web.post({""type"": ""message_removed"", ""id"": mid})"	self._web	False
+_native_remove_message	2224	_delete_message		Load	self._native_remove_message	self._native_remove_message	True
+_messages	2225	_delete_message		Load	self._messages	self._messages	False
+_transcript_mode	2226	_delete_message		Load	self._transcript_mode	self._transcript_mode	False
+_web	2226	_delete_message		Load	self._web	self._web	False
+_web	2227	_delete_message		mutation-call	self._web.reset([])	self._web	False
+chat_box	2228	_delete_message		Load	self.chat_box	self.chat_box	False
+chat_box	2229	_delete_message		mutation-call	self.chat_box.get_first_child()	self.chat_box	False
+chat_box	2230	_delete_message		mutation-call	self.chat_box.remove(child)	self.chat_box	False
+_native_rows	2231	_delete_message		mutation-call	self._native_rows.clear()	self._native_rows	False
+_show_empty_state	2232	_delete_message		Load	self._show_empty_state	self._show_empty_state	True
+_messages	2236	_drop_messages_from		Load	self._messages	self._messages	False
+_messages	2238	_drop_messages_from		Load	self._messages	self._messages	False
+_messages	2239	_drop_messages_from		Store	self._messages = self._messages[:idx]	self._messages	False
+_messages	2239	_drop_messages_from		Load	self._messages	self._messages	False
+_conversation_id	2245	_drop_messages_from		Load	self._conversation_id	self._conversation_id	False
+_store	2245	_drop_messages_from		mutation-call	self._store.delete_message(mid, conversation_id=self._conversation_id)	self._store	False
+_transcript_mode	2250	_drop_messages_from		Load	self._transcript_mode	self._transcript_mode	False
+_web	2250	_drop_messages_from		Load	self._web	self._web	False
+_web	2251	_drop_messages_from		mutation-call	"self._web.post({""type"": ""message_removed"", ""id"": mid})"	self._web	False
+_native_remove_message	2253	_drop_messages_from		Load	self._native_remove_message	self._native_remove_message	True
+_loading_model	2256	_regenerate_message		Load	self._loading_model	self._loading_model	False
+_model	2256	_regenerate_message		Load	self._model	self._model	False
+_streaming	2256	_regenerate_message		Load	self._streaming	self._streaming	False
+_find_message_index	2258	_regenerate_message		Load	self._find_message_index	self._find_message_index	True
+_messages	2261	_regenerate_message		Load	self._messages	self._messages	False
+_drop_messages_from	2264	_regenerate_message		Load	self._drop_messages_from	self._drop_messages_from	True
+_messages	2265	_regenerate_message		Load	self._messages	self._messages	False
+_start_assistant_stream	2266	_regenerate_message		Load	self._start_assistant_stream	self._start_assistant_stream	True
+_api_messages	2268	_regenerate_message		Load	self._api_messages	self._api_messages	True
+_messages	2274	_regenerate_message		Load	self._messages	self._messages	False
+_conversation_id	2280	_regenerate_message		Load	self._conversation_id	self._conversation_id	False
+_store	2280	_regenerate_message		mutation-call	self._store.delete_message(mid, conversation_id=self._conversation_id)	self._store	False
+_transcript_mode	2283	_regenerate_message		Load	self._transcript_mode	self._transcript_mode	False
+_web	2283	_regenerate_message		Load	self._web	self._web	False
+_web	2284	_regenerate_message		mutation-call	"self._web.post({""type"": ""message_removed"", ""id"": mid})"	self._web	False
+_native_remove_message	2286	_regenerate_message		Load	self._native_remove_message	self._native_remove_message	True
+_messages	2287	_regenerate_message		Store	self._messages = self._messages[:idx]	self._messages	False
+_messages	2287	_regenerate_message		Load	self._messages	self._messages	False
+_conversation_id	2289	_regenerate_message		Load	self._conversation_id	self._conversation_id	False
+_store	2289	_regenerate_message		mutation-call	self._store.delete_message(message_id, conversation_id=self._conversation_id)	self._store	False
+_messages	2292	_regenerate_message		Load	self._messages	self._messages	False
+_start_assistant_stream	2293	_regenerate_message		Load	self._start_assistant_stream	self._start_assistant_stream	True
+_api_messages	2296	_regenerate_message		Load	self._api_messages	self._api_messages	True
+_streaming	2305	_edit_resend_message		Load	self._streaming	self._streaming	False
+_loading_model	2306	_edit_resend_message		Load	self._loading_model	self._loading_model	False
+_model	2307	_edit_resend_message		Load	self._model	self._model	False
+_find_message_index	2310	_edit_resend_message		Load	self._find_message_index	self._find_message_index	True
+_messages	2311	_edit_resend_message		Load	self._messages	self._messages	False
+_messages	2313	_edit_resend_message		Subscript-Store	"self._messages[idx][""content""]"	self._messages	False
+_store	2315	_edit_resend_message		mutation-call	self._store.update_message(message_id, text)	self._store	False
+_drop_messages_from	2319	_edit_resend_message		Load	self._drop_messages_from	self._drop_messages_from	True
+_transcript_mode	2321	_edit_resend_message		Load	self._transcript_mode	self._transcript_mode	False
+_web	2321	_edit_resend_message		Load	self._web	self._web	False
+_web	2322	_edit_resend_message		mutation-call	"self._web.post(\n                {\n                    ""type"": ""message_added"",\n                    ""id"": message_id,\n                    ""role"": ""user"",\n                    ""text"": text,\n                    ""streaming"": False,\n                }\n            )"	self._web	False
+_native_remove_message	2332	_edit_resend_message		Load	self._native_remove_message	self._native_remove_message	True
+_append_message	2333	_edit_resend_message		Load	self._append_message	self._append_message	True
+_messages	2334	_edit_resend_message		Load	self._messages	self._messages	False
+_start_assistant_stream	2335	_edit_resend_message		Load	self._start_assistant_stream	self._start_assistant_stream	True
+_api_messages	2337	_edit_resend_message		Load	self._api_messages	self._api_messages	True
+_loading_model	2341	_continue_message		Load	self._loading_model	self._loading_model	False
+_model	2341	_continue_message		Load	self._model	self._model	False
+_streaming	2341	_continue_message		Load	self._streaming	self._streaming	False
+_find_message_index	2343	_continue_message		Load	self._find_message_index	self._find_message_index	True
+_messages	2344	_continue_message		Load	self._messages	self._messages	False
+_messages	2347	_continue_message		Load	self._messages	self._messages	False
+_messages	2350	_continue_message		Load	self._messages	self._messages	False
+_api_messages	2351	_continue_message		Load	self._api_messages	self._api_messages	True
+_messages	2351	_continue_message		Load	self._messages	self._messages	False
+_start_assistant_stream	2361	_continue_message		Load	self._start_assistant_stream	self._start_assistant_stream	True
+_status_label	2369	_set_status		Load	self._status_label	self._status_label	False
+_loading_model	2372	_set_status		Load	self._loading_model	self._loading_model	False
+_streaming	2372	_set_status		Load	self._streaming	self._streaming	False
+_status_label	2377	_set_status		mutation-call	self._status_label.set_text(text)	self._status_label	False
+_model	2378	_set_status		Load	self._model	self._model	False
+_model	2378	_set_status		Load	self._model	self._model	False
+_refresh_chat_title	2380	_set_status		Load	self._refresh_chat_title	self._refresh_chat_title	True
+_refresh_chat_title	2382	_set_status		Load	self._refresh_chat_title	self._refresh_chat_title	True
+_send	2388	_on_input_key		Load	self._send	self._send	True
+_suppress_model_select	2393	_on_model_selected		Load	self._suppress_model_select	self._suppress_model_select	False
+model_combo	2395	_on_model_selected		mutation-call	self.model_combo.get_selected_item()	self.model_combo	False
+_load_failed	2405	_on_model_selected		Load	self._load_failed	self._load_failed	False
+_loading_model	2405	_on_model_selected		Load	self._loading_model	self._loading_model	False
+_model	2405	_on_model_selected		Load	self._model	self._model	False
+_model	2407	_on_model_selected		Store	self._model = name	self._model	False
+_set_status	2408	_on_model_selected		Load	self._set_status	self._set_status	True
+_begin_model_load	2409	_on_model_selected		Load	self._begin_model_load	self._begin_model_load	True
+_messages	2409	_on_model_selected		Load	self._messages	self._messages	False
+_loading_model	2412	_refresh_models		Load	self._loading_model	self._loading_model	False
+_apply_health	2415	_refresh_models		Load	self._apply_health	self._apply_health	True
+_set_status	2416	_refresh_models		Load	self._set_status	self._set_status	True
+_set_load_controls_sensitive	2417	_refresh_models		Load	self._set_load_controls_sensitive	self._set_load_controls_sensitive	True
+_refresh_btn	2418	_refresh_models		Load	self._refresh_btn	self._refresh_btn	False
+_refresh_btn	2419	_refresh_models		mutation-call	self._refresh_btn.set_sensitive(False)	self._refresh_btn	False
+client	2422	_refresh_models	work	Load	self.client	self.client	False
+_on_ollama_probe	2423	_refresh_models	work	Load	self._on_ollama_probe	self._on_ollama_probe	True
+_apply_health	2430	_on_ollama_probe		Load	self._apply_health	self._apply_health	True
+_load_failed	2433	_on_ollama_probe		Store	self._load_failed = False	self._load_failed	False
+_suppress_model_select	2436	_on_ollama_probe		Store	self._suppress_model_select = True	self._suppress_model_select	False
+model_combo	2437	_on_ollama_probe		mutation-call	self.model_combo.set_model(model_list)	self.model_combo	False
+_preferred_model	2438	_on_ollama_probe		Load	self._preferred_model	self._preferred_model	True
+model_combo	2440	_on_ollama_probe		mutation-call	self.model_combo.set_selected(idx)	self.model_combo	False
+_model	2442	_on_ollama_probe		Store	self._model = chosen	self._model	False
+send_btn	2443	_on_ollama_probe		mutation-call	self.send_btn.set_sensitive(False)	self.send_btn	False
+_set_status	2444	_on_ollama_probe		Load	self._set_status	self._set_status	True
+_suppress_model_select	2445	_on_ollama_probe		Store	self._suppress_model_select = False	self._suppress_model_select	False
+_begin_model_load	2446	_on_ollama_probe		Load	self._begin_model_load	self._begin_model_load	True
+_messages	2446	_on_ollama_probe		Load	self._messages	self._messages	False
+_hide_load_overlay	2450	_on_ollama_probe		Load	self._hide_load_overlay	self._hide_load_overlay	True
+_load_failed	2451	_on_ollama_probe		Store	self._load_failed = True	self._load_failed	False
+_model	2452	_on_ollama_probe		Store	self._model = None	self._model	False
+_suppress_model_select	2462	_on_ollama_probe		Store	self._suppress_model_select = True	self._suppress_model_select	False
+model_combo	2463	_on_ollama_probe		mutation-call	self.model_combo.set_model(Gtk.StringList.new(placeholder))	self.model_combo	False
+_suppress_model_select	2464	_on_ollama_probe		Store	self._suppress_model_select = False	self._suppress_model_select	False
+send_btn	2465	_on_ollama_probe		mutation-call	self.send_btn.set_sensitive(False)	self.send_btn	False
+_set_status	2466	_on_ollama_probe		Load	self._set_status	self._set_status	True
+_set_load_controls_sensitive	2468	_on_ollama_probe		Load	self._set_load_controls_sensitive	self._set_load_controls_sensitive	True
+send_btn	2469	_on_ollama_probe		Load	self.send_btn	self.send_btn	False
+send_btn	2470	_on_ollama_probe		mutation-call	self.send_btn.set_sensitive(False)	self.send_btn	False
+input	2471	_on_ollama_probe		Load	self.input	self.input	False
+input	2473	_on_ollama_probe		mutation-call	self.input.set_sensitive(True)	self.input	False
+_health	2478	_apply_health		Store	self._health = state	self._health	False
+_health_banner	2479	_apply_health		Load	self._health_banner	self._health_banner	False
+_health_banner	2485	_apply_health		mutation-call	self._health_banner.set_visible(show)	self._health_banner	False
+_health_title	2488	_apply_health		Load	self._health_title	self._health_title	False
+_health_title	2489	_apply_health		mutation-call	self._health_title.set_text(state.title)	self._health_title	False
+_health_detail	2490	_apply_health		Load	self._health_detail	self._health_detail	False
+_health_detail	2491	_apply_health		mutation-call	self._health_detail.set_text(state.detail)	self._health_detail	False
+_health_banner	2496	_apply_health		mutation-call	self._health_banner.get_child()	self._health_banner	False
+_health_banner	2501	_apply_health		Load	self._health_banner	self._health_banner	False
+_health_banner	2501	_apply_health		mutation-call	self._health_banner.get_child()	self._health_banner	False
+_health_action_btn	2516	_apply_health		Load	self._health_action_btn	self._health_action_btn	False
+_health_action_btn	2518	_apply_health		mutation-call	self._health_action_btn.set_visible(True)	self._health_action_btn	False
+_health_action_btn	2519	_apply_health		mutation-call	self._health_action_btn.set_label(state.action_label)	self._health_action_btn	False
+_health_action_id	2520	_apply_health		Store	self._health_action_id = state.action	self._health_action_id	False
+_health_action_model	2521	_apply_health		Store	self._health_action_model = state.model	self._health_action_model	False
+_health_action_btn	2523	_apply_health		mutation-call	self._health_action_btn.set_visible(False)	self._health_action_btn	False
+_health_action_id	2524	_apply_health		Store	self._health_action_id = None	self._health_action_id	False
+_health_action_model	2525	_apply_health		Store	self._health_action_model = None	self._health_action_model	False
+_health_action_id	2528	_on_health_action		Load	self._health_action_id	self._health_action_id	False
+_refresh_models	2530	_on_health_action		Load	self._refresh_models	self._refresh_models	True
+_health_action_model	2532	_on_health_action		Load	self._health_action_model	self._health_action_model	False
+_model	2532	_on_health_action		Load	self._model	self._model	False
+_begin_model_load	2534	_on_health_action		Load	self._begin_model_load	self._begin_model_load	True
+_messages	2534	_on_health_action		Load	self._messages	self._messages	False
+_refresh_models	2536	_on_health_action		Load	self._refresh_models	self._refresh_models	True
+_apply_health	2538	_on_health_action		Load	self._apply_health	self._apply_health	True
+_health_banner	2545	_on_health_action		Load	self._health_banner	self._health_banner	False
+_health_banner	2545	_on_health_action		mutation-call	self._health_banner.set_visible(False)	self._health_banner	False
+_conversation_id	2548	_preferred_model		Load	self._conversation_id	self._conversation_id	False
+_conversation_id	2550	_preferred_model		Load	self._conversation_id	self._conversation_id	False
+_store	2550	_preferred_model		mutation-call	self._store.get_conversation(self._conversation_id)	self._store	False
+input	2559	_set_load_controls_sensitive		Load	self.input	self.input	False
+_streaming	2560	_set_load_controls_sensitive		Load	self._streaming	self._streaming	False
+input	2560	_set_load_controls_sensitive		mutation-call	self.input.set_sensitive(enabled and not self._streaming)	self.input	False
+send_btn	2561	_set_load_controls_sensitive		Load	self.send_btn	self.send_btn	False
+send_btn	2562	_set_load_controls_sensitive		mutation-call	self.send_btn.set_sensitive(\n                enabled and bool(self._model) and not self._streaming and not self._load_failed\n            )	self.send_btn	False
+_load_failed	2563	_set_load_controls_sensitive		Load	self._load_failed	self._load_failed	False
+_model	2563	_set_load_controls_sensitive		Load	self._model	self._model	False
+_streaming	2563	_set_load_controls_sensitive		Load	self._streaming	self._streaming	False
+model_combo	2565	_set_load_controls_sensitive		Load	self.model_combo	self.model_combo	False
+model_combo	2566	_set_load_controls_sensitive		mutation-call	self.model_combo.set_sensitive(enabled)	self.model_combo	False
+_refresh_btn	2567	_set_load_controls_sensitive		Load	self._refresh_btn	self._refresh_btn	False
+_refresh_btn	2568	_set_load_controls_sensitive		mutation-call	self._refresh_btn.set_sensitive(enabled)	self._refresh_btn	False
+_refresh_action	2569	_set_load_controls_sensitive		getattr	"getattr(self, ""_refresh_action"", None)"	"getattr(self, ""_refresh_action"", None)"	False
+_refresh_action	2570	_set_load_controls_sensitive		mutation-call	self._refresh_action.set_enabled(enabled)	self._refresh_action	False
+_clear_btn	2571	_set_load_controls_sensitive		Load	self._clear_btn	self._clear_btn	False
+_clear_btn	2572	_set_load_controls_sensitive		mutation-call	self._clear_btn.set_sensitive(enabled and not self._loading_model)	self._clear_btn	False
+_loading_model	2572	_set_load_controls_sensitive		Load	self._loading_model	self._loading_model	False
+_streaming	2573	_set_load_controls_sensitive		Load	self._streaming	self._streaming	False
+_new_chat_btn	2574	_set_load_controls_sensitive		Load	self._new_chat_btn	self._new_chat_btn	False
+_new_chat_btn	2575	_set_load_controls_sensitive		mutation-call	self._new_chat_btn.set_sensitive(nav)	self._new_chat_btn	False
+_sidebar_new_btn	2576	_set_load_controls_sensitive		Load	self._sidebar_new_btn	self._sidebar_new_btn	False
+_sidebar_new_btn	2577	_set_load_controls_sensitive		mutation-call	self._sidebar_new_btn.set_sensitive(nav)	self._sidebar_new_btn	False
+_sidebar_btn	2578	_set_load_controls_sensitive		Load	self._sidebar_btn	self._sidebar_btn	False
+_sidebar_btn	2579	_set_load_controls_sensitive		mutation-call	self._sidebar_btn.set_sensitive(enabled)	self._sidebar_btn	False
+_history_list	2580	_set_load_controls_sensitive		Load	self._history_list	self._history_list	False
+_history_list	2581	_set_load_controls_sensitive		mutation-call	self._history_list.set_sensitive(nav)	self._history_list	False
+_load_overlay	2594	_show_load_overlay		Load	self._load_overlay	self._load_overlay	False
+_load_title	2596	_show_load_overlay		Load	self._load_title	self._load_title	False
+_load_title	2597	_show_load_overlay		mutation-call	self._load_title.set_text(title)	self._load_title	False
+_load_model_label	2598	_show_load_overlay		Load	self._load_model_label	self._load_model_label	False
+_load_model_label	2599	_show_load_overlay		mutation-call	"self._load_model_label.set_text(model or """")"	self._load_model_label	False
+_load_model_label	2600	_show_load_overlay		mutation-call	self._load_model_label.set_visible(bool(model))	self._load_model_label	False
+_load_status	2601	_show_load_overlay		Load	self._load_status	self._load_status	False
+_load_status	2602	_show_load_overlay		mutation-call	self._load_status.set_text(status)	self._load_status	False
+_load_progress	2603	_show_load_overlay		Load	self._load_progress	self._load_progress	False
+_load_indeterminate	2605	_show_load_overlay		Store	self._load_indeterminate = True	self._load_indeterminate	False
+_load_progress	2606	_show_load_overlay		mutation-call	self._load_progress.pulse()	self._load_progress	False
+_start_load_pulse	2607	_show_load_overlay		Load	self._start_load_pulse	self._start_load_pulse	True
+_load_indeterminate	2609	_show_load_overlay		Store	self._load_indeterminate = False	self._load_indeterminate	False
+_stop_load_pulse	2610	_show_load_overlay		Load	self._stop_load_pulse	self._stop_load_pulse	True
+_load_progress	2611	_show_load_overlay		mutation-call	self._load_progress.set_fraction(max(0.0, min(1.0, fraction)))	self._load_progress	False
+_load_spinner	2612	_show_load_overlay		Load	self._load_spinner	self._load_spinner	False
+_load_spinner	2614	_show_load_overlay		mutation-call	self._load_spinner.start()	self._load_spinner	False
+_load_overlay	2617	_show_load_overlay		mutation-call	self._load_overlay.set_visible(True)	self._load_overlay	False
+_set_load_controls_sensitive	2618	_show_load_overlay		Load	self._set_load_controls_sensitive	self._set_load_controls_sensitive	True
+_load_pulse_id	2621	_start_load_pulse		Load	self._load_pulse_id	self._load_pulse_id	False
+_load_overlay	2625	_start_load_pulse	tick	Load	self._load_overlay	self._load_overlay	False
+_load_overlay	2625	_start_load_pulse	tick	mutation-call	self._load_overlay.get_visible()	self._load_overlay	False
+_load_pulse_id	2626	_start_load_pulse	tick	Store	self._load_pulse_id = 0	self._load_pulse_id	False
+_load_indeterminate	2628	_start_load_pulse	tick	Load	self._load_indeterminate	self._load_indeterminate	False
+_load_progress	2628	_start_load_pulse	tick	Load	self._load_progress	self._load_progress	False
+_load_progress	2629	_start_load_pulse	tick	mutation-call	self._load_progress.pulse()	self._load_progress	False
+_load_pulse_id	2632	_start_load_pulse		Store	self._load_pulse_id = GLib.timeout_add(100, tick)	self._load_pulse_id	False
+_load_pulse_id	2635	_stop_load_pulse		Load	self._load_pulse_id	self._load_pulse_id	False
+_load_pulse_id	2637	_stop_load_pulse		Load	self._load_pulse_id	self._load_pulse_id	False
+_load_pulse_id	2640	_stop_load_pulse		Store	self._load_pulse_id = 0	self._load_pulse_id	False
+_stop_load_pulse	2643	_hide_load_overlay		Load	self._stop_load_pulse	self._stop_load_pulse	True
+_load_overlay	2644	_hide_load_overlay		Load	self._load_overlay	self._load_overlay	False
+_load_overlay	2645	_hide_load_overlay		mutation-call	self._load_overlay.set_visible(False)	self._load_overlay	False
+_load_spinner	2646	_hide_load_overlay		Load	self._load_spinner	self._load_spinner	False
+_load_spinner	2648	_hide_load_overlay		mutation-call	self._load_spinner.stop()	self._load_spinner	False
+_set_load_controls_sensitive	2651	_hide_load_overlay		Load	self._set_load_controls_sensitive	self._set_load_controls_sensitive	True
+_load_status	2673	_update_load_progress		Load	self._load_status	self._load_status	False
+_load_status	2674	_update_load_progress		mutation-call	self._load_status.set_text(line)	self._load_status	False
+_load_progress	2675	_update_load_progress		Load	self._load_progress	self._load_progress	False
+_load_indeterminate	2677	_update_load_progress		Store	self._load_indeterminate = False	self._load_indeterminate	False
+_stop_load_pulse	2678	_update_load_progress		Load	self._stop_load_pulse	self._stop_load_pulse	True
+_load_progress	2679	_update_load_progress		mutation-call	self._load_progress.set_fraction(max(0.0, min(1.0, fraction)))	self._load_progress	False
+_load_indeterminate	2681	_update_load_progress		Store	self._load_indeterminate = True	self._load_indeterminate	False
+_load_progress	2682	_update_load_progress		mutation-call	self._load_progress.pulse()	self._load_progress	False
+_start_load_pulse	2683	_update_load_progress		Load	self._start_load_pulse	self._start_load_pulse	True
+_streaming	2688	_begin_model_load		Load	self._streaming	self._streaming	False
+_loading_model	2691	_begin_model_load		Load	self._loading_model	self._loading_model	False
+_stop_load	2692	_begin_model_load		Store	self._stop_load = True	self._stop_load	False
+_load_generation	2693	_begin_model_load		AugAssign	self._load_generation += 1	self._load_generation	False
+_load_generation	2694	_begin_model_load		Load	self._load_generation	self._load_generation	False
+_loading_model	2695	_begin_model_load		Store	self._loading_model = True	self._loading_model	False
+_load_failed	2696	_begin_model_load		Store	self._load_failed = False	self._load_failed	False
+_stop_load	2697	_begin_model_load		Store	self._stop_load = False	self._stop_load	False
+_show_load_overlay	2698	_begin_model_load		Load	self._show_load_overlay	self._show_load_overlay	True
+_set_status	2704	_begin_model_load		Load	self._set_status	self._set_status	True
+client	2709	_begin_model_load	work	mutation-call	self.client.is_model_loaded(model)	self.client	False
+_load_generation	2710	_begin_model_load	work	Load	self._load_generation	self._load_generation	False
+_on_load_status	2714	_begin_model_load	work	Load	self._on_load_status	self._on_load_status	True
+_on_load_status	2723	_begin_model_load	work	Load	self._on_load_status	self._on_load_status	True
+client	2730	_begin_model_load	work	mutation-call	self.client.load_model(\n                        model,\n                        should_stop=lambda: self._stop_load\n                        or gen != self._load_generation,\n                    )	self.client	False
+_stop_load	2732	_begin_model_load	<lambda:L2732>	Load	self._stop_load	self._stop_load	False
+_load_generation	2733	_begin_model_load	<lambda:L2732>	Load	self._load_generation	self._load_generation	False
+_load_generation	2735	_begin_model_load	work	Load	self._load_generation	self._load_generation	False
+_on_load_chunk	2737	_begin_model_load	work	Load	self._on_load_chunk	self._on_load_chunk	True
+_on_model_load_finished	2742	_begin_model_load	work	Load	self._on_model_load_finished	self._on_model_load_finished	True
+_load_generation	2754	_on_load_status		Load	self._load_generation	self._load_generation	False
+_load_title	2756	_on_load_status		Load	self._load_title	self._load_title	False
+_load_title	2757	_on_load_status		mutation-call	self._load_title.set_text(title)	self._load_title	False
+_load_model_label	2758	_on_load_status		Load	self._load_model_label	self._load_model_label	False
+_load_model_label	2759	_on_load_status		mutation-call	self._load_model_label.set_text(model)	self._load_model_label	False
+_load_model_label	2760	_on_load_status		mutation-call	self._load_model_label.set_visible(True)	self._load_model_label	False
+_load_status	2761	_on_load_status		Load	self._load_status	self._load_status	False
+_load_status	2762	_on_load_status		mutation-call	self._load_status.set_text(status)	self._load_status	False
+_load_progress	2763	_on_load_status		Load	self._load_progress	self._load_progress	False
+_load_indeterminate	2765	_on_load_status		Store	self._load_indeterminate = True	self._load_indeterminate	False
+_load_progress	2766	_on_load_status		mutation-call	self._load_progress.pulse()	self._load_progress	False
+_start_load_pulse	2767	_on_load_status		Load	self._start_load_pulse	self._start_load_pulse	True
+_load_indeterminate	2769	_on_load_status		Store	self._load_indeterminate = False	self._load_indeterminate	False
+_stop_load_pulse	2770	_on_load_status		Load	self._stop_load_pulse	self._stop_load_pulse	True
+_load_progress	2771	_on_load_status		mutation-call	self._load_progress.set_fraction(fraction)	self._load_progress	False
+_load_generation	2775	_on_load_chunk		Load	self._load_generation	self._load_generation	False
+_update_load_progress	2777	_on_load_chunk		Load	self._update_load_progress	self._update_load_progress	True
+_load_generation	2783	_on_model_load_finished		Load	self._load_generation	self._load_generation	False
+_loading_model	2785	_on_model_load_finished		Store	self._loading_model = False	self._loading_model	False
+_stop_load_pulse	2786	_on_model_load_finished		Load	self._stop_load_pulse	self._stop_load_pulse	True
+_load_failed	2788	_on_model_load_finished		Store	self._load_failed = True	self._load_failed	False
+_model	2789	_on_model_load_finished		Store	self._model = model	self._model	False
+_hide_load_overlay	2790	_on_model_load_finished		Load	self._hide_load_overlay	self._hide_load_overlay	True
+_apply_health	2792	_on_model_load_finished		Load	self._apply_health	self._apply_health	True
+_set_status	2793	_on_model_load_finished		Load	self._set_status	self._set_status	True
+model_combo	2795	_on_model_load_finished		Load	self.model_combo	self.model_combo	False
+model_combo	2796	_on_model_load_finished		mutation-call	self.model_combo.set_sensitive(True)	self.model_combo	False
+_refresh_btn	2797	_on_model_load_finished		Load	self._refresh_btn	self._refresh_btn	False
+_refresh_btn	2798	_on_model_load_finished		mutation-call	self._refresh_btn.set_sensitive(True)	self._refresh_btn	False
+input	2799	_on_model_load_finished		Load	self.input	self.input	False
+input	2800	_on_model_load_finished		mutation-call	self.input.set_sensitive(True)	self.input	False
+send_btn	2801	_on_model_load_finished		Load	self.send_btn	self.send_btn	False
+send_btn	2802	_on_model_load_finished		mutation-call	self.send_btn.set_sensitive(False)	self.send_btn	False
+_clear_btn	2803	_on_model_load_finished		Load	self._clear_btn	self._clear_btn	False
+_clear_btn	2804	_on_model_load_finished		mutation-call	self._clear_btn.set_sensitive(True)	self._clear_btn	False
+_new_chat_btn	2805	_on_model_load_finished		Load	self._new_chat_btn	self._new_chat_btn	False
+_new_chat_btn	2806	_on_model_load_finished		mutation-call	self._new_chat_btn.set_sensitive(True)	self._new_chat_btn	False
+_sidebar_new_btn	2807	_on_model_load_finished		Load	self._sidebar_new_btn	self._sidebar_new_btn	False
+_sidebar_new_btn	2808	_on_model_load_finished		mutation-call	self._sidebar_new_btn.set_sensitive(True)	self._sidebar_new_btn	False
+_sidebar_btn	2809	_on_model_load_finished		Load	self._sidebar_btn	self._sidebar_btn	False
+_sidebar_btn	2810	_on_model_load_finished		mutation-call	self._sidebar_btn.set_sensitive(True)	self._sidebar_btn	False
+_history_list	2811	_on_model_load_finished		Load	self._history_list	self._history_list	False
+_history_list	2812	_on_model_load_finished		mutation-call	self._history_list.set_sensitive(True)	self._history_list	False
+_load_failed	2815	_on_model_load_finished		Store	self._load_failed = False	self._load_failed	False
+_load_progress	2816	_on_model_load_finished		Load	self._load_progress	self._load_progress	False
+_load_progress	2817	_on_model_load_finished		mutation-call	self._load_progress.set_fraction(1.0)	self._load_progress	False
+_load_status	2818	_on_model_load_finished		Load	self._load_status	self._load_status	False
+_load_status	2819	_on_model_load_finished		mutation-call	"self._load_status.set_text(""Ready"")"	self._load_status	False
+_hide_load_overlay	2820	_on_model_load_finished		Load	self._hide_load_overlay	self._hide_load_overlay	True
+_apply_health	2821	_on_model_load_finished		Load	self._apply_health	self._apply_health	True
+_health_banner	2828	_on_model_load_finished		Load	self._health_banner	self._health_banner	False
+_health_banner	2829	_on_model_load_finished		mutation-call	self._health_banner.set_visible(False)	self._health_banner	False
+_set_status	2830	_on_model_load_finished		Load	self._set_status	self._set_status	True
+_ensure_conversation	2833	_on_model_load_finished		Load	self._ensure_conversation	self._ensure_conversation	True
+_store	2834	_on_model_load_finished		mutation-call	self._store.set_model(cid, model)	self._store	False
+_greeted_models	2837	_on_model_load_finished		Load	self._greeted_models	self._greeted_models	False
+_messages	2837	_on_model_load_finished		Load	self._messages	self._messages	False
+_greeted_models	2838	_on_model_load_finished		mutation-call	self._greeted_models.add(model)	self._greeted_models	False
+_show_ephemeral_greeting	2839	_on_model_load_finished		Load	self._show_ephemeral_greeting	self._show_ephemeral_greeting	True
+send_btn	2840	_on_model_load_finished		Load	self.send_btn	self.send_btn	False
+send_btn	2841	_on_model_load_finished		mutation-call	self.send_btn.set_sensitive(True)	self.send_btn	False
+input	2842	_on_model_load_finished		Load	self.input	self.input	False
+input	2844	_on_model_load_finished		mutation-call	self.input.grab_focus()	self.input	False
+_messages	2851	_show_ephemeral_greeting		Load	self._messages	self._messages	False
+_transcript_mode	2853	_show_ephemeral_greeting		Load	self._transcript_mode	self._transcript_mode	False
+_web	2853	_show_ephemeral_greeting		Load	self._web	self._web	False
+_web	2854	_show_ephemeral_greeting		mutation-call	"self._web.post(\n                {\n                    ""type"": ""empty_state"",\n                    ""title"": GREETING_TEXT,\n                    ""subtitle"": GREETING_SUB,\n                }\n            )"	self._web	False
+_empty_box	2863	_show_ephemeral_greeting		Load	self._empty_box	self._empty_box	False
+chat_box	2864	_show_ephemeral_greeting		Load	self.chat_box	self.chat_box	False
+_empty_box	2865	_show_ephemeral_greeting		mutation-call	self._empty_box.get_parent()	self._empty_box	False
+chat_box	2867	_show_ephemeral_greeting		Load	self.chat_box	self.chat_box	False
+chat_box	2868	_show_ephemeral_greeting		mutation-call	self.chat_box.get_first_child()	self.chat_box	False
+chat_box	2869	_show_ephemeral_greeting		mutation-call	self.chat_box.remove(child)	self.chat_box	False
+_show_empty_state	2870	_show_ephemeral_greeting		Load	self._show_empty_state	self._show_empty_state	True
+_empty_title	2871	_show_ephemeral_greeting		getattr	"getattr(self, ""_empty_title"", None)"	"getattr(self, ""_empty_title"", None)"	False
+_empty_title	2872	_show_ephemeral_greeting		mutation-call	self._empty_title.set_text(GREETING_TEXT)	self._empty_title	False
+_empty_sub	2873	_show_ephemeral_greeting		getattr	"getattr(self, ""_empty_sub"", None)"	"getattr(self, ""_empty_sub"", None)"	False
+_empty_sub	2874	_show_ephemeral_greeting		mutation-call	self._empty_sub.set_text(GREETING_SUB)	self._empty_sub	False
+send_btn	2875	_show_ephemeral_greeting		Load	self.send_btn	self.send_btn	False
+send_btn	2876	_show_ephemeral_greeting		mutation-call	self.send_btn.set_sensitive(True)	self.send_btn	False
+_active_stream_cancel	2880	_request_stop		Load	self._active_stream_cancel	self._active_stream_cancel	False
+_active_stream_cancel	2881	_request_stop		mutation-call	self._active_stream_cancel.set()	self._active_stream_cancel	False
+_active_stream_cancel	2892	_invalidate_active_stream		Load	self._active_stream_cancel	self._active_stream_cancel	False
+_active_stream_cancel	2893	_invalidate_active_stream		mutation-call	self._active_stream_cancel.set()	self._active_stream_cancel	False
+_stream_generation	2894	_invalidate_active_stream		AugAssign	self._stream_generation += 1	self._stream_generation	False
+_streaming	2895	_invalidate_active_stream		Load	self._streaming	self._streaming	False
+_stream_finished	2897	_invalidate_active_stream		Load	self._stream_finished	self._stream_finished	True
+_next_msg_id	2903	_post_status_message		Load	self._next_msg_id	self._next_msg_id	True
+_transcript_mode	2904	_post_status_message		Load	self._transcript_mode	self._transcript_mode	False
+_web	2904	_post_status_message		Load	self._web	self._web	False
+_web	2905	_post_status_message		mutation-call	"self._web.post(\n                {\n                    ""type"": ""message_added"",\n                    ""id"": mid,\n                    ""role"": ""assistant"",\n                    ""text"": text,\n                    ""streaming"": streaming,\n                }\n            )"	self._web	False
+_append_message	2915	_post_status_message		Load	self._append_message	self._append_message	True
+_run_ollama_pull	2928	_try_composer_command		Load	self._run_ollama_pull	self._run_ollama_pull	True
+_run_ollama_info	2931	_try_composer_command		Load	self._run_ollama_info	self._run_ollama_info	True
+_run_ollama_info	2934	_try_composer_command		Load	self._run_ollama_info	self._run_ollama_info	True
+_post_status_message	2937	_try_composer_command		Load	self._post_status_message	self._post_status_message	True
+_ollama_cli_busy	2948	_composer_cmd_busy		getattr	"getattr(self, ""_ollama_cli_busy"", False)"	"getattr(self, ""_ollama_cli_busy"", False)"	False
+_ollama_cli_busy	2951	_set_composer_cmd_busy		Store	self._ollama_cli_busy = busy	self._ollama_cli_busy	False
+send_btn	2952	_set_composer_cmd_busy		Load	self.send_btn	self.send_btn	False
+send_btn	2953	_set_composer_cmd_busy		mutation-call	self.send_btn.set_sensitive(\n                bool(self._model)\n                and not self._streaming\n                and not self._loading_model\n                and not self._load_failed\n            )	self.send_btn	False
+_model	2954	_set_composer_cmd_busy		Load	self._model	self._model	False
+_streaming	2955	_set_composer_cmd_busy		Load	self._streaming	self._streaming	False
+_loading_model	2956	_set_composer_cmd_busy		Load	self._loading_model	self._loading_model	False
+_load_failed	2957	_set_composer_cmd_busy		Load	self._load_failed	self._load_failed	False
+send_btn	2959	_set_composer_cmd_busy		Load	self.send_btn	self.send_btn	False
+send_btn	2960	_set_composer_cmd_busy		mutation-call	self.send_btn.set_sensitive(False)	self.send_btn	False
+_transcript_mode	2964	_update_status_message		Load	self._transcript_mode	self._transcript_mode	False
+_web	2964	_update_status_message		Load	self._web	self._web	False
+_web	2966	_update_status_message		mutation-call	"self._web.post({""type"": ""message_done"", ""id"": mid, ""text"": text})"	self._web	False
+_web	2969	_update_status_message		mutation-call	"self._web.post(\n                    {\n                        ""type"": ""message_reset"",\n                        ""id"": mid,\n                        ""text"": text,\n                        ""streaming"": True,\n                    }\n                )"	self._web	False
+_native_remove_message	2979	_update_status_message		Load	self._native_remove_message	self._native_remove_message	True
+_append_message	2982	_update_status_message		Load	self._append_message	self._append_message	True
+_composer_cmd_busy	3005	_run_ollama_pull		Load	self._composer_cmd_busy	self._composer_cmd_busy	True
+_post_status_message	3006	_run_ollama_pull		Load	self._post_status_message	self._post_status_message	True
+_set_composer_cmd_busy	3011	_run_ollama_pull		Load	self._set_composer_cmd_busy	self._set_composer_cmd_busy	True
+_post_status_message	3012	_run_ollama_pull		Load	self._post_status_message	self._post_status_message	True
+_set_status	3013	_run_ollama_pull		Load	self._set_status	self._set_status	True
+client	3021	_run_ollama_pull	work	mutation-call	self.client.pull_model(model)	self.client	False
+_format_pull_progress	3022	_run_ollama_pull	work	Load	self._format_pull_progress	self._format_pull_progress	True
+_update_status_message	3044	_run_ollama_pull	<lambda:L3043>	Load	self._update_status_message	self._update_status_message	True
+_update_status_message	3073	_run_ollama_pull	done	Load	self._update_status_message	self._update_status_message	True
+_set_composer_cmd_busy	3074	_run_ollama_pull	done	Load	self._set_composer_cmd_busy	self._set_composer_cmd_busy	True
+_refresh_models	3076	_run_ollama_pull	done	Load	self._refresh_models	self._refresh_models	True
+_model	3078	_run_ollama_pull	done	Load	self._model	self._model	False
+_set_status	3078	_run_ollama_pull	done	Load	self._set_status	self._set_status	True
+_composer_cmd_busy	3087	_run_ollama_info		Load	self._composer_cmd_busy	self._composer_cmd_busy	True
+_post_status_message	3088	_run_ollama_info		Load	self._post_status_message	self._post_status_message	True
+_set_composer_cmd_busy	3093	_run_ollama_info		Load	self._set_composer_cmd_busy	self._set_composer_cmd_busy	True
+_post_status_message	3094	_run_ollama_info		Load	self._post_status_message	self._post_status_message	True
+_set_status	3095	_run_ollama_info		Load	self._set_status	self._set_status	True
+client	3100	_run_ollama_info	work	mutation-call	self.client.format_list_models()	self.client	False
+client	3102	_run_ollama_info	work	mutation-call	self.client.format_ps_models()	self.client	False
+_update_status_message	3112	_run_ollama_info	done	Load	self._update_status_message	self._update_status_message	True
+_set_composer_cmd_busy	3113	_run_ollama_info	done	Load	self._set_composer_cmd_busy	self._set_composer_cmd_busy	True
+_model	3114	_run_ollama_info	done	Load	self._model	self._model	False
+_set_status	3114	_run_ollama_info	done	Load	self._set_status	self._set_status	True
+_loading_model	3122	_send		Load	self._loading_model	self._loading_model	False
+_streaming	3122	_send		Load	self._streaming	self._streaming	False
+_ollama_cli_busy	3124	_send		getattr	"getattr(self, ""_ollama_cli_busy"", False)"	"getattr(self, ""_ollama_cli_busy"", False)"	False
+input	3126	_send		mutation-call	self.input.get_buffer()	self.input	False
+_try_composer_command	3132	_send		Load	self._try_composer_command	self._try_composer_command	True
+_health	3136	_send		getattr	"getattr(self, ""_health"", None)"	"getattr(self, ""_health"", None)"	False
+_health	3136	_send		Load	self._health	self._health	False
+_refresh_models	3138	_send		Load	self._refresh_models	self._refresh_models	True
+_model	3140	_send		Load	self._model	self._model	False
+_next_msg_id	3143	_send		Load	self._next_msg_id	self._next_msg_id	True
+_transcript_mode	3144	_send		Load	self._transcript_mode	self._transcript_mode	False
+_web	3144	_send		Load	self._web	self._web	False
+_web	3145	_send		mutation-call	"self._web.post(\n                {\n                    ""type"": ""message_added"",\n                    ""id"": uid,\n                    ""role"": ""user"",\n                    ""text"": text,\n                    ""streaming"": False,\n                }\n            )"	self._web	False
+_append_message	3155	_send		Load	self._append_message	self._append_message	True
+_messages	3156	_send		mutation-call	"self._messages.append({""id"": uid, ""role"": ""user"", ""content"": text})"	self._messages	False
+_persist_message	3157	_send		Load	self._persist_message	self._persist_message	True
+_sync_composer_hint	3158	_send		Load	self._sync_composer_hint	self._sync_composer_hint	True
+_start_assistant_stream	3159	_send		Load	self._start_assistant_stream	self._start_assistant_stream	True
+chat_box	3162	_remove_empty_state		Load	self.chat_box	self.chat_box	False
+_empty_box	3163	_remove_empty_state		Load	self._empty_box	self._empty_box	False
+_empty_box	3163	_remove_empty_state		mutation-call	self._empty_box.get_parent()	self._empty_box	False
+_empty_box	3164	_remove_empty_state		Load	self._empty_box	self._empty_box	False
+chat_box	3164	_remove_empty_state		mutation-call	self.chat_box.remove(self._empty_box)	self.chat_box	False
+_empty_box	3165	_remove_empty_state		Store	self._empty_box = None	self._empty_box	False
+chat_box	3166	_remove_empty_state		mutation-call	self.chat_box.set_valign(Gtk.Align.START)	self.chat_box	False
+chat_box	3167	_remove_empty_state		mutation-call	self.chat_box.set_vexpand(False)	self.chat_box	False
+_sync_composer_hint	3168	_remove_empty_state		Load	self._sync_composer_hint	self._sync_composer_hint	True
+_remove_empty_state	3179	_append_message		Load	self._remove_empty_state	self._remove_empty_state	True
+_next_msg_id	3181	_append_message		Load	self._next_msg_id	self._next_msg_id	True
+_native_action_bar	3239	_append_message		Load	self._native_action_bar	self._native_action_bar	True
+chat_box	3246	_append_message		mutation-call	self.chat_box.append(row)	self.chat_box	False
+_native_rows	3247	_append_message		Subscript-Store	self._native_rows[mid]	self._native_rows	False
+_scroll_to_end	3248	_append_message		Load	self._scroll_to_end	self._scroll_to_end	True
+_find_message_index	3281	_native_action_bar	current_text	Load	self._find_message_index	self._find_message_index	True
+_messages	3283	_native_action_bar	current_text	Load	self._messages	self._messages	False
+_clipboard_set	3290	_native_action_bar	<lambda:L3290>	Load	self._clipboard_set	self._clipboard_set	True
+_native_edit_user	3297	_native_action_bar	<lambda:L3297>	Load	self._native_edit_user	self._native_edit_user	True
+_regenerate_message	3302	_native_action_bar	<lambda:L3302>	Load	self._regenerate_message	self._regenerate_message	True
+_delete_message	3307	_native_action_bar	<lambda:L3307>	Load	self._delete_message	self._delete_message	True
+_regenerate_message	3316	_native_action_bar	<lambda:L3316>	Load	self._regenerate_message	self._regenerate_message	True
+_continue_message	3321	_native_action_bar	<lambda:L3321>	Load	self._continue_message	self._continue_message	True
+_delete_message	3326	_native_action_bar	<lambda:L3326>	Load	self._delete_message	self._delete_message	True
+_clipboard_set	3350	_native_action_bar	<lambda:L3348>	Load	self._clipboard_set	self._clipboard_set	True
+_edit_resend_message	3396	_native_edit_user	on_response	Load	self._edit_resend_message	self._edit_resend_message	True
+_native_rows	3402	_native_remove_message		mutation-call	self._native_rows.pop(message_id, None)	self._native_rows	False
+chat_box	3403	_native_remove_message		Load	self.chat_box	self.chat_box	False
+chat_box	3405	_native_remove_message		mutation-call	self.chat_box.remove(row)	self.chat_box	False
+scroller	3410	_scroll_to_end		Load	self.scroller	self.scroller	False
+scroller	3412	_scroll_to_end		mutation-call	self.scroller.get_vadjustment()	self.scroller	False
+_streaming	3429	_start_assistant_stream		Load	self._streaming	self._streaming	False
+_stream_generation	3431	_start_assistant_stream		AugAssign	self._stream_generation += 1	self._stream_generation	False
+_stream_generation	3432	_start_assistant_stream		Load	self._stream_generation	self._stream_generation	False
+_active_stream_cancel	3434	_start_assistant_stream		Store	self._active_stream_cancel = cancel_event	self._active_stream_cancel	False
+_conversation_id	3435	_start_assistant_stream		Load	self._conversation_id	self._conversation_id	False
+_model	3436	_start_assistant_stream		Load	self._model	self._model	False
+_streaming	3437	_start_assistant_stream		Store	self._streaming = True	self._streaming	False
+send_btn	3438	_start_assistant_stream		mutation-call	self.send_btn.set_sensitive(False)	self.send_btn	False
+send_btn	3439	_start_assistant_stream		mutation-call	self.send_btn.set_visible(False)	self.send_btn	False
+stop_btn	3440	_start_assistant_stream		mutation-call	self.stop_btn.set_visible(True)	self.stop_btn	False
+stop_btn	3441	_start_assistant_stream		mutation-call	self.stop_btn.set_sensitive(True)	self.stop_btn	False
+_set_status	3442	_start_assistant_stream		Load	self._set_status	self._set_status	True
+_transcript_mode	3444	_start_assistant_stream		Load	self._transcript_mode	self._transcript_mode	False
+_web	3444	_start_assistant_stream		Load	self._web	self._web	False
+_next_msg_id	3450	_start_assistant_stream		Load	self._next_msg_id	self._next_msg_id	True
+_web	3459	_start_assistant_stream		mutation-call	"self._web.post(\n                    {\n                        ""type"": ""message_reset"",\n                        ""id"": aid,\n                        ""streaming"": True,\n                        ""text"": """",\n                    }\n                )"	self._web	False
+_web	3469	_start_assistant_stream		mutation-call	"self._web.post(\n                    {\n                        ""type"": ""message_reset"",\n                        ""id"": aid,\n                        ""streaming"": True,\n                        ""text"": stream_seed,\n                    }\n                )"	self._web	False
+_web	3478	_start_assistant_stream		mutation-call	"self._web.post(\n                    {\n                        ""type"": ""message_added"",\n                        ""id"": aid,\n                        ""role"": ""assistant"",\n                        ""text"": """",\n                        ""streaming"": True,\n                    }\n                )"	self._web	False
+_native_remove_message	3489	_start_assistant_stream		Load	self._native_remove_message	self._native_remove_message	True
+_append_message	3490	_start_assistant_stream		Load	self._append_message	self._append_message	True
+_native_remove_message	3495	_start_assistant_stream		Load	self._native_remove_message	self._native_remove_message	True
+_append_message	3496	_start_assistant_stream		Load	self._append_message	self._append_message	True
+_append_message	3502	_start_assistant_stream		Load	self._append_message	self._append_message	True
+_api_messages	3519	_start_assistant_stream		Load	self._api_messages	self._api_messages	True
+_stream_generation	3523	_start_assistant_stream	still_current	Load	self._stream_generation	self._stream_generation	False
+_apply_health	3543	_start_assistant_stream	finalize_ui	Load	self._apply_health	self._apply_health	True
+_web	3551	_start_assistant_stream	finalize_ui	Load	self._web	self._web	False
+_web	3553	_start_assistant_stream	finalize_ui	mutation-call	"self._web.post(\n                        {\n                            ""type"": ""message_error"",\n                            ""id"": aid,\n                            ""text"": (\n                                f""Error: {err}""\n                                if not final\n                                else final + f""\n\n[Error: {err}]""\n                            ),\n                        }\n                    )"	self._web	False
+_web	3565	_start_assistant_stream	finalize_ui	mutation-call	"self._web.post(\n                        {\n                            ""type"": ""message_done"",\n                            ""id"": aid,\n                            ""text"": final or ""(no response)"",\n                        }\n                    )"	self._web	False
+_commit_assistant_result	3572	_start_assistant_stream	finalize_ui	Load	self._commit_assistant_result	self._commit_assistant_result	True
+_stream_finished	3579	_start_assistant_stream	finalize_ui	Load	self._stream_finished	self._stream_finished	True
+_commit_assistant_result	3594	_start_assistant_stream	finalize_ui	Load	self._commit_assistant_result	self._commit_assistant_result	True
+_native_remove_message	3603	_start_assistant_stream	finalize_ui	Load	self._native_remove_message	self._native_remove_message	True
+_append_message	3604	_start_assistant_stream	finalize_ui	Load	self._append_message	self._append_message	True
+_scroll_to_end	3607	_start_assistant_stream	finalize_ui	Load	self._scroll_to_end	self._scroll_to_end	True
+_stream_finished	3608	_start_assistant_stream	finalize_ui	Load	self._stream_finished	self._stream_finished	True
+_web	3620	_start_assistant_stream	flush_stream	Load	self._web	self._web	False
+_web	3621	_start_assistant_stream	flush_stream	mutation-call	"self._web.post(\n                        {\n                            ""type"": ""message_delta"",\n                            ""id"": aid,\n                            ""text"": chunk,\n                        }\n                    )"	self._web	False
+_scroll_to_end	3630	_start_assistant_stream	flush_stream	Load	self._scroll_to_end	self._scroll_to_end	True
+_web	3639	_start_assistant_stream	flush_stream	Load	self._web	self._web	False
+_web	3640	_start_assistant_stream	flush_stream	mutation-call	"self._web.post(\n                        {\n                            ""type"": ""message_delta"",\n                            ""id"": aid,\n                            ""text"": leftover,\n                        }\n                    )"	self._web	False
+_scroll_to_end	3649	_start_assistant_stream	flush_stream	Load	self._scroll_to_end	self._scroll_to_end	True
+client	3657	_start_assistant_stream	work	mutation-call	self.client.chat_stream(\n                    origin_model,\n                    list(outbound),\n                    cancel_event=cancel_event,\n                )	self.client	False
+_find_message_index	3686	_commit_assistant_result		Load	self._find_message_index	self._find_message_index	True
+_messages	3688	_commit_assistant_result		Subscript-Store	"self._messages[idx][""content""]"	self._messages	False
+_store	3690	_commit_assistant_result		mutation-call	self._store.update_message(assistant_id, text)	self._store	False
+_messages	3696	_commit_assistant_result		Subscript-Store	"self._messages[idx][""content""]"	self._messages	False
+_messages	3698	_commit_assistant_result		mutation-call	"self._messages.append(\n                    {""id"": assistant_id, ""role"": ""assistant"", ""content"": text}\n                )"	self._messages	False
+_store	3704	_commit_assistant_result		mutation-call	"self._store.append_message(\n                    origin_conversation_id,\n                    role=""assistant"",\n                    content=text,\n                    message_id=assistant_id,\n                )"	self._store	False
+_store	3713	_commit_assistant_result		mutation-call	self._store.update_message(assistant_id, text)	self._store	False
+_messages	3718	_commit_assistant_result		mutation-call	"self._messages.append(\n            {""id"": assistant_id, ""role"": ""assistant"", ""content"": text}\n        )"	self._messages	False
+_store	3722	_commit_assistant_result		mutation-call	"self._store.append_message(\n                origin_conversation_id,\n                role=""assistant"",\n                content=text,\n                message_id=assistant_id,\n            )"	self._store	False
+_streaming	3732	_stream_finished		Store	self._streaming = False	self._streaming	False
+_active_stream_cancel	3733	_stream_finished		Store	self._active_stream_cancel = None	self._active_stream_cancel	False
+_model	3734	_stream_finished		Load	self._model	self._model	False
+send_btn	3734	_stream_finished		mutation-call	self.send_btn.set_sensitive(bool(self._model))	self.send_btn	False
+send_btn	3735	_stream_finished		mutation-call	self.send_btn.set_visible(True)	self.send_btn	False
+stop_btn	3736	_stream_finished		mutation-call	self.stop_btn.set_visible(False)	self.stop_btn	False
+stop_btn	3737	_stream_finished		mutation-call	self.stop_btn.set_sensitive(False)	self.stop_btn	False
+_model	3738	_stream_finished		Load	self._model	self._model	False
+_model	3739	_stream_finished		Load	self._model	self._model	False
+_set_status	3739	_stream_finished		Load	self._set_status	self._set_status	True
+_set_status	3741	_stream_finished		Load	self._set_status	self._set_status	True

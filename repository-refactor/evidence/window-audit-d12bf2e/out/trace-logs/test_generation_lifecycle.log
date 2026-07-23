@@ -1,0 +1,34 @@
+Lifecycle DB: /tmp/cb-lifecycle-krrqets3/lifecycle.db
+Transcript: WebKit (default)
+
+[1] Switch mid-stream: no cross-chat leak
+Switched to conv-5b1cbe5… (0 messages)
+  PASS  switch clears _streaming immediately
+  PASS  switch cleared active cancel handle
+  PASS  conversation_id now B
+  PASS  no leaked content in B — []
+  PASS  B has no assistant reply at all
+  PASS  A keeps only its persisted user message (partial discarded) — ['hi']
+  PASS  in-memory _messages (now B's) untouched by stale stream
+
+[2] Stale generation cannot update a newer one
+Switched to conv-82584e9… (0 messages)
+  PASS  old generation's text never persisted — ['hi', 'hi', 'new-gen-text']
+  PASS  new generation's text persisted — ['hi', 'hi', 'new-gen-text']
+
+[3] Stale completion cannot reset controls of a current stream
+Switched to conv-4b7e600… (0 messages)
+  PASS  controls still reflect the CURRENT stream after stale completion
+  PASS  current stream still completes and persists normally — ['hi', 'fresh fresh-more']
+
+[4] Captured model is immune to a later model switch
+  PASS  worker called with the model captured at start — model-x
+
+[5] Manual Stop preserves partial output
+  PASS  manual stop cut generation short (no 'world') — ['hi', 'Hello ']
+  PASS  manual stop kept the partial as the final message — ['hi', 'Hello ']
+
+=== Summary ===
+Passed: 14  Failed: 0
+
+(WebKitWebProcess:2): GLib-GIO-WARNING **: 16:30:46.687: Error releasing name dev.local.chickenbutt.lifecycle.Sandboxed.WebProcess-d0e6cb49-69f7-4304-8b7a-f7f124c1286a: The connection is closed

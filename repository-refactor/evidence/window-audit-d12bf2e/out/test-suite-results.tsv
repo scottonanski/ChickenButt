@@ -1,0 +1,16 @@
+script	exit_code
+scripts/test_dependency_declaration.py	0
+scripts/test_desktop_integration.py	0
+scripts/test_generation_lifecycle.py	0
+scripts/test_installed_layout.py	0
+scripts/test_markdown_sanitization.py	0
+scripts/test_message_actions.py	0
+scripts/test_multichat.py	0
+scripts/test_ollama_health.py	0
+scripts/test_release_identity.py	0
+scripts/test_restore_scroll.py	0
+scripts/test_sidebar_interactions.py	0
+scripts/test_stream_cancellation.py	0
+scripts/test_web_content_security_policy.py	0
+scripts/test_web_navigation_policy.py	0
+scripts/test_wire_code_ui_batch.py	0

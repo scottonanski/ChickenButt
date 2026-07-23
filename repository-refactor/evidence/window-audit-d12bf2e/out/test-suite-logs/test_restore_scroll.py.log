@@ -1,0 +1,19 @@
+Transcript: WebKit (default)
+
+[1] Restore 1000 mixed messages — scroll call count
+Switched to conv-a9dccdb… (1000 messages)
+  PASS  restore completed (1000 messages) — got 1000
+  PASS  restore scrolls a small constant number of times, not once per message — scroll calls = 1
+  PASS  message count correct after restore
+  PASS  message order preserved (first/last content) — {'id': 't0', 'role': 'user', 'content': 'msg 0'} / {'id': 't999', 'role': 'assistant', 'content': '## Reply 999\n\n```python\nprint(999)\n```\n'}
+
+[2] Correctness: DOM output matches expectations
+  PASS  all rows rendered — {'hljs': 500, 'collapsed': 0, 'type': 'test_dom_check', 'copyBtns': 500, 'rows': 1000}
+  PASS  assistant code blocks highlighted — {'hljs': 500, 'collapsed': 0, 'type': 'test_dom_check', 'copyBtns': 500, 'rows': 1000}
+  PASS  copy controls wired for every code block — {'hljs': 500, 'collapsed': 0, 'type': 'test_dom_check', 'copyBtns': 500, 'rows': 1000}
+
+[3] Normal (non-restore) addMessage still scrolls per message
+  PASS  a normal live message still triggers scrollIfPinned — scroll calls = 1
+
+=== Summary ===
+Passed: 8  Failed: 0

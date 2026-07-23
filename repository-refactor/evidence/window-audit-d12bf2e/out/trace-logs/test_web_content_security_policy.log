@@ -1,0 +1,72 @@
+
+[1] Configured CSP contains exactly the expected restrictive directives
+  PASS  CSP property is set
+  PASS  module-level TRANSCRIPT_CSP matches what was configured on the WebView — default-src 'none'; script-src 'self'; script-src-attr 'none'; style-src 'self'; style-src-attr 'none'; img-src 'self'; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; child-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  PASS  directive present and exact: default-src 'none' — got "'none'"
+  PASS  directive present and exact: script-src 'self' — got "'self'"
+  PASS  directive present and exact: script-src-attr 'none' — got "'none'"
+  PASS  directive present and exact: style-src 'self' — got "'self'"
+  PASS  directive present and exact: style-src-attr 'none' — got "'none'"
+  PASS  directive present and exact: img-src 'self' — got "'self'"
+  PASS  directive present and exact: connect-src 'none' — got "'none'"
+  PASS  directive present and exact: font-src 'none' — got "'none'"
+  PASS  directive present and exact: media-src 'none' — got "'none'"
+  PASS  directive present and exact: object-src 'none' — got "'none'"
+  PASS  directive present and exact: frame-src 'none' — got "'none'"
+  PASS  directive present and exact: child-src 'none' — got "'none'"
+  PASS  directive present and exact: worker-src 'none' — got "'none'"
+  PASS  directive present and exact: manifest-src 'none' — got "'none'"
+  PASS  directive present and exact: base-uri 'none' — got "'none'"
+  PASS  directive present and exact: form-action 'none' — got "'none'"
+  PASS  directive present and exact: frame-ancestors 'none' — got "'none'"
+  PASS  no extra/unexpected directives — {'default-src': "'none'", 'script-src': "'self'", 'script-src-attr': "'none'", 'style-src': "'self'", 'style-src-attr': "'none'", 'img-src': "'self'", 'connect-src': "'none'", 'font-src': "'none'", 'media-src': "'none'", 'object-src': "'none'", 'frame-src': "'none'", 'child-src': "'none'", 'worker-src': "'none'", 'manifest-src': "'none'", 'base-uri': "'none'", 'form-action': "'none'", 'frame-ancestors': "'none'"}
+
+[2] No wildcard, unsafe-*, or broad scheme allowance anywhere in the policy
+  PASS  policy does not contain 'unsafe-inline' — default-src 'none'; script-src 'self'; script-src-attr 'none'; style-src 'self'; style-src-attr 'none'; img-src 'self'; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; child-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  PASS  policy does not contain 'unsafe-eval' — default-src 'none'; script-src 'self'; script-src-attr 'none'; style-src 'self'; style-src-attr 'none'; img-src 'self'; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; child-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  PASS  policy does not contain '*' — default-src 'none'; script-src 'self'; script-src-attr 'none'; style-src 'self'; style-src-attr 'none'; img-src 'self'; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; child-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  PASS  policy does not contain 'data:' — default-src 'none'; script-src 'self'; script-src-attr 'none'; style-src 'self'; style-src-attr 'none'; img-src 'self'; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; child-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  PASS  policy does not contain 'blob:' — default-src 'none'; script-src 'self'; script-src-attr 'none'; style-src 'self'; style-src-attr 'none'; img-src 'self'; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; child-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  PASS  policy does not contain 'http:' — default-src 'none'; script-src 'self'; script-src-attr 'none'; style-src 'self'; style-src-attr 'none'; img-src 'self'; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; child-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  PASS  policy does not contain 'https:' — default-src 'none'; script-src 'self'; script-src-attr 'none'; style-src 'self'; style-src-attr 'none'; img-src 'self'; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; child-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  PASS  policy does not contain 'file:' — default-src 'none'; script-src 'self'; script-src-attr 'none'; style-src 'self'; style-src-attr 'none'; img-src 'self'; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; child-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+
+[3] Transcript reaches ready state
+  PASS  WebView reports ready after load
+  PASS  WebView URI is the trusted local transcript
+
+[4] Required local resources load under the strict policy
+  PASS  marked loaded (script-src 'self') — {'markedDefined': True, 'domPurifyDefined': True, 'hljsDefined': True, 'appJsRan': True, 'iconNaturalWidth': 64, 'iconComplete': True, 'bodyBg': 'rgb(18, 18, 22)'}
+  PASS  DOMPurify loaded (script-src 'self') — {'markedDefined': True, 'domPurifyDefined': True, 'hljsDefined': True, 'appJsRan': True, 'iconNaturalWidth': 64, 'iconComplete': True, 'bodyBg': 'rgb(18, 18, 22)'}
+  PASS  hljs loaded (script-src 'self') — {'markedDefined': True, 'domPurifyDefined': True, 'hljsDefined': True, 'appJsRan': True, 'iconNaturalWidth': 64, 'iconComplete': True, 'bodyBg': 'rgb(18, 18, 22)'}
+  PASS  app.js ran (script-src 'self') — {'markedDefined': True, 'domPurifyDefined': True, 'hljsDefined': True, 'appJsRan': True, 'iconNaturalWidth': 64, 'iconComplete': True, 'bodyBg': 'rgb(18, 18, 22)'}
+  PASS  transcript CSS applied (style-src 'self') — {'markedDefined': True, 'domPurifyDefined': True, 'hljsDefined': True, 'appJsRan': True, 'iconNaturalWidth': 64, 'iconComplete': True, 'bodyBg': 'rgb(18, 18, 22)'}
+  PASS  empty-state chicken icon loaded with nonzero natural size (img-src 'self') — {'markedDefined': True, 'domPurifyDefined': True, 'hljsDefined': True, 'appJsRan': True, 'iconNaturalWidth': 64, 'iconComplete': True, 'bodyBg': 'rgb(18, 18, 22)'}
+
+[5] Python can still post a transcript event and the DOM updates
+  PASS  DOM updates normally via Python->page bridge — {'type': 'test_post_check', 'hasRow': True}
+
+[6] Python evaluate_javascript() still executes (host APIs bypass page CSP)
+  PASS  evaluate_javascript() executes a harmless expression without 'unsafe-eval' — {'value': '42'}
+
+[7] External-content vectors are blocked; stub server receives nothing
+  PASS  stub server received zero requests — []
+  PASS  no external script executed — {'externalScriptRan': False, 'inlineScriptRan': False, 'bodyBg': 'rgb(18, 18, 22)', 'imgNaturalWidth': 0, 'iframeLoaded': True, 'iframeHref': 'about:blank', 'iframeHasExternalContent': False, 'workerMessage': None, 'workerThrew': None, 'baseURIBefore': 'file:///home/scott/Development/ChickenButt/web/index.html', 'baseURIAfter': 'file:///home/scott/Development/ChickenButt/web/index.html', 'cspViolations': ['connect-src', 'script-src-elem', 'style-src-elem', 'img-src', 'frame-src', 'script-src-elem', 'style-src-elem', 'base-uri']}
+  PASS  no dynamically-appended inline <script> executed — {'externalScriptRan': False, 'inlineScriptRan': False, 'bodyBg': 'rgb(18, 18, 22)', 'imgNaturalWidth': 0, 'iframeLoaded': True, 'iframeHref': 'about:blank', 'iframeHasExternalContent': False, 'workerMessage': None, 'workerThrew': None, 'baseURIBefore': 'file:///home/scott/Development/ChickenButt/web/index.html', 'baseURIAfter': 'file:///home/scott/Development/ChickenButt/web/index.html', 'cspViolations': ['connect-src', 'script-src-elem', 'style-src-elem', 'img-src', 'frame-src', 'script-src-elem', 'style-src-elem', 'base-uri']}
+  PASS  dynamically-appended inline <style> had no effect on computed styling — 'rgb(18, 18, 22)' != baseline 'rgb(18, 18, 22)'
+  PASS  external <img> never loaded (naturalWidth 0) — {'externalScriptRan': False, 'inlineScriptRan': False, 'bodyBg': 'rgb(18, 18, 22)', 'imgNaturalWidth': 0, 'iframeLoaded': True, 'iframeHref': 'about:blank', 'iframeHasExternalContent': False, 'workerMessage': None, 'workerThrew': None, 'baseURIBefore': 'file:///home/scott/Development/ChickenButt/web/index.html', 'baseURIAfter': 'file:///home/scott/Development/ChickenButt/web/index.html', 'cspViolations': ['connect-src', 'script-src-elem', 'style-src-elem', 'img-src', 'frame-src', 'script-src-elem', 'style-src-elem', 'base-uri']}
+  PASS  external <iframe> never actually loaded the blocked page's content — {'externalScriptRan': False, 'inlineScriptRan': False, 'bodyBg': 'rgb(18, 18, 22)', 'imgNaturalWidth': 0, 'iframeLoaded': True, 'iframeHref': 'about:blank', 'iframeHasExternalContent': False, 'workerMessage': None, 'workerThrew': None, 'baseURIBefore': 'file:///home/scott/Development/ChickenButt/web/index.html', 'baseURIAfter': 'file:///home/scott/Development/ChickenButt/web/index.html', 'cspViolations': ['connect-src', 'script-src-elem', 'style-src-elem', 'img-src', 'frame-src', 'script-src-elem', 'style-src-elem', 'base-uri']}
+  PASS  external worker never delivered a message — {'externalScriptRan': False, 'inlineScriptRan': False, 'bodyBg': 'rgb(18, 18, 22)', 'imgNaturalWidth': 0, 'iframeLoaded': True, 'iframeHref': 'about:blank', 'iframeHasExternalContent': False, 'workerMessage': None, 'workerThrew': None, 'baseURIBefore': 'file:///home/scott/Development/ChickenButt/web/index.html', 'baseURIAfter': 'file:///home/scott/Development/ChickenButt/web/index.html', 'cspViolations': ['connect-src', 'script-src-elem', 'style-src-elem', 'img-src', 'frame-src', 'script-src-elem', 'style-src-elem', 'base-uri']}
+  PASS  <base> injection did not change document.baseURI — {'externalScriptRan': False, 'inlineScriptRan': False, 'bodyBg': 'rgb(18, 18, 22)', 'imgNaturalWidth': 0, 'iframeLoaded': True, 'iframeHref': 'about:blank', 'iframeHasExternalContent': False, 'workerMessage': None, 'workerThrew': None, 'baseURIBefore': 'file:///home/scott/Development/ChickenButt/web/index.html', 'baseURIAfter': 'file:///home/scott/Development/ChickenButt/web/index.html', 'cspViolations': ['connect-src', 'script-src-elem', 'style-src-elem', 'img-src', 'frame-src', 'script-src-elem', 'style-src-elem', 'base-uri']}
+  PASS  transcript stayed on its trusted local URI throughout — file:///home/scott/Development/ChickenButt/web/index.html
+  PASS  CSP violations were reported for the blocked vectors — {'connect-src', 'script-src-elem', 'style-src-elem', 'base-uri', 'img-src', 'frame-src'}
+
+[8] Normal sanitized Markdown, code highlighting and code controls still work
+  PASS  markdown row rendered — {'type': 'test_md_check', 'hasRow': True, 'found': True, 'copyBtns': 1, 'tableCount': 1, 'hljsCount': 1, 'expandBtns': 1}
+  PASS  GFM table still renders — {'type': 'test_md_check', 'hasRow': True, 'found': True, 'copyBtns': 1, 'tableCount': 1, 'hljsCount': 1, 'expandBtns': 1}
+  PASS  fenced code still highlighted — {'type': 'test_md_check', 'hasRow': True, 'found': True, 'copyBtns': 1, 'tableCount': 1, 'hljsCount': 1, 'expandBtns': 1}
+  PASS  copy control still wired — {'type': 'test_md_check', 'hasRow': True, 'found': True, 'copyBtns': 1, 'tableCount': 1, 'hljsCount': 1, 'expandBtns': 1}
+  PASS  expand control still wired — {'type': 'test_md_check', 'hasRow': True, 'found': True, 'copyBtns': 1, 'tableCount': 1, 'hljsCount': 1, 'expandBtns': 1}
+
+=== Summary ===
+Passed: 53  Failed: 0

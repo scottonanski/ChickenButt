@@ -1,0 +1,99 @@
+Transcript: WebKit (default)
+
+[1] Restored assistant history
+Switched to conv-ef93cce… (3 messages)
+  PASS  restore completed (3 messages) — got 3
+  PASS  [restore/malicious] row found in DOM — {'sourceTags': 0, 'innerHTML': '<div class="col"><div class="bubble md"><div class="md-body"><h1>Malicious content probe</h1>\n\n\n<div>click me</div>\n\n\n\n<p></p>\n<p><a>bad-js</a></p>\n<p><a>bad-d
+  PASS  [restore/malicious] no <script> element — 0
+  PASS  [restore/malicious] no <iframe> element — 0
+  PASS  [restore/malicious] no <svg> element — 0
+  PASS  [restore/malicious] no <img> element — 0
+  PASS  [restore/malicious] no <video> element — 0
+  PASS  [restore/malicious] no <audio> element — 0
+  PASS  [restore/malicious] no <object> element — 0
+  PASS  [restore/malicious] no <embed> element — 0
+  PASS  [restore/malicious] no <picture> element — 0
+  PASS  [restore/malicious] no <source> element — 0
+  PASS  [restore/malicious] no style attribute survives — 0
+  PASS  [restore/malicious] no onerror attribute survives — 0
+  PASS  [restore/malicious] no onclick attribute survives — 0
+  PASS  [restore/malicious] no onload attribute survives — 0
+  PASS  [restore/malicious] no unsafe URL scheme survives in any href — [None, None, None, None]
+  PASS  [restore/malicious] malicious HTML inside fenced code stays literal text — ['<script>window.__cbXssMarker_in_code = true;</script>']
+  PASS  [restore/safe] heading rendered — 1
+  PASS  [restore/safe] emphasis rendered — 1
+  PASS  [restore/safe] bold rendered — 1
+  PASS  [restore/safe] list items rendered — 3
+  PASS  [restore/safe] blockquote rendered — 1
+  PASS  [restore/safe] GFM table still renders — 1
+  PASS  [restore/safe] fenced code is highlighted — 1
+  PASS  [restore/safe] copy control wired — 1
+  PASS  [restore/safe] expand control wired — 1
+  PASS  [restore/safe] safe https:// link preserved — ['https://example.com/safe']
+
+[2] Completed live assistant response (real streaming path)
+  PASS  live stream completed
+  PASS  assistant message id captured — [{'id': 'u-live', 'role': 'user', 'content': 'trigger'}, {'id': 'asst-1-36a443', 'role': 'assistant', 'content': '# Malicious content probe\n\n<script>window.__cbXssMarker = (window.__cbXssMarker||0) + 1;</script>\n\n<div onclick="window.__cbXssMarker=(window.__cbXssMarker||0)+1" onerror="window.__cbXssMarker=(window.__cbXssMarker||0)+1" onload="window.__cbXssMarker=(window.__cbXssMarker||0)+1">click me</div>\n\n<iframe srcdoc="<script>window.__cbXssMarker=(window.__cbXssMarker||0)+1</script>"></iframe>\n\n<svg onload="window.__cbXssMarker=(window.__cbXssMarker||0)+1"><circle r="1"></circle></svg>\n\n[bad-js](javascript:window.__cbXssMarker=(window.__cbXssMarker||0)+1)\n\n[bad-data](data:text/html,%3Cscript%3Ewindow.__cbXssMarker=1%3C/script%3E)\n\n[bad-vbs](vbscript:msgbox(1))\n\n[bad-file](file:///etc/passwd)\n\n<p style="color:red;">styled paragraph</p>\n\n<img src="https://evil.example/x.png" onerror="window.__cbXssMarker=(window.__cbXssMarker||0)+1">\n\n<video src="https://evil.example/x.mp4"></video>\n\n<audio src="https://evil.example/x.mp3"></audio>\n\n<object data="https://evil.example/x.swf"></object>\n\n<embed src="https://evil.example/x.swf">\n\n<picture><source srcset="https://evil.example/x.webp"><img src="https://evil.example/x.webp"></picture>\n\n```html\n<script>window.__cbXssMarker_in_code = true;</script>\n```\n'}]
+  PASS  [live/malicious] row found in DOM — {'sourceTags': 0, 'innerHTML': '<div class="col"><div class="bubble md"><div class="md-body"><h1>Malicious content probe</h1>\n\n\n<div>click me</div>\n\n\n\n<p></p>\n<p><a>bad-js</a></p>\n<p><a>bad-d
+  PASS  [live/malicious] no <script> element — 0
+  PASS  [live/malicious] no <iframe> element — 0
+  PASS  [live/malicious] no <svg> element — 0
+  PASS  [live/malicious] no <img> element — 0
+  PASS  [live/malicious] no <video> element — 0
+  PASS  [live/malicious] no <audio> element — 0
+  PASS  [live/malicious] no <object> element — 0
+  PASS  [live/malicious] no <embed> element — 0
+  PASS  [live/malicious] no <picture> element — 0
+  PASS  [live/malicious] no <source> element — 0
+  PASS  [live/malicious] no style attribute survives — 0
+  PASS  [live/malicious] no onerror attribute survives — 0
+  PASS  [live/malicious] no onclick attribute survives — 0
+  PASS  [live/malicious] no onload attribute survives — 0
+  PASS  [live/malicious] no unsafe URL scheme survives in any href — [None, None, None, None]
+  PASS  [live/malicious] malicious HTML inside fenced code stays literal text — ['<script>window.__cbXssMarker_in_code = true;</script>']
+
+[3] Non-streaming message_reset (real messageReset() path)
+  PASS  [message_reset/malicious] row found in DOM — {'sourceTags': 0, 'innerHTML': '<div class="col"><div class="bubble md"><div class="md-body"><h1>Malicious content probe</h1>\n\n\n<div>click me</div>\n\n\n\n<p></p>\n<p><a>bad-js</a></p>\n<p><a>bad-d
+  PASS  [message_reset/malicious] no <script> element — 0
+  PASS  [message_reset/malicious] no <iframe> element — 0
+  PASS  [message_reset/malicious] no <svg> element — 0
+  PASS  [message_reset/malicious] no <img> element — 0
+  PASS  [message_reset/malicious] no <video> element — 0
+  PASS  [message_reset/malicious] no <audio> element — 0
+  PASS  [message_reset/malicious] no <object> element — 0
+  PASS  [message_reset/malicious] no <embed> element — 0
+  PASS  [message_reset/malicious] no <picture> element — 0
+  PASS  [message_reset/malicious] no <source> element — 0
+  PASS  [message_reset/malicious] no style attribute survives — 0
+  PASS  [message_reset/malicious] no onerror attribute survives — 0
+  PASS  [message_reset/malicious] no onclick attribute survives — 0
+  PASS  [message_reset/malicious] no onload attribute survives — 0
+  PASS  [message_reset/malicious] no unsafe URL scheme survives in any href — [None, None, None, None]
+  PASS  [message_reset/malicious] malicious HTML inside fenced code stays literal text — ['<script>window.__cbXssMarker_in_code = true;</script>']
+  PASS  [message_reset/safe] heading rendered — 1
+  PASS  [message_reset/safe] emphasis rendered — 1
+  PASS  [message_reset/safe] bold rendered — 1
+  PASS  [message_reset/safe] list items rendered — 3
+  PASS  [message_reset/safe] blockquote rendered — 1
+  PASS  [message_reset/safe] GFM table still renders — 1
+  PASS  [message_reset/safe] fenced code is highlighted — 1
+  PASS  [message_reset/safe] copy control wired — 1
+  PASS  [message_reset/safe] expand control wired — 1
+  PASS  [message_reset/safe] safe https:// link preserved — ['https://example.com/safe']
+  PASS  no execution marker triggered across any scenario — marker=0
+  PASS  code-fenced <script> never executed either — inCode=False
+
+[4] Fail-closed rendering when DOMPurify is missing
+  PASS  fail-closed: no <script> element even without DOMPurify — 0
+  PASS  fail-closed: no <iframe>/<svg>/<img> element without DOMPurify — (0, 0, 0)
+  PASS  fail-closed: raw markdown text is visible as escaped plain text — <div class="col"><div class="bubble md"><div class="md-body"><p># Malicious content probe<br><br>&lt;script&gt;window.__cbXssMarker = (window.__cbXssMarker||0) + 1;&lt;/script&gt;<br><br>&lt;div oncli
+
+[5] Fail-closed rendering when DOMPurify.isSupported is false
+  PASS  fail-closed: no <script> element when DOMPurify.isSupported is false — 0
+  PASS  fail-closed: no <iframe>/<svg>/<img> element when DOMPurify.isSupported is false — (0, 0, 0)
+  PASS  fail-closed: no HTML elements survive other than <p>/<br> (only escaped text) — 0
+  PASS  fail-closed: raw markdown text is visible as escaped plain text (isSupported=false) — <div class="col"><div class="bubble md"><div class="md-body"><p># Malicious content probe<br><br>&lt;script&gt;window.__cbXssMarker = (window.__cbXssMarker||0) + 1;&lt;/script&gt;<br><br>&lt;div oncli
+  PASS  no execution marker triggered by the isSupported=false payload — marker=0
+
+=== Summary ===
+Passed: 84  Failed: 0

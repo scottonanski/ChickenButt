@@ -1,0 +1,19 @@
+Transcript: WebKit (default)
+
+[1] Restore 1000 mixed messages — wireCodeUi (rAF) call count
+Switched to conv-af663d6… (1000 messages)
+  PASS  restore completed (1000 messages) — got 1000
+  PASS  restore wires code UI a small constant number of times, not once per message — rAF calls = 1
+  PASS  message count correct after restore
+
+[2] Correctness: DOM output matches expectations
+  PASS  all rows rendered — {'rows': 1000, 'hljs': 500, 'expandBtns': 500, 'type': 'test_dom_check', 'collapsed': 0, 'copyBtns': 500}
+  PASS  assistant code blocks highlighted — {'rows': 1000, 'hljs': 500, 'expandBtns': 500, 'type': 'test_dom_check', 'collapsed': 0, 'copyBtns': 500}
+  PASS  copy controls wired for every code block — {'rows': 1000, 'hljs': 500, 'expandBtns': 500, 'type': 'test_dom_check', 'collapsed': 0, 'copyBtns': 500}
+  PASS  expand controls wired for every code block — {'rows': 1000, 'hljs': 500, 'expandBtns': 500, 'type': 'test_dom_check', 'collapsed': 0, 'copyBtns': 500}
+
+[3] Normal (non-restore) addMessage still wires code UI
+  PASS  a normal live assistant message still wires its own code UI — rAF calls = 2
+
+=== Summary ===
+Passed: 8  Failed: 0

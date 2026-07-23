@@ -1,0 +1,79 @@
+
+[1] Initial load of the local transcript page
+  PASS  local transcript finished loading
+  PASS  WebView URI is the trusted local transcript — 'file:///home/scott/Development/ChickenButt/web/index.html' != 'file:///home/scott/Development/ChickenButt/web/index.html'
+
+[2] Exact local reload remains allowed
+  PASS  reload of the exact trusted URI succeeds — file:///home/scott/Development/ChickenButt/web/index.html
+
+[3] Same-document fragment navigation remains allowed
+  PASS  fragment navigation on the trusted URI succeeds — file:///home/scott/Development/ChickenButt/web/index.html#section-1
+
+[4] User-initiated http(s) links go to the external launcher, not the WebView
+  PASS  decide-policy handled NAVIGATION_ACTION for https://example.com/page
+  PASS  https://example.com/page sent to external launcher exactly once — ['https://example.com/page']
+  PASS  https://example.com/page never used() by the embedded WebView
+  PASS  https://example.com/page ignore()d by the embedded WebView
+  PASS  decide-policy handled NAVIGATION_ACTION for http://example.org/other
+  PASS  http://example.org/other sent to external launcher exactly once — ['https://example.com/page', 'http://example.org/other']
+  PASS  http://example.org/other never used() by the embedded WebView
+  PASS  http://example.org/other ignore()d by the embedded WebView
+  PASS  WebView URI is unaffected by the fake user-gesture decisions — file:///home/scott/Development/ChickenButt/web/index.html
+
+[5] target="_blank" (NEW_WINDOW_ACTION) does not create another WebView
+  PASS  decide-policy handled NEW_WINDOW_ACTION
+  PASS  NEW_WINDOW_ACTION link sent to external launcher — ['https://example.com/blank']
+  PASS  NEW_WINDOW_ACTION never use()d (no new WebView created)
+  PASS  NEW_WINDOW_ACTION ignore()d
+  PASS  trusted URI as a NEW_WINDOW_ACTION is still ignore()d, not use()d
+
+[6] Programmatic HTTP/HTTPS navigation is blocked (no real user gesture)
+  PASS  WebView URI still the trusted transcript after programmatic external load_uri — file:///home/scott/Development/ChickenButt/web/index.html
+  PASS  no external launch for programmatic navigation — []
+
+[7] Relative, malformed and prohibited-scheme links are blocked
+  PASS  blocked/never used(): 'relative/path.html'
+  PASS  blocked/ignore()d: 'relative/path.html'
+  PASS  not externally launched: 'relative/path.html' — []
+  PASS  blocked/never used(): '../escape.html'
+  PASS  blocked/ignore()d: '../escape.html'
+  PASS  not externally launched: '../escape.html' — []
+  PASS  blocked/never used(): 'file:///etc/passwd'
+  PASS  blocked/ignore()d: 'file:///etc/passwd'
+  PASS  not externally launched: 'file:///etc/passwd' — []
+  PASS  blocked/never used(): 'data:text/html,<script>window.__cbNav=1</script>'
+  PASS  blocked/ignore()d: 'data:text/html,<script>window.__cbNav=1</script>'
+  PASS  not externally launched: 'data:text/html,<script>window.__cbNav=1</script>' — []
+  PASS  blocked/never used(): 'javascript:window.__cbNav=1'
+  PASS  blocked/ignore()d: 'javascript:window.__cbNav=1'
+  PASS  not externally launched: 'javascript:window.__cbNav=1' — []
+  PASS  blocked/never used(): 'vbscript:msgbox(1)'
+  PASS  blocked/ignore()d: 'vbscript:msgbox(1)'
+  PASS  not externally launched: 'vbscript:msgbox(1)' — []
+  PASS  blocked/never used(): 'about:blank'
+  PASS  blocked/ignore()d: 'about:blank'
+  PASS  not externally launched: 'about:blank' — []
+  PASS  blocked/never used(): 'ftp://example.com/file'
+  PASS  blocked/ignore()d: 'ftp://example.com/file'
+  PASS  not externally launched: 'ftp://example.com/file' — []
+  PASS  blocked/never used(): 'mailto:someone@example.com'
+  PASS  blocked/ignore()d: 'mailto:someone@example.com'
+  PASS  not externally launched: 'mailto:someone@example.com' — []
+  PASS  blocked/never used(): 'http://\x01bad\x02host/'
+  PASS  blocked/ignore()d: 'http://\x01bad\x02host/'
+  PASS  not externally launched: 'http://\x01bad\x02host/' — []
+  PASS  blocked/never used(): 'notascheme'
+  PASS  blocked/ignore()d: 'notascheme'
+  PASS  not externally launched: 'notascheme' — []
+
+[8] Direct load_uri() to an external page is blocked end-to-end
+  PASS  load_uri('https://evil.example/') did not navigate the WebView away from the transcript — file:///home/scott/Development/ChickenButt/web/index.html
+  PASS  load_uri('file:///etc/hosts') did not navigate the WebView away from the transcript — file:///home/scott/Development/ChickenButt/web/index.html
+
+[9] Python can still post events and the DOM updates after blocked attempts
+  PASS  DOM still updates normally after every blocked navigation attempt — {'type': 'test_nav_check', 'rows': 1, 'hasRow': True}
+
+=== Summary ===
+Passed: 56  Failed: 0
+
+(WebKitWebProcess:2): GLib-GIO-WARNING **: 16:30:38.143: Error releasing name dev.local.chickenbutt.navpolicy.Sandboxed.WebProcess-7a693043-db53-4f5f-bf76-415a25de8da3: The connection is closed

@@ -1,0 +1,233 @@
+caller_method	callee_method	line	source_text	enclosing_closure
+__init__	_install_css	566	self._install_css()	
+__init__	_build_ui	569	self._build_ui()	
+__init__	_restore_history	583	self._restore_history()	
+_build_ui	_build_history_sidebar	617	self._build_history_sidebar()	
+_build_ui	clear_chat	668	self.clear_chat()	<lambda:L668>
+_build_ui	new_chat	709	self.new_chat()	<lambda:L709>
+_build_ui	toggle_sidebar	712	self.toggle_sidebar()	<lambda:L712>
+_build_ui	open_settings	715	self.open_settings()	<lambda:L715>
+_build_ui	export_conversation	720	"self.export_conversation(self._conversation_id or """", ""md"")"	<lambda:L720>
+_build_ui	export_conversation	726	"self.export_conversation(self._conversation_id or """", ""json"")"	<lambda:L726>
+_build_ui	hide_to_tray	731	self.hide_to_tray()	<lambda:L731>
+_build_ui	toggle_maximize	734	self.toggle_maximize()	<lambda:L734>
+_build_ui	hide_to_tray	737	self.hide_to_tray()	<lambda:L737>
+_build_ui	_refresh_models	740	self._refresh_models()	<lambda:L740>
+_build_ui	_show_empty_state	829	self._show_empty_state()	
+_build_ui	_apply_composer_height	865	self._apply_composer_height()	
+_build_ui	_request_stop	898	self._request_stop()	<lambda:L898>
+_build_ui	_send	924	self._send()	<lambda:L924>
+_build_ui	_apply_composer_height	961	self._apply_composer_height()	<lambda:L961>
+_build_ui	_build_load_overlay	998	self._build_load_overlay()	
+_build_history_sidebar	new_chat	1029	self.new_chat()	<lambda:L1029>
+_build_history_sidebar	open_settings	1093	self.open_settings()	<lambda:L1093>
+toggle_sidebar	_rebuild_history_list	1109	self._rebuild_history_list()	
+_on_sidebar_toggled	toggle_sidebar	1154	self.toggle_sidebar(btn.get_active())	
+_hook_composer_surface_layout	_apply_composer_height	1246	self._apply_composer_height()	<lambda:L1246>
+_hook_composer_surface_layout	_apply_composer_height	1248	self._apply_composer_height()	
+_apply_composer_height	_composer_line_height_px	1299	self._composer_line_height_px()	
+_apply_composer_height	_composer_max_visible_lines	1303	self._composer_max_visible_lines()	
+_apply_composer_height	_composer_content_height_px	1304	self._composer_content_height_px()	
+_apply_composer_height	_sync_composer_action_valign	1319	self._sync_composer_action_valign(content_h=content_h, min_h=min_h)	
+_sync_composer_action_valign	_composer_content_height_px	1326	self._composer_content_height_px()	
+_sync_composer_hint	_composer_hint_should_show	1368	self._composer_hint_should_show()	
+_sync_composer_hint	_composer_hint_should_show	1386	self._composer_hint_should_show()	_hide
+_on_composer_insert_text	_update_composer_char_counter	1402	self._update_composer_char_counter(current)	
+_on_buffer_changed	_update_composer_char_counter	1429	self._update_composer_char_counter(n)	
+_on_buffer_changed	_apply_composer_height	1431	self._apply_composer_height()	
+_make_empty_brand_icon	_brand_icon_path	1453	self._brand_icon_path()	
+_sync_empty_brand_icon	_brand_icon_path	1475	self._brand_icon_path()	
+_show_empty_state	_make_empty_brand_icon	1494	self._make_empty_brand_icon()	
+clear_chat	_request_stop	1541	self._request_stop()	
+clear_chat	_mark_history_dirty	1555	self._mark_history_dirty()	
+clear_chat	_rebuild_history_list	1556	self._rebuild_history_list()	
+clear_chat	_render_empty_transcript	1557	self._render_empty_transcript()	
+clear_chat	_set_status	1558	"self._set_status(self._model or ""Ready"")"	
+clear_chat	_show_ephemeral_greeting	1561	self._show_ephemeral_greeting()	
+clear_chat	_refresh_chat_title	1562	self._refresh_chat_title()	
+clear_chat	_sync_composer_hint	1563	self._sync_composer_hint()	
+new_chat	_invalidate_active_stream	1583	self._invalidate_active_stream()	
+new_chat	_active_chat_is_empty	1588	self._active_chat_is_empty()	
+new_chat	_show_ephemeral_greeting	1590	self._show_ephemeral_greeting()	
+new_chat	_render_empty_transcript	1614	self._render_empty_transcript()	
+new_chat	_set_status	1615	"self._set_status(self._model or ""Ready"")"	
+new_chat	_show_ephemeral_greeting	1617	self._show_ephemeral_greeting()	
+new_chat	_mark_history_dirty	1618	self._mark_history_dirty()	
+new_chat	_rebuild_history_list	1619	self._rebuild_history_list()	
+new_chat	_refresh_chat_title	1620	self._refresh_chat_title()	
+new_chat	_sync_composer_hint	1621	self._sync_composer_hint()	
+_render_empty_transcript	_show_empty_state	1635	self._show_empty_state()	
+_rebuild_history_list	_select_active_history_row	1642	self._select_active_history_row()	
+_rebuild_history_list	_make_chat_actions_popover	1712	self._make_chat_actions_popover(cid)	
+_rebuild_history_list	_refresh_chat_title	1722	self._refresh_chat_title()	
+_on_history_row_activated	switch_conversation	1739	self.switch_conversation(cid)	
+_make_chat_actions_popover	export_conversation	1782	"self.export_conversation(conversation_id, ""md"")"	<lambda:L1782>
+_make_chat_actions_popover	export_conversation	1787	"self.export_conversation(conversation_id, ""json"")"	<lambda:L1787>
+_make_chat_actions_popover	_confirm_delete_conversation	1792	self._confirm_delete_conversation(conversation_id)	<lambda:L1792>
+_safe_export_basename	_conversation_display_title	1816	self._conversation_display_title(conversation_id)	
+export_conversation	_safe_export_basename	1848	self._safe_export_basename(conversation_id)	
+_confirm_delete_conversation	_conversation_display_title	1897	self._conversation_display_title(conversation_id)	
+_confirm_delete_conversation	delete_conversation	1913	self.delete_conversation(conversation_id)	on_response
+delete_conversation	_invalidate_active_stream	1923	self._invalidate_active_stream()	
+delete_conversation	_mark_history_dirty	1930	self._mark_history_dirty()	
+delete_conversation	switch_conversation	1937	self.switch_conversation(nxt.id)	
+delete_conversation	new_chat	1939	self.new_chat()	
+delete_conversation	_rebuild_history_list	1941	self._rebuild_history_list()	
+switch_conversation	_invalidate_active_stream	1949	self._invalidate_active_stream()	
+switch_conversation	_mark_history_dirty	1958	self._mark_history_dirty()	
+switch_conversation	_apply_restored_transcript	1991	self._apply_restored_transcript(payload)	
+switch_conversation	_render_empty_transcript	1993	self._render_empty_transcript()	
+switch_conversation	_show_ephemeral_greeting	1995	self._show_ephemeral_greeting()	
+switch_conversation	_sync_composer_hint	1996	self._sync_composer_hint()	
+switch_conversation	_select_model_name	2000	self._select_model_name(conv.model, warm=True, greet=not real)	
+switch_conversation	_set_status	2002	"self._set_status(self._model or ""Ready"")"	
+switch_conversation	_mark_history_dirty	2003	self._mark_history_dirty()	
+switch_conversation	_rebuild_history_list	2004	self._rebuild_history_list()	
+switch_conversation	_refresh_chat_title	2005	self._refresh_chat_title()	
+_select_model_name	_begin_model_load	2022	self._begin_model_load(name, greet=greet)	
+_select_model_name	_begin_model_load	2044	self._begin_model_load(\n                self._model, greet=bool(greet) and not self._messages\n            )	
+_on_web_intent	_regenerate_message	2059	"self._regenerate_message(str(payload.get(""id"") or """"))"	
+_on_web_intent	_continue_message	2061	"self._continue_message(str(payload.get(""id"") or """"))"	
+_on_web_intent	_delete_message	2063	"self._delete_message(str(payload.get(""id"") or """"))"	
+_on_web_intent	_edit_resend_message	2065	"self._edit_resend_message(\n                str(payload.get(""id"") or """"),\n                str(payload.get(""text"") or """"),\n            )"	
+_persist_message	_ensure_conversation	2084	self._ensure_conversation()	
+_persist_message	_mark_history_dirty	2093	self._mark_history_dirty()	
+_restore_history	_mark_history_dirty	2110	self._mark_history_dirty()	
+_restore_history	_apply_restored_transcript	2149	self._apply_restored_transcript(payload)	
+_restore_history	_sync_composer_hint	2150	self._sync_composer_hint()	
+_apply_restored_transcript	_show_empty_state	2172	self._show_empty_state()	
+_apply_restored_transcript	_next_msg_id	2177	self._next_msg_id(role[:4])	
+_apply_restored_transcript	_append_message	2179	"self._append_message(""user"", content, message_id=mid)"	
+_apply_restored_transcript	_append_message	2181	"self._append_message(\n                    ""assistant"", content, markdown=True, message_id=mid\n                )"	
+_delete_message	_find_message_index	2207	self._find_message_index(message_id)	
+_delete_message	_native_remove_message	2224	self._native_remove_message(mid)	
+_delete_message	_show_empty_state	2232	self._show_empty_state()	
+_drop_messages_from	_native_remove_message	2253	self._native_remove_message(mid)	
+_regenerate_message	_find_message_index	2258	self._find_message_index(message_id)	
+_regenerate_message	_drop_messages_from	2264	self._drop_messages_from(idx + 1)	
+_regenerate_message	_start_assistant_stream	2266	"self._start_assistant_stream(\n                mode=""new"",\n                api_messages=self._api_messages(prefix),\n            )"	
+_regenerate_message	_api_messages	2268	self._api_messages(prefix)	
+_regenerate_message	_native_remove_message	2286	self._native_remove_message(mid)	
+_regenerate_message	_start_assistant_stream	2293	"self._start_assistant_stream(\n            mode=""replace"",\n            assistant_id=message_id,\n            api_messages=self._api_messages(prefix),\n        )"	
+_regenerate_message	_api_messages	2296	self._api_messages(prefix)	
+_edit_resend_message	_find_message_index	2310	self._find_message_index(message_id)	
+_edit_resend_message	_drop_messages_from	2319	self._drop_messages_from(idx + 1)	
+_edit_resend_message	_native_remove_message	2332	self._native_remove_message(message_id)	
+_edit_resend_message	_append_message	2333	"self._append_message(""user"", text, message_id=message_id)"	
+_edit_resend_message	_start_assistant_stream	2335	"self._start_assistant_stream(\n            mode=""new"",\n            api_messages=self._api_messages(prefix),\n        )"	
+_edit_resend_message	_api_messages	2337	self._api_messages(prefix)	
+_continue_message	_find_message_index	2343	self._find_message_index(message_id)	
+_continue_message	_api_messages	2351	self._api_messages(self._messages[: idx + 1])	
+_continue_message	_start_assistant_stream	2361	"self._start_assistant_stream(\n            mode=""continue"",\n            assistant_id=message_id,\n            seed_text=seed,\n            api_messages=api,\n        )"	
+_set_status	_refresh_chat_title	2380	self._refresh_chat_title()	
+_set_status	_refresh_chat_title	2382	self._refresh_chat_title()	
+_on_input_key	_send	2388	self._send()	
+_on_model_selected	_set_status	2408	self._set_status(name)	
+_on_model_selected	_begin_model_load	2409	self._begin_model_load(name, greet=not self._messages)	
+_refresh_models	_apply_health	2415	self._apply_health(checking_state())	
+_refresh_models	_set_status	2416	"self._set_status(""Checking Ollama…"")"	
+_refresh_models	_set_load_controls_sensitive	2417	self._set_load_controls_sensitive(False)	
+_on_ollama_probe	_apply_health	2430	self._apply_health(result.state)	
+_on_ollama_probe	_preferred_model	2438	self._preferred_model()	
+_on_ollama_probe	_set_status	2444	"self._set_status(f""Loading {chosen}…"")"	
+_on_ollama_probe	_begin_model_load	2446	self._begin_model_load(chosen, greet=not self._messages)	
+_on_ollama_probe	_hide_load_overlay	2450	self._hide_load_overlay()	
+_on_ollama_probe	_set_status	2466	self._set_status(result.state.title)	
+_on_ollama_probe	_set_load_controls_sensitive	2468	self._set_load_controls_sensitive(True)	
+_on_health_action	_refresh_models	2530	self._refresh_models()	
+_on_health_action	_begin_model_load	2534	self._begin_model_load(model, greet=not self._messages)	
+_on_health_action	_refresh_models	2536	self._refresh_models()	
+_on_health_action	_apply_health	2538	"self._apply_health(\n                HealthState(\n                    kind=HealthKind.OK,\n                    title=""Ollama is ready"",\n                    detail="""",\n                )\n            )"	
+_show_load_overlay	_start_load_pulse	2607	self._start_load_pulse()	
+_show_load_overlay	_stop_load_pulse	2610	self._stop_load_pulse()	
+_show_load_overlay	_set_load_controls_sensitive	2618	self._set_load_controls_sensitive(False)	
+_hide_load_overlay	_stop_load_pulse	2643	self._stop_load_pulse()	
+_hide_load_overlay	_set_load_controls_sensitive	2651	self._set_load_controls_sensitive(True)	
+_update_load_progress	_stop_load_pulse	2678	self._stop_load_pulse()	
+_update_load_progress	_start_load_pulse	2683	self._start_load_pulse()	
+_begin_model_load	_show_load_overlay	2698	"self._show_load_overlay(\n            model=model,\n            title=""Loading model"",\n            status=""Checking if the model is already in memory…"",\n            pulse=True,\n        )"	
+_begin_model_load	_set_status	2704	"self._set_status(f""Loading {model}…"")"	
+_on_load_status	_start_load_pulse	2767	self._start_load_pulse()	
+_on_load_status	_stop_load_pulse	2770	self._stop_load_pulse()	
+_on_load_chunk	_update_load_progress	2777	self._update_load_progress(chunk)	
+_on_model_load_finished	_stop_load_pulse	2786	self._stop_load_pulse()	
+_on_model_load_finished	_hide_load_overlay	2790	self._hide_load_overlay()	
+_on_model_load_finished	_apply_health	2792	self._apply_health(health)	
+_on_model_load_finished	_set_status	2793	"self._set_status(""Load failed"")"	
+_on_model_load_finished	_hide_load_overlay	2820	self._hide_load_overlay()	
+_on_model_load_finished	_apply_health	2821	"self._apply_health(\n            HealthState(\n                kind=HealthKind.OK,\n                title=""Ollama is ready"",\n                detail=""Connected to the local Ollama service."",\n            )\n        )"	
+_on_model_load_finished	_set_status	2830	self._set_status(model)	
+_on_model_load_finished	_ensure_conversation	2833	self._ensure_conversation()	
+_on_model_load_finished	_show_ephemeral_greeting	2839	self._show_ephemeral_greeting()	
+_show_ephemeral_greeting	_show_empty_state	2870	self._show_empty_state()	
+_invalidate_active_stream	_stream_finished	2897	self._stream_finished()	
+_post_status_message	_next_msg_id	2903	"self._next_msg_id(""asst"")"	
+_post_status_message	_append_message	2915	"self._append_message(\n                ""assistant"", text, message_id=mid, markdown=True\n            )"	
+_try_composer_command	_run_ollama_pull	2928	self._run_ollama_pull(pull.group(1))	
+_try_composer_command	_run_ollama_info	2931	"self._run_ollama_info(""list"")"	
+_try_composer_command	_run_ollama_info	2934	"self._run_ollama_info(""ps"")"	
+_try_composer_command	_post_status_message	2937	"self._post_status_message(\n            ""Composer command not recognized.\n\n""\n            ""Supported:\n""\n            ""- `ollama pull <model-name>`\n""\n            ""- `ollama list`\n""\n            ""- `ollama ps`\n\n""\n            ""Example: `ollama pull llama3.2`""\n        )"	
+_update_status_message	_native_remove_message	2979	self._native_remove_message(mid)	
+_update_status_message	_append_message	2982	"self._append_message(""assistant"", text, message_id=mid, markdown=True)"	
+_run_ollama_pull	_composer_cmd_busy	3005	self._composer_cmd_busy()	
+_run_ollama_pull	_post_status_message	3006	"self._post_status_message(\n                ""An Ollama command is already running. Wait for it to finish.""\n            )"	
+_run_ollama_pull	_set_composer_cmd_busy	3011	self._set_composer_cmd_busy(True)	
+_run_ollama_pull	_post_status_message	3012	"self._post_status_message(f""**Pulling** `{model}`…\n\n_starting_"", streaming=True)"	
+_run_ollama_pull	_set_status	3013	"self._set_status(f""Pulling {model}…"")"	
+_run_ollama_pull	_format_pull_progress	3022	self._format_pull_progress(chunk)	work
+_run_ollama_pull	_update_status_message	3044	self._update_status_message(mid, b, done=False)	<lambda:L3043>
+_run_ollama_pull	_update_status_message	3073	self._update_status_message(mid, final, done=True)	done
+_run_ollama_pull	_set_composer_cmd_busy	3074	self._set_composer_cmd_busy(False)	done
+_run_ollama_pull	_refresh_models	3076	self._refresh_models()	done
+_run_ollama_pull	_set_status	3078	"self._set_status(self._model or ""Ready"")"	done
+_run_ollama_info	_composer_cmd_busy	3087	self._composer_cmd_busy()	
+_run_ollama_info	_post_status_message	3088	"self._post_status_message(\n                ""An Ollama command is already running. Wait for it to finish.""\n            )"	
+_run_ollama_info	_set_composer_cmd_busy	3093	self._set_composer_cmd_busy(True)	
+_run_ollama_info	_post_status_message	3094	"self._post_status_message(f""Running `{label}`…"", streaming=True)"	
+_run_ollama_info	_set_status	3095	"self._set_status(f""Running {label}…"")"	
+_run_ollama_info	_update_status_message	3112	self._update_status_message(mid, body, done=True)	done
+_run_ollama_info	_set_composer_cmd_busy	3113	self._set_composer_cmd_busy(False)	done
+_run_ollama_info	_set_status	3114	"self._set_status(self._model or ""Ready"")"	done
+_send	_try_composer_command	3132	self._try_composer_command(text)	
+_send	_refresh_models	3138	self._refresh_models()	
+_send	_next_msg_id	3143	"self._next_msg_id(""user"")"	
+_send	_append_message	3155	"self._append_message(""user"", text, message_id=uid)"	
+_send	_persist_message	3157	"self._persist_message(""user"", text, message_id=uid)"	
+_send	_sync_composer_hint	3158	self._sync_composer_hint()	
+_send	_start_assistant_stream	3159	"self._start_assistant_stream(mode=""new"")"	
+_remove_empty_state	_sync_composer_hint	3168	self._sync_composer_hint()	
+_append_message	_remove_empty_state	3179	self._remove_empty_state()	
+_append_message	_next_msg_id	3181	"self._next_msg_id(""user"" if is_user else ""asst"")"	
+_append_message	_native_action_bar	3239	self._native_action_bar(\n                    mid, body, content, role=role, is_user=is_user\n                )	
+_append_message	_scroll_to_end	3248	self._scroll_to_end()	
+_native_action_bar	_find_message_index	3281	self._find_message_index(message_id)	current_text
+_native_action_bar	_clipboard_set	3290	self._clipboard_set(current_text())	<lambda:L3290>
+_native_action_bar	_native_edit_user	3297	self._native_edit_user(message_id, current_text())	<lambda:L3297>
+_native_action_bar	_regenerate_message	3302	self._regenerate_message(message_id)	<lambda:L3302>
+_native_action_bar	_delete_message	3307	self._delete_message(message_id)	<lambda:L3307>
+_native_action_bar	_regenerate_message	3316	self._regenerate_message(message_id)	<lambda:L3316>
+_native_action_bar	_continue_message	3321	self._continue_message(message_id)	<lambda:L3321>
+_native_action_bar	_delete_message	3326	self._delete_message(message_id)	<lambda:L3326>
+_native_action_bar	_clipboard_set	3350	self._clipboard_set(current_text())	<lambda:L3348>
+_native_edit_user	_edit_resend_message	3396	self._edit_resend_message(message_id, text)	on_response
+_start_assistant_stream	_set_status	3442	"self._set_status(""Thinking…"")"	
+_start_assistant_stream	_next_msg_id	3450	"self._next_msg_id(""asst"")"	
+_start_assistant_stream	_native_remove_message	3489	self._native_remove_message(aid)	
+_start_assistant_stream	_append_message	3490	"self._append_message(\n                    ""assistant"", ""···"", typing=True, message_id=aid\n                )"	
+_start_assistant_stream	_native_remove_message	3495	self._native_remove_message(aid)	
+_start_assistant_stream	_append_message	3496	"self._append_message(\n                    ""assistant"", stream_seed or ""···"", typing=True, message_id=aid\n                )"	
+_start_assistant_stream	_append_message	3502	"self._append_message(\n                    ""assistant"", ""···"", typing=True, message_id=aid\n                )"	
+_start_assistant_stream	_api_messages	3519	self._api_messages()	
+_start_assistant_stream	_apply_health	3543	"self._apply_health(\n                    classify_error(\n                        err,\n                        context=""stream"",\n                        model=origin_model,\n                    )\n                )"	finalize_ui
+_start_assistant_stream	_commit_assistant_result	3572	self._commit_assistant_result(\n                    aid,\n                    final,\n                    mode=mode,\n                    origin_conversation_id=origin_conversation_id,\n                    allow_empty=bool(err),\n                )	finalize_ui
+_start_assistant_stream	_stream_finished	3579	self._stream_finished()	finalize_ui
+_start_assistant_stream	_commit_assistant_result	3594	self._commit_assistant_result(\n                aid,\n                final,\n                mode=mode,\n                origin_conversation_id=origin_conversation_id,\n                allow_empty=bool(err),\n            )	finalize_ui
+_start_assistant_stream	_native_remove_message	3603	self._native_remove_message(aid)	finalize_ui
+_start_assistant_stream	_append_message	3604	"self._append_message(\n                    ""assistant"", final, markdown=True, message_id=aid\n                )"	finalize_ui
+_start_assistant_stream	_scroll_to_end	3607	self._scroll_to_end()	finalize_ui
+_start_assistant_stream	_stream_finished	3608	self._stream_finished()	finalize_ui
+_start_assistant_stream	_scroll_to_end	3630	self._scroll_to_end()	flush_stream
+_start_assistant_stream	_scroll_to_end	3649	self._scroll_to_end()	flush_stream
+_commit_assistant_result	_find_message_index	3686	self._find_message_index(assistant_id)	
+_stream_finished	_set_status	3739	self._set_status(self._model)	
+_stream_finished	_set_status	3741	"self._set_status(""Ready"")"	

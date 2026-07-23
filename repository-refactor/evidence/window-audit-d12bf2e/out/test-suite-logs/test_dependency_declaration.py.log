@@ -1,0 +1,609 @@
+
+[1] Runs successfully headless (no DISPLAY/WAYLAND_DISPLAY/DBUS_SESSION_BUS_ADDRESS)
+  PASS  [1] check_dependencies.py exits 0 with no display/D-Bus session env vars — rc=0 stdout_tail='al capability ===\n  [PASS] GdkPixbuf 2.0 (gi.repository.GdkPixbuf)\n  [SKIP (optional)] GtkSource 5 (gi.repository.GtkSource) — Namespace GtkSource not available\n\n=== External service ===\n  [PASS] ollama executable on PATH — /usr/local/bin/ollama\n\n=== Summary ===\nAll required dependencies satisfied.\n' stderr_tail=''
+
+[2] Confirms required real runtime dependencies on this machine
+  PASS  [2] default run reports PASS for every required check on this dev machine — === Required runtime dependencies ===
+  [PASS] Python >= 3.10 — found 3.14.4
+  [PASS] PyGObject (gi)
+  [PASS] Gtk 4.0 (gi.repository.Gtk)
+  [PASS] Adw 1 (gi.repository.Adw)
+  [PASS] WebKit 6.0 (gi.repository.WebKit)
+  [PASS] dasbus
+
+=== Optional capability ===
+  [PASS] GdkPixbuf 2.0 (gi.repository.GdkPixbuf)
+  [SKIP (optional)] GtkSource 5 (gi.repository.GtkSource) — Namespace GtkSource not available
+
+=== External service ===
+  [PASS] ollama executable on PATH — /usr/local/bin/ollama
+
+=== Summary ===
+All required dependencies satisfied.
+
+
+[3] Declares exactly the required Python/GI namespaces
+  PASS  [3] source declares required namespace Gtk
+  PASS  [3] source declares required namespace Adw
+  PASS  [3] source declares required namespace WebKit
+  PASS  [3] source declares a PyGObject (gi) check
+  PASS  [3] source declares a dasbus check
+  PASS  [3] GdkPixbuf is declared optional, not required
+  PASS  [3] GtkSource is declared optional
+
+[4] GtkSource and GdkPixbuf are optional and cannot cause a failure
+  PASS  [4] default run exits 0 even though GtkSource reports SKIP on this machine — === Required runtime dependencies ===
+  [PASS] Python >= 3.10 — found 3.14.4
+  [PASS] PyGObject (gi)
+  [PASS] Gtk 4.0 (gi.repository.Gtk)
+  [PASS] Adw 1 (gi.repository.Adw)
+  [PASS] WebKit 6.0 (gi.repository.WebKit)
+  [PASS] dasbus
+
+=== Optional capability ===
+  [PASS] GdkPixbuf 2.0 (gi.repository.GdkPixbuf)
+  [SKIP (optional)] GtkSource 5 (gi.repository.GtkSource) — Namespace GtkSource not available
+
+=== External service ===
+  [PASS] ollama executable on PATH — /usr/local/bin/ollama
+
+=== Summary ===
+All required dependencies satisfied.
+
+  PASS  [4] GdkPixbuf is reported under Optional capability, not Required — === Required runtime dependencies ===
+  [PASS] Python >= 3.10 — found 3.14.4
+  [PASS] PyGObject (gi)
+  [PASS] Gtk 4.0 (gi.repository.Gtk)
+  [PASS] Adw 1 (gi.repository.Adw)
+  [PASS] WebKit 6.0 (gi.repository.WebKit)
+  [PASS] dasbus
+
+=== Optional capability ===
+  [PASS] GdkPixbuf 2.0 (gi.repository.GdkPixbuf)
+  [SKIP (optional)] GtkSource 5 (gi.repository.GtkSource) — Namespace GtkSource not available
+
+=== External service ===
+  [PASS] ollama executable on PATH — /usr/local/bin/ollama
+
+=== Summary ===
+All required dependencies satisfied.
+
+
+[5] Ollama absence cannot cause a failure
+  PASS  [5] checker still exits 0 when ollama isn't on PATH — rc=0
+  PASS  [5] checker reports ollama as WARN, not FAIL — === Required runtime dependencies ===
+  [PASS] Python >= 3.10 — found 3.14.4
+  [PASS] PyGObject (gi)
+  [PASS] Gtk 4.0 (gi.repository.Gtk)
+  [PASS] Adw 1 (gi.repository.Adw)
+  [PASS] WebKit 6.0 (gi.repository.WebKit)
+  [PASS] dasbus
+
+=== Optional capability ===
+  [PASS] GdkPixbuf 2.0 (gi.repository.GdkPixbuf)
+  [SKIP (optional)] GtkSource 5 (gi.repository.GtkSource) — Namespace GtkSource not available
+
+=== External service ===
+  [WARN] ollama executable on PATH — not found — ChickenButt still starts and shows its health/onboarding banner without it; this is a warning, not a failure
+
+=== Summary ===
+All required dependencies satisfied.
+
+
+[6] --build checks git/meson/ninja and enforces meson >= 0.64.0
+  PASS  [6] source checks git
+  PASS  [6] source checks meson
+  PASS  [6] source checks ninja
+  PASS  [6] source enforces MIN_MESON = (0, 64, 0)
+  PASS  [6] a too-old fake meson (0.50.0) is correctly rejected by the version gate — r/local/bin/ollama
+
+=== Build tools (--build) ===
+  [PASS] git — /tmp/cb-fake-meson-qsx5h44e/git
+  [FAIL] meson >= 0.64.0 — found 0.50.0 at /tmp/cb-fake-meson-qsx5h44e/meson
+  [PASS] ninja — /tmp/cb-fake-meson-qsx5h44e/ninja
+
+=== Optional validation tools (--build) ===
+  [PASS] desktop-file-validate — /usr/bin/desktop-file-validate
+  [PASS] appstreamcli — /usr/bin/appstreamcli
+
+=== Summary ===
+1 required dependency(ies) missing:
+  - meson >= 0.64.0
+
+See DEPENDENCIES.md for distro package names.
+
+
+[7] Shadowed gi module fails clearly and names PyGObject/gi
+  PASS  [7] checker fails when gi cannot be imported — rc=1
+  PASS  [7] failure output names PyGObject/gi — === Required runtime dependencies ===
+  [PASS] Python >= 3.10 — found 3.14.4
+  [FAIL] PyGObject (gi) — simulated missing PyGObject — install the system PyGObject package (e.g. python3-gobject / python3-gi), not pip
+  [FAIL] Gtk 4.0 (gi.repository.Gtk) — PyGObject (gi) unavailable
+  [FAIL] Adw 1 (gi.repository.Adw) — PyGObject (gi) unavailable
+  [FAIL] WebKit 6.0 (gi.repository.WebKit) — PyGObject (gi) unavailable
+  [PASS] dasbus
+
+=== Optional capability ===
+  [SKIP (optional)] GdkPixbuf 2.0 (gi.repository.GdkPixbuf) — PyGObject (gi) unavailable
+  [SKIP (optional)] GtkSource 5 (gi.repository.GtkSource) — PyGObject (gi) unavailable
+
+=== External service ===
+  [PASS] ollama executable on PATH — /usr/local/bin/ollama
+
+=== Summary ===
+4 required dependency(ies) missing:
+  - PyGObject (gi)
+  - Gtk 4.0 (gi.repository.Gtk)
+  - Adw 1 (gi.repository.Adw)
+  - WebKit 6.0 (gi.repository.WebKit)
+
+See DEPENDENCIES.md for distro package names.
+
+
+[8] Shadowed dasbus module fails clearly and names dasbus
+  PASS  [8] checker fails when dasbus cannot be imported — rc=1
+  PASS  [8] failure output names dasbus — === Required runtime dependencies ===
+  [PASS] Python >= 3.10 — found 3.14.4
+  [PASS] PyGObject (gi)
+  [PASS] Gtk 4.0 (gi.repository.Gtk)
+  [PASS] Adw 1 (gi.repository.Adw)
+  [PASS] WebKit 6.0 (gi.repository.WebKit)
+  [FAIL] dasbus — simulated missing dasbus — required unconditionally by tray.py's StatusNotifier implementation; install the system python3-dasbus package, not pip
+
+=== Optional capability ===
+  [PASS] GdkPixbuf 2.0 (gi.repository.GdkPixbuf)
+  [SKIP (optional)] GtkSource 5 (gi.repository.GtkSource) — Namespace GtkSource not available
+
+=== External service ===
+  [PASS] ollama executable on PATH — /usr/local/bin/ollama
+
+=== Summary ===
+1 required dependency(ies) missing:
+  - dasbus
+
+See DEPENDENCIES.md for distro package names.
+
+
+[9] No checker path initializes GTK or creates a window
+  PASS  [9] source never calls 'Gtk.Window('
+  PASS  [9] source never calls 'Adw.Application('
+  PASS  [9] source never calls '.present()'
+  PASS  [9] source never calls 'Gtk.init('
+  PASS  [9] source never calls 'Adw.init('
+  PASS  [9] headless run (check [1]) completed without hanging (real evidence, not just source inspection)
+
+[10] DEPENDENCIES.md contains the exact Fedora and Ubuntu package mappings
+  PASS  [10] Fedora package 'python3-gobject' listed
+  PASS  [10] Fedora package 'python3-dasbus' listed
+  PASS  [10] Fedora package 'gtk4' listed
+  PASS  [10] Fedora package 'libadwaita' listed
+  PASS  [10] Fedora package 'webkitgtk6.0' listed
+  PASS  [10] Ubuntu package 'python3-gi' listed
+  PASS  [10] Ubuntu package 'python3-dasbus' listed
+  PASS  [10] Ubuntu package 'gir1.2-gtk-4.0' listed
+  PASS  [10] Ubuntu package 'gir1.2-adw-1' listed
+  PASS  [10] Ubuntu package 'gir1.2-webkit-6.0' listed
+  PASS  [10] desktop-file-utils documented for both distros — 4
+  PASS  [10] appstream package documented for both distros — 6
+
+[10b] check_dependencies.py declares desktop-file-validate/appstreamcli as optional --build tools
+  PASS  [10b] source declares a desktop-file-validate check
+  PASS  [10b] source declares an appstreamcli check
+  PASS  [10b] both are reported via r.optional(...), not r.required(...)
+  PASS  [10b] --build run never fails solely due to these two tools (both present on this dev machine, reported PASS not skipped) — apability ===
+  [PASS] GdkPixbuf 2.0 (gi.repository.GdkPixbuf)
+  [SKIP (optional)] GtkSource 5 (gi.repository.GtkSource) — Namespace GtkSource not available
+
+=== External service ===
+  [PASS] ollama executable on PATH — /usr/local/bin/ollama
+
+=== Build tools (--build) ===
+  [PASS] git — /usr/bin/git
+  [PASS] meson >= 0.64.0 — found 1.10.1 at /usr/bin/meson
+  [PASS] ninja — /usr/bin/ninja
+
+=== Optional validation tools (--build) ===
+  [PASS] desktop-file-validate — /usr/bin/desktop-file-validate
+  [PASS] appstreamcli — /usr/bin/appstreamcli
+
+=== Summary ===
+All required dependencies satisfied.
+
+
+[11]-[15] README.md content checks
+  PASS  [11] README links to DEPENDENCIES.md
+  PASS  [12] README contains the reproducible local-prefix meson commands
+  PASS  [13] README does not recommend pip install of PyGObject/pygobject/dasbus — <p align="center">
+  <img src="icons/hicolor/256x256/apps/chickenbutt.png" width="128" height="128" alt="ChickenButt icon">
+</p>
+
+<h1 align="center">ChickenButt</h1>
+
+A simple, lightweight GNOME desktop client for chatting with local [Ollama](https://ollama.com) models — focused on feel and ease of use rather than feature parity with Open WebUI or LM Studio.
+
+## Features
+
+- Native GTK4 + libadwaita shell with a tray icon
+- Streaming chat over the Ollama HTTP API
+- Multi-chat history, persisted locally in SQLite
+- Markdown rendering with syntax-highlighted code blocks (copy, expand/collapse)
+- Health checks with clear banners when Ollama isn't running or has no models
+- Pull, list, and inspect models straight from the composer (`ollama pull <model>`, `ollama list`, `ollama ps`)
+- Export any chat as Markdown or JSON
+
+## Requirements
+
+Linux with GTK4, libadwaita, WebKitGTK, PyGObject and dasbus (system packages, not pip), plus Python 3.10+. See **[DEPENDENCIES.md](DEPENDENCIES.md)** for the full list, why each one is required, and distro-specific install commands (Fedora, Ubuntu 24.04+). Check your system without installing anything:
+
+```bash
+python3 scripts/check_dependencies.py
+```
+
+[Ollama](https://ollama.com) is not a build/install dependency — ChickenButt starts and shows its own onboarding UI without it. See [Running Ollama](#running-ollama) below.
+
+## Running (source tree, no install)
+
+```bash
+git clone https://github.com/scottonanski/ChickenButt.git
+cd ChickenButt
+./run.sh
+```
+
+Use the native GTK bubble transcript instead of the default WebKit view:
+
+```bash
+CHICKENBUTT_TRANSCRIPT=native ./run.sh
+```
+
+Running straight from the source tree does not add a launcher entry to
+your app grid — use `./run.sh` from a terminal, or see **Install from
+source** below for a real installed app-grid entry.
+
+## Install from source
+
+For a real `chickenbutt` command outside the checkout, ChickenButt uses [Meson](https://mesonbuild.com):
+
+```bash
+git clone https://github.com/scottonanski/ChickenButt.git
+cd ChickenButt
+
+python3 scripts/check_dependencies.py --build
+
+meson setup build --prefix="$HOME/.local"
+meson install -C build
+
+"$HOME/.local/bin/chickenbutt" --version
+"$HOME/.local/bin/chickenbutt"
+```
+
+- Make sure `$HOME/.local/bin` is on your `PATH` (add `export PATH="$HOME/.local/bin:$PATH"` to your shell profile if `chickenbutt` isn't found afterward).
+- This installs the `chickenbutt` command, its private runtime directory, a desktop launcher entry, and the public app icon — AppStream metadata is installed alongside them, and installed ChickenButt should appear in your GNOME app grid under "ChickenButt" (you may need to log out and back in, or restart the shell, for the icon/app-grid cache to pick it up). You can still launch it from a terminal by running `chickenbutt` at any time.
+- Screenshot and release-history metadata in the AppStream file, plus Flatpak packaging, remain unfinished.
+- Rebuilding after pulling changes:
+
+  ```bash
+  meson setup --reconfigure build --prefix="$HOME/.local"
+  meson install -C build
+  ```
+
+- Uninstalling (from the retained build directory):
+
+  ```bash
+  ninja -C build uninstall
+  ```
+
+### Running Ollama
+
+```bash
+ollama serve   # if it isn't already running as a service
+ollama list    # confirm at least one model is pulled
+```
+
+See the official [Ollama Linux documentation](https://docs.ollama.com/linux) for installation and running it as a service.
+
+## Data locations
+
+| What | Where |
+|------|-------|
+| Conversation history | `~/.local/share/chickenbutt/conversations.db` (override with `CHICKENBUTT_DB`) |
+| Settings | `~/.config/chickenbutt/settings.json` |
+
+## Testing
+
+```bash
+python3 scripts/smoke_gui.py
+python3 scripts/test_multichat.py
+python3 scripts/test_message_actions.py
+python3 scripts/test_ollama_health.py
+python3 scripts/test_generation_lifecycle.py
+python3 scripts/test_stream_cancellation.py
+python3 scripts/test_restore_scroll.py
+python3 scripts/test_wire_code_ui_batch.py
+python3 scripts/test_markdown_sanitization.py
+python3 scripts/test_web_navigation_policy.py
+python3 scripts/test_web_content_security_policy.py
+python3 scripts/test_release_identity.py
+python3 scripts/test_sidebar_interactions.py
+python3 scripts/test_installed_layout.py       # real `meson install`; skips if meson isn't on PATH
+python3 scripts/test_desktop_integration.py    # real `meson install`; skips if meson isn't on PATH
+python3 scripts/test_dependency_declaration.py
+```
+
+## Project status
+
+ChickenButt's repository-recovery phase is complete — the documentation,
+dead-code, and dead-asset debt that prompted it has been cleaned up under
+a verified baseline, and feature work is no longer paused. See
+[recovery-reports/REPOSITORY_RECOVERY.md](recovery-reports/REPOSITORY_RECOVERY.md)
+for the historical record of what recovery found and fixed.
+
+## License
+
+[GPL-3.0-or-later](LICENSE).
+
+Vendored third-party code: [mistune](vendor/mistune) (BSD-3-Clause), [marked.js](web/vendor/marked.min.js) (MIT), [DOMPurify](web/vendor/purify.min.js) (Apache-2.0 OR MPL-2.0), [highlight.js](web/vendor/highlight.min.js) (BSD-3-Clause).
+
+  PASS  [14] README says AppStream metadata is now installed — <p align="center">
+  <img src="icons/hicolor/256x256/apps/chickenbutt.png" width="128" height="128" alt="ChickenButt icon">
+</p>
+
+<h1 align="center">ChickenButt</h1>
+
+A simple, lightweight GNOME desktop client for chatting with local [Ollama](https://ollama.com) models — focused on feel and ease of use rather than feature parity with Open WebUI or LM Studio.
+
+## Features
+
+- Native GTK4 + libadwaita shell with a tray icon
+- Streaming chat over the Ollama HTTP API
+- Multi-chat history, persisted locally in SQLite
+- Markdown rendering with syntax-highlighted code blocks (copy, expand/collapse)
+- Health checks with clear banners when Ollama isn't running or has no models
+- Pull, list, and inspect models straight from the composer (`ollama pull <model>`, `ollama list`, `ollama ps`)
+- Export any chat as Markdown or JSON
+
+## Requirements
+
+Linux with GTK4, libadwaita, WebKitGTK, PyGObject and dasbus (system packages, not pip), plus Python 3.10+. See **[DEPENDENCIES.md](DEPENDENCIES.md)** for the full list, why each one is required, and distro-specific install commands (Fedora, Ubuntu 24.04+). Check your system without installing anything:
+
+```bash
+python3 scripts/check_dependencies.py
+```
+
+[Ollama](https://ollama.com) is not a build/install dependency — ChickenButt starts and shows its own onboarding UI without it. See [Running Ollama](#running-ollama) below.
+
+## Running (source tree, no install)
+
+```bash
+git clone https://github.com/scottonanski/ChickenButt.git
+cd ChickenButt
+./run.sh
+```
+
+Use the native GTK bubble transcript instead of the default WebKit view:
+
+```bash
+CHICKENBUTT_TRANSCRIPT=native ./run.sh
+```
+
+Running straight from the source tree does not add a launcher entry to
+your app grid — use `./run.sh` from a terminal, or see **Install from
+source** below for a real installed app-grid entry.
+
+## Install from source
+
+For a real `chickenbutt` command outside the checkout, ChickenButt uses [Meson](https://mesonbuild.com):
+
+```bash
+git clone https://github.com/scottonanski/ChickenButt.git
+cd ChickenButt
+
+python3 scripts/check_dependencies.py --build
+
+meson setup build --prefix="$HOME/.local"
+meson install -C build
+
+"$HOME/.local/bin/chickenbutt" --version
+"$HOME/.local/bin/chickenbutt"
+```
+
+- Make sure `$HOME/.local/bin` is on your `PATH` (add `export PATH="$HOME/.local/bin:$PATH"` to your shell profile if `chickenbutt` isn't found afterward).
+- This installs the `chickenbutt` command, its private runtime directory, a desktop launcher entry, and the public app icon — AppStream metadata is installed alongside them, and installed ChickenButt should appear in your GNOME app grid under "ChickenButt" (you may need to log out and back in, or restart the shell, for the icon/app-grid cache to pick it up). You can still launch it from a terminal by running `chickenbutt` at any time.
+- Screenshot and release-history metadata in the AppStream file, plus Flatpak packaging, remain unfinished.
+- Rebuilding after pulling changes:
+
+  ```bash
+  meson setup --reconfigure build --prefix="$HOME/.local"
+  meson install -C build
+  ```
+
+- Uninstalling (from the retained build directory):
+
+  ```bash
+  ninja -C build uninstall
+  ```
+
+### Running Ollama
+
+```bash
+ollama serve   # if it isn't already running as a service
+ollama list    # confirm at least one model is pulled
+```
+
+See the official [Ollama Linux documentation](https://docs.ollama.com/linux) for installation and running it as a service.
+
+## Data locations
+
+| What | Where |
+|------|-------|
+| Conversation history | `~/.local/share/chickenbutt/conversations.db` (override with `CHICKENBUTT_DB`) |
+| Settings | `~/.config/chickenbutt/settings.json` |
+
+## Testing
+
+```bash
+python3 scripts/smoke_gui.py
+python3 scripts/test_multichat.py
+python3 scripts/test_message_actions.py
+python3 scripts/test_ollama_health.py
+python3 scripts/test_generation_lifecycle.py
+python3 scripts/test_stream_cancellation.py
+python3 scripts/test_restore_scroll.py
+python3 scripts/test_wire_code_ui_batch.py
+python3 scripts/test_markdown_sanitization.py
+python3 scripts/test_web_navigation_policy.py
+python3 scripts/test_web_content_security_policy.py
+python3 scripts/test_release_identity.py
+python3 scripts/test_sidebar_interactions.py
+python3 scripts/test_installed_layout.py       # real `meson install`; skips if meson isn't on PATH
+python3 scripts/test_desktop_integration.py    # real `meson install`; skips if meson isn't on PATH
+python3 scripts/test_dependency_declaration.py
+```
+
+## Project status
+
+ChickenButt's repository-recovery phase is complete — the documentation,
+dead-code, and dead-asset debt that prompted it has been cleaned up under
+a verified baseline, and feature work is no longer paused. See
+[recovery-reports/REPOSITORY_RECOVERY.md](recovery-reports/REPOSITORY_RECOVERY.md)
+for the historical record of what recovery found and fixed.
+
+## License
+
+[GPL-3.0-or-later](LICENSE).
+
+Vendored third-party code: [mistune](vendor/mistune) (BSD-3-Clause), [marked.js](web/vendor/marked.min.js) (MIT), [DOMPurify](web/vendor/purify.min.js) (Apache-2.0 OR MPL-2.0), [highlight.js](web/vendor/highlight.min.js) (BSD-3-Clause).
+
+  PASS  [14] README says screenshot/release metadata and Flatpak packaging remain unfinished — <p align="center">
+  <img src="icons/hicolor/256x256/apps/chickenbutt.png" width="128" height="128" alt="ChickenButt icon">
+</p>
+
+<h1 align="center">ChickenButt</h1>
+
+A simple, lightweight GNOME desktop client for chatting with local [Ollama](https://ollama.com) models — focused on feel and ease of use rather than feature parity with Open WebUI or LM Studio.
+
+## Features
+
+- Native GTK4 + libadwaita shell with a tray icon
+- Streaming chat over the Ollama HTTP API
+- Multi-chat history, persisted locally in SQLite
+- Markdown rendering with syntax-highlighted code blocks (copy, expand/collapse)
+- Health checks with clear banners when Ollama isn't running or has no models
+- Pull, list, and inspect models straight from the composer (`ollama pull <model>`, `ollama list`, `ollama ps`)
+- Export any chat as Markdown or JSON
+
+## Requirements
+
+Linux with GTK4, libadwaita, WebKitGTK, PyGObject and dasbus (system packages, not pip), plus Python 3.10+. See **[DEPENDENCIES.md](DEPENDENCIES.md)** for the full list, why each one is required, and distro-specific install commands (Fedora, Ubuntu 24.04+). Check your system without installing anything:
+
+```bash
+python3 scripts/check_dependencies.py
+```
+
+[Ollama](https://ollama.com) is not a build/install dependency — ChickenButt starts and shows its own onboarding UI without it. See [Running Ollama](#running-ollama) below.
+
+## Running (source tree, no install)
+
+```bash
+git clone https://github.com/scottonanski/ChickenButt.git
+cd ChickenButt
+./run.sh
+```
+
+Use the native GTK bubble transcript instead of the default WebKit view:
+
+```bash
+CHICKENBUTT_TRANSCRIPT=native ./run.sh
+```
+
+Running straight from the source tree does not add a launcher entry to
+your app grid — use `./run.sh` from a terminal, or see **Install from
+source** below for a real installed app-grid entry.
+
+## Install from source
+
+For a real `chickenbutt` command outside the checkout, ChickenButt uses [Meson](https://mesonbuild.com):
+
+```bash
+git clone https://github.com/scottonanski/ChickenButt.git
+cd ChickenButt
+
+python3 scripts/check_dependencies.py --build
+
+meson setup build --prefix="$HOME/.local"
+meson install -C build
+
+"$HOME/.local/bin/chickenbutt" --version
+"$HOME/.local/bin/chickenbutt"
+```
+
+- Make sure `$HOME/.local/bin` is on your `PATH` (add `export PATH="$HOME/.local/bin:$PATH"` to your shell profile if `chickenbutt` isn't found afterward).
+- This installs the `chickenbutt` command, its private runtime directory, a desktop launcher entry, and the public app icon — AppStream metadata is installed alongside them, and installed ChickenButt should appear in your GNOME app grid under "ChickenButt" (you may need to log out and back in, or restart the shell, for the icon/app-grid cache to pick it up). You can still launch it from a terminal by running `chickenbutt` at any time.
+- Screenshot and release-history metadata in the AppStream file, plus Flatpak packaging, remain unfinished.
+- Rebuilding after pulling changes:
+
+  ```bash
+  meson setup --reconfigure build --prefix="$HOME/.local"
+  meson install -C build
+  ```
+
+- Uninstalling (from the retained build directory):
+
+  ```bash
+  ninja -C build uninstall
+  ```
+
+### Running Ollama
+
+```bash
+ollama serve   # if it isn't already running as a service
+ollama list    # confirm at least one model is pulled
+```
+
+See the official [Ollama Linux documentation](https://docs.ollama.com/linux) for installation and running it as a service.
+
+## Data locations
+
+| What | Where |
+|------|-------|
+| Conversation history | `~/.local/share/chickenbutt/conversations.db` (override with `CHICKENBUTT_DB`) |
+| Settings | `~/.config/chickenbutt/settings.json` |
+
+## Testing
+
+```bash
+python3 scripts/smoke_gui.py
+python3 scripts/test_multichat.py
+python3 scripts/test_message_actions.py
+python3 scripts/test_ollama_health.py
+python3 scripts/test_generation_lifecycle.py
+python3 scripts/test_stream_cancellation.py
+python3 scripts/test_restore_scroll.py
+python3 scripts/test_wire_code_ui_batch.py
+python3 scripts/test_markdown_sanitization.py
+python3 scripts/test_web_navigation_policy.py
+python3 scripts/test_web_content_security_policy.py
+python3 scripts/test_release_identity.py
+python3 scripts/test_sidebar_interactions.py
+python3 scripts/test_installed_layout.py       # real `meson install`; skips if meson isn't on PATH
+python3 scripts/test_desktop_integration.py    # real `meson install`; skips if meson isn't on PATH
+python3 scripts/test_dependency_declaration.py
+```
+
+## Project status
+
+ChickenButt's repository-recovery phase is complete — the documentation,
+dead-code, and dead-asset debt that prompted it has been cleaned up under
+a verified baseline, and feature work is no longer paused. See
+[recovery-reports/REPOSITORY_RECOVERY.md](recovery-reports/REPOSITORY_RECOVERY.md)
+for the historical record of what recovery found and fixed.
+
+## License
+
+[GPL-3.0-or-later](LICENSE).
+
+Vendored third-party code: [mistune](vendor/mistune) (BSD-3-Clause), [marked.js](web/vendor/marked.min.js) (MIT), [DOMPurify](web/vendor/purify.min.js) (Apache-2.0 OR MPL-2.0), [highlight.js](web/vendor/highlight.min.js) (BSD-3-Clause).
+
+  PASS  [15] vendored-code notice includes DOMPurify
+
+=== Summary ===
+Passed: 50  Failed: 0

@@ -1,0 +1,64 @@
+receiver	call_or_construct	line	source_text	enclosing_method	enclosing_closure
+ConversationStore(...)	__init__/construct	499	ConversationStore()	__init__	
+self._store	get_conversation	1169	self._store.get_conversation(self._conversation_id)	_refresh_chat_title	
+self._store	clear_messages	1548	self._store.clear_messages(self._conversation_id)	clear_chat	
+self._store	create_conversation	1550	self._store.create_conversation(model=self._model)	clear_chat	
+self._store	is_empty	1572	self._store.is_empty(self._conversation_id)	_active_chat_is_empty	
+self._store	prune_empty_conversations	1600	self._store.prune_empty_conversations(keep_id=None)	new_chat	
+self._store	create_conversation	1605	self._store.create_conversation(model=self._model)	new_chat	
+self._web	reset	1631	self._web.reset([])	_render_empty_transcript	
+self._store	list_conversations	1651	self._store.list_conversations(limit=40)	_rebuild_history_list	
+self._store	get_conversation	1801	self._store.get_conversation(conversation_id)	_conversation_display_title	
+self._store	list_messages	1804	self._store.list_messages(conversation_id)	_conversation_display_title	
+self._store	export_dict	1833	self._store.export_dict(conversation_id)	export_conversation	
+self._store	export_markdown	1841	self._store.export_markdown(conversation_id)	export_conversation	
+self._store	delete_conversation	1926	self._store.delete_conversation(conversation_id)	delete_conversation	
+self._store	get_active_conversation	1933	self._store.get_active_conversation()	delete_conversation	
+self._store	is_empty	1956	self._store.is_empty(prev)	switch_conversation	
+self._store	delete_conversation	1957	self._store.delete_conversation(prev)	switch_conversation	
+self._store	get_conversation	1961	self._store.get_conversation(conversation_id)	switch_conversation	
+self._store	set_active	1966	self._store.set_active(conversation_id)	switch_conversation	
+self._store	list_messages	1974	self._store.list_messages(conversation_id)	switch_conversation	
+self._store	ensure_active	2078	self._store.ensure_active(model=self._model)	_ensure_conversation	
+self._store	append_message	2085	self._store.append_message(\n                cid,\n                role=role,\n                content=content,\n                message_id=message_id,\n            )	_persist_message	
+self._store	get_active_conversation	2101	self._store.get_active_conversation()	_restore_history	
+self._store	create_conversation	2103	self._store.create_conversation(model=self._model)	_restore_history	
+self._store	prune_empty_conversations	2107	self._store.prune_empty_conversations(keep_id=conv.id)	_restore_history	
+self._store	list_messages	2113	self._store.list_messages(conv.id)	_restore_history	
+self._store	delete_message	2123	self._store.delete_message(m.id)	_restore_history	
+self._store	touch	2128	self._store.touch(conv.id)	_restore_history	
+self._web	reset	2163	self._web.reset(messages)	_apply_restored_transcript	
+self._store	delete_message	2218	self._store.delete_message(mid, conversation_id=self._conversation_id)	_delete_message	
+self._web	post	2222	"self._web.post({""type"": ""message_removed"", ""id"": mid})"	_delete_message	
+self._web	reset	2227	self._web.reset([])	_delete_message	
+self._store	delete_message	2245	self._store.delete_message(mid, conversation_id=self._conversation_id)	_drop_messages_from	
+self._web	post	2251	"self._web.post({""type"": ""message_removed"", ""id"": mid})"	_drop_messages_from	
+self._store	delete_message	2280	self._store.delete_message(mid, conversation_id=self._conversation_id)	_regenerate_message	
+self._web	post	2284	"self._web.post({""type"": ""message_removed"", ""id"": mid})"	_regenerate_message	
+self._store	delete_message	2289	self._store.delete_message(message_id, conversation_id=self._conversation_id)	_regenerate_message	
+self._store	update_message	2315	self._store.update_message(message_id, text)	_edit_resend_message	
+self._web	post	2322	"self._web.post(\n                {\n                    ""type"": ""message_added"",\n                    ""id"": message_id,\n                    ""role"": ""user"",\n                    ""text"": text,\n                    ""streaming"": False,\n                }\n            )"	_edit_resend_message	
+self._store	get_conversation	2550	self._store.get_conversation(self._conversation_id)	_preferred_model	
+self.client	is_model_loaded	2709	self.client.is_model_loaded(model)	_begin_model_load	work
+self.client	load_model	2730	self.client.load_model(\n                        model,\n                        should_stop=lambda: self._stop_load\n                        or gen != self._load_generation,\n                    )	_begin_model_load	work
+self._store	set_model	2834	self._store.set_model(cid, model)	_on_model_load_finished	
+self._web	post	2854	"self._web.post(\n                {\n                    ""type"": ""empty_state"",\n                    ""title"": GREETING_TEXT,\n                    ""subtitle"": GREETING_SUB,\n                }\n            )"	_show_ephemeral_greeting	
+self._web	post	2905	"self._web.post(\n                {\n                    ""type"": ""message_added"",\n                    ""id"": mid,\n                    ""role"": ""assistant"",\n                    ""text"": text,\n                    ""streaming"": streaming,\n                }\n            )"	_post_status_message	
+self._web	post	2966	"self._web.post({""type"": ""message_done"", ""id"": mid, ""text"": text})"	_update_status_message	
+self._web	post	2969	"self._web.post(\n                    {\n                        ""type"": ""message_reset"",\n                        ""id"": mid,\n                        ""text"": text,\n                        ""streaming"": True,\n                    }\n                )"	_update_status_message	
+self.client	pull_model	3021	self.client.pull_model(model)	_run_ollama_pull	work
+self.client	format_list_models	3100	self.client.format_list_models()	_run_ollama_info	work
+self.client	format_ps_models	3102	self.client.format_ps_models()	_run_ollama_info	work
+self._web	post	3145	"self._web.post(\n                {\n                    ""type"": ""message_added"",\n                    ""id"": uid,\n                    ""role"": ""user"",\n                    ""text"": text,\n                    ""streaming"": False,\n                }\n            )"	_send	
+self._web	post	3459	"self._web.post(\n                    {\n                        ""type"": ""message_reset"",\n                        ""id"": aid,\n                        ""streaming"": True,\n                        ""text"": """",\n                    }\n                )"	_start_assistant_stream	
+self._web	post	3469	"self._web.post(\n                    {\n                        ""type"": ""message_reset"",\n                        ""id"": aid,\n                        ""streaming"": True,\n                        ""text"": stream_seed,\n                    }\n                )"	_start_assistant_stream	
+self._web	post	3478	"self._web.post(\n                    {\n                        ""type"": ""message_added"",\n                        ""id"": aid,\n                        ""role"": ""assistant"",\n                        ""text"": """",\n                        ""streaming"": True,\n                    }\n                )"	_start_assistant_stream	
+self._web	post	3553	"self._web.post(\n                        {\n                            ""type"": ""message_error"",\n                            ""id"": aid,\n                            ""text"": (\n                                f""Error: {err}""\n                                if not final\n                                else final + f""\n\n[Error: {err}]""\n                            ),\n                        }\n                    )"	_start_assistant_stream	finalize_ui
+self._web	post	3565	"self._web.post(\n                        {\n                            ""type"": ""message_done"",\n                            ""id"": aid,\n                            ""text"": final or ""(no response)"",\n                        }\n                    )"	_start_assistant_stream	finalize_ui
+self._web	post	3621	"self._web.post(\n                        {\n                            ""type"": ""message_delta"",\n                            ""id"": aid,\n                            ""text"": chunk,\n                        }\n                    )"	_start_assistant_stream	flush_stream
+self._web	post	3640	"self._web.post(\n                        {\n                            ""type"": ""message_delta"",\n                            ""id"": aid,\n                            ""text"": leftover,\n                        }\n                    )"	_start_assistant_stream	flush_stream
+self.client	chat_stream	3657	self.client.chat_stream(\n                    origin_model,\n                    list(outbound),\n                    cancel_event=cancel_event,\n                )	_start_assistant_stream	work
+self._store	update_message	3690	self._store.update_message(assistant_id, text)	_commit_assistant_result	
+self._store	append_message	3704	"self._store.append_message(\n                    origin_conversation_id,\n                    role=""assistant"",\n                    content=text,\n                    message_id=assistant_id,\n                )"	_commit_assistant_result	
+self._store	update_message	3713	self._store.update_message(assistant_id, text)	_commit_assistant_result	
+self._store	append_message	3722	"self._store.append_message(\n                origin_conversation_id,\n                role=""assistant"",\n                content=text,\n                message_id=assistant_id,\n            )"	_commit_assistant_result	

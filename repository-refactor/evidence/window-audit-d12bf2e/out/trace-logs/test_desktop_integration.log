@@ -1,0 +1,377 @@
+
+[setup] Export clean source tree and run a real meson install
+  PASS  meson setup succeeds
+  PASS  meson install succeeds
+
+[1] Desktop file exists with the exact APP_ID filename
+  PASS  [1] desktop file exists under share/applications — /tmp/cb-desktop-integration-o27pak9c/prefix/share/applications/io.github.scottonanski.ChickenButt.desktop
+  PASS  [2] its filename exactly matches APP_ID + '.desktop' (only one desktop file installed) — ['io.github.scottonanski.ChickenButt.desktop']
+  PASS  [3] Exec=chickenbutt — chickenbutt
+  PASS  [4] TryExec=chickenbutt — chickenbutt
+  PASS  [5] Icon exactly equals APP_ID — io.github.scottonanski.ChickenButt
+  PASS  [6] StartupWMClass exactly equals APP_ID — io.github.scottonanski.ChickenButt
+  PASS  [7] DBusActivatable=false — false
+  PASS  [8] no checkout path, @REPO_DIR@, temp prefix or absolute executable path in the desktop file — [Desktop Entry]
+Type=Application
+Name=ChickenButt
+GenericName=Local AI Chat Client
+Comment=Chat with local Ollama models
+Exec=chickenbutt
+TryExec=chickenbutt
+Icon=io.github.scottonanski.ChickenButt
+Terminal=false
+Categories=Network;Chat;Utility;
+Keywords=Ollama;AI;LLM;Chat;Local;
+StartupNotify=true
+StartupWMClass=io.github.scottonanski.ChickenButt
+SingleMainWindow=true
+DBusActivatable=false
+
+
+[desktop-file-validate] Real validation against the installed file
+  PASS  desktop-file-validate succeeds against the installed desktop file — /tmp/cb-desktop-integration-o27pak9c/prefix/share/applications/io.github.scottonanski.ChickenButt.desktop: hint: value "Network;Chat;Utility;" for key "Categories" in group "Desktop Entry" contains more than one main category; application might appear more than once in the application menu
+
+[9] Public SVG installed under the exact App-ID filename
+  PASS  [9] public SVG exists under the App-ID filename — /tmp/cb-desktop-integration-o27pak9c/prefix/share/icons/hicolor/scalable/apps/io.github.scottonanski.ChickenButt.svg
+  PASS  [10] no public chickenbutt.svg alias installed — /tmp/cb-desktop-integration-o27pak9c/prefix/share/icons/hicolor/scalable/apps/chickenbutt.svg
+
+[11] Metainfo file exists under share/metainfo
+  PASS  [11] metainfo file exists under share/metainfo — /tmp/cb-desktop-integration-o27pak9c/prefix/share/metainfo/io.github.scottonanski.ChickenButt.metainfo.xml
+  PASS  [12] metainfo <id> equals APP_ID — io.github.scottonanski.ChickenButt
+  PASS  [13] launchable equals APP_ID + '.desktop' — io.github.scottonanski.ChickenButt.desktop
+  PASS  [14] binary provider is 'chickenbutt' — chickenbutt
+  PASS  [15] project_license is GPL-3.0-or-later — GPL-3.0-or-later
+  PASS  [15] metadata_license is CC0-1.0 — CC0-1.0
+  PASS  [16] contains a <developer> element
+  PASS  [16] contains homepage url — {'homepage': 'https://github.com/scottonanski/ChickenButt', 'vcs-browser': 'https://github.com/scottonanski/ChickenButt', 'bugtracker': 'https://github.com/scottonanski/ChickenButt/issues'}
+  PASS  [16] contains vcs-browser url — {'homepage': 'https://github.com/scottonanski/ChickenButt', 'vcs-browser': 'https://github.com/scottonanski/ChickenButt', 'bugtracker': 'https://github.com/scottonanski/ChickenButt/issues'}
+  PASS  [16] contains bugtracker url — {'homepage': 'https://github.com/scottonanski/ChickenButt', 'vcs-browser': 'https://github.com/scottonanski/ChickenButt', 'bugtracker': 'https://github.com/scottonanski/ChickenButt/issues'}
+  PASS  [16] contains OARS content_rating
+  PASS  [17] no fabricated <screenshots> element
+  PASS  [17] no fabricated <releases> element
+
+[appstreamcli] Real validation against the installed metainfo file
+  PASS  appstreamcli validate succeeds (real schema/errors, not pedantic-only hints) — ✔ Validation was successful: pedantic: 2
+  known pre-Flathub pedantic gap (not a failure): missing release metadata — add before a Flathub submission.
+  PASS  no unexpected pedantic AppStream issues beyond the known pre-Flathub gaps — P: io.github.scottonanski.ChickenButt:3: cid-contains-uppercase-letter
+     io.github.scottonanski.ChickenButt
+   The component ID should only contain lowercase characters.
+
+P: io.github.scottonanski.ChickenButt:~: releases-info-missing
+   This component is missing information about releases. Consider adding a `releases` tag to
+   describe releases and their changes.
+
+✔ Validation was successful: pedantic: 2
+
+[18] main.py uses APP_ID for the application window icon
+  PASS  [18] main.py contains no literal 'chickenbutt' icon-theme-name call — #!/usr/bin/env python3
+"""ChickenButt — tray-toggleable Ollama chat window for GNOME."""
+
+from __future__ import annotations
+
+import os
+import sys
+
+# Allow running from any cwd
+APP_DIR = os.path.dirname(os.path.abspath(__file__))
+if APP_DIR not in sys.path:
+    sys.path.insert(0, APP_DIR)
+
+import gi
+
+gi.require_version("Gtk", "4.0")
+gi.require_version("Adw", "1")
+
+from gi.repository import Adw, Gio, GLib
+
+from ollama_client import OllamaClient
+from release_info import APP_ID, APP_NAME, VERSION
+from tray import TrayIcon
+from window import ChatSidebar
+
+
+class ChickenButtApp(Adw.Application):
+    def __init__(self):
+        super().__init__(application_id=APP_ID, flags=Gio.ApplicationFlags.FLAGS_NONE)
+        self.window: ChatSidebar | None = None
+        self.tray: TrayIcon | None = None
+        self.connect("activate", self._on_activate)
+
+        quit_action = Gio.SimpleAction.new("quit", None)
+        quit_action.connect("activate", lambda *_: self._quit())
+        self.add_action(quit_action)
+        self.set_accels_for_action("app.quit", ["<Control>q"])
+
+    def _on_activate(self, *_args) -> None:
+        if self.window is None:
+            self.window = ChatSidebar(self, client=OllamaClient())
+            self.window.set_close_handler(self._on_window_close)
+            # Refresh tray menu enabled state when visibility changes
+            self.window.connect("notify::visible", self._on_window_visible)
+
+            # Panel/tray: system chat-bubble symbolic (not the brand chicken —
+            # the chick stays on the empty state / app icon / dock).
+            tray_icon = self._resolve_tray_chat_icon()
+
+            self.tray = TrayIcon(
+                on_show=self._show_window,
+                on_hide=self._hide_window,
+                on_toggle=self._toggle_window,
+                on_quit=self._quit,
+                on_clear=self._clear_chat,
+                is_visible=self._window_is_visible,
+                icon_name=tray_icon,
+                # Empty theme path → load from system Adwaita/Yaru icon theme
+                icon_theme_path="",
+                title=APP_NAME,
+            )
+            # Window icon: themed name (icon-theme lookup resolves APP_ID
+            # to the installed hicolor icon; see meson.build).
+            self.window.set_icon_name(APP_ID)
+            ok = self.tray.start()
+            if not ok:
+                print(
+                    "No StatusNotifier host found.\n"
+                    "On GNOME, enable App Indicator support for a tray icon.",
+                    flush=True,
+                )
+            else:
+                print(
+                    "Tray ready.\n"
+                    "  Left-click:  Show / Hide / Quit\n"
+                    "  Right-click: Show / Hide / Clear / Quit (when host sends ContextMenu)\n"
+                    "  Middle-click: toggle window",
+                    flush=True,
+                )
+            self.window.present()
+            GLib.idle_add(self._focus_input)
+        else:
+            self._show_window()
+
+    def _focus_input(self) -> bool:
+        if self.window is not None:
+            try:
+                self.window.input.grab_focus()
+            except Exception:  # noqa: BLE001
+                pass
+        return False
+
+    def _resolve_tray_chat_icon(self) -> str:
+        """Pick a chat-bubble style symbolic for the GNOME top-bar indicator."""
+        candidates = (
+            # Prefer real bubble glyphs when the theme has them (Yaru/Adwaita+)
+            "chat-bubbles-empty-symbolic",
+            "chat-bubble-text-symbolic",
+            "chat-symbolic",
+            "chat-message-new-symbolic",  # Adwaita standard
+            "internet-chat-symbolic",
+            "internet-group-chat",
+            "mail-unread-symbolic",
+        )
+        try:
+            from gi.repository import Gdk, Gtk
+
+            display = Gdk.Display.get_default()
+            if display is not None:
+                theme = Gtk.IconTheme.get_for_display(display)
+                for name in candidates:
+                    if theme is not None and theme.has_icon(name):
+                        return name
+        except Exception:  # noqa: BLE001
+            pass
+        return "chat-message-new-symbolic"
+
+    def _window_is_visible(self) -> bool:
+        return bool(self.window and self.window.is_visible())
+
+    def _on_window_visible(self, *_args) -> None:
+        if self.tray:
+            self.tray.notify_visibility_changed()
+
+    def _on_window_close(self) -> bool:
+        self._hide_window()
+        return True
+
+    def _show_window(self) -> None:
+        if self.window is None:
+            return
+        if self.tray:
+            self.tray.prepare_primary_menu()
+        self.window.present()
+        GLib.idle_add(self._focus_input)
+
+    def _hide_window(self) -> None:
+        if self.window is None:
+            return
+        self.window.set_visible(False)
+
+    def _toggle_window(self) -> None:
+        if self.window is None:
+            return
+        if self.window.is_visible():
+            self._hide_window()
+        else:
+            self._show_window()
+
+    def _clear_chat(self) -> None:
+        if self.window is not None:
+            self.window.clear_chat()
+
+    def _quit(self) -> None:
+        if self.tray:
+            self.tray.stop()
+        self.quit()
+
+
+def main() -> int:
+    if "--version" in sys.argv[1:]:
+        print(f"{APP_NAME} {VERSION}")
+        return 0
+    Adw.init()
+    # Shown in dock tooltips / about when desktop match works
+    GLib.set_application_name(APP_NAME)
+    GLib.set_prgname(APP_NAME)
+    app = ChickenButtApp()
+    return app.run(sys.argv)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+
+  PASS  [18] main.py sets the window icon via APP_ID
+
+[19]-[20] Old clone-bound desktop install path is gone
+  PASS  [19] old root desktop file is absent — /home/scott/Development/ChickenButt/io.github.scottonanski.ChickenButt.desktop
+  PASS  [20] scripts/install-desktop-entry.py is absent — /home/scott/Development/ChickenButt/scripts/install-desktop-entry.py
+
+[21] scripts/generate-icons.py contains no home-directory install path
+  PASS  scripts/generate-icons.py exists — /home/scott/Development/ChickenButt/scripts/generate-icons.py
+  PASS  [21] no expanduser('~...') / .local/share/icons write path in generate-icons.py — #!/usr/bin/env python3
+"""Regenerate ChickenButt's tracked private icon assets (FreeDesktop hicolor
+layout) from their SVG sources. Source-asset generator only — it writes
+exclusively into the tracked project tree (icons/hicolor/) and never touches
+the user's home directory or system icon caches. Commit the regenerated
+files like any other source change.
+
+The public, installed application icon is a separate concern: Meson installs
+icons/chickenbutt-dash-desktop-icon.svg directly under
+share/icons/hicolor/scalable/apps/<APP_ID>.svg at `meson install` time (see
+meson.build) and runs gtk-update-icon-cache there when available — this
+script has nothing to do with that path.
+
+Source (in icons/):
+  chickenbutt-dash-desktop-icon.svg  → app grid / window icon (full color)
+
+Regenerates (in icons/, tracked in git):
+  icons/hicolor/...          (private project-tree mirror, installed into
+                               the runtime tree by meson.build; main.py
+                               resolves the window icon via GTK icon-theme
+                               name lookup against APP_ID, not a literal
+                               file path — see main.py's set_icon_name(APP_ID)
+                               call and meson.build)
+
+Does NOT generate icons/tray/ — TrayIcon is always constructed with
+icon_theme_path="" (main.py), so it resolves its icon by name from the
+system Adwaita/Yaru icon theme, never from a file path. A prior version of
+this script generated icons/tray/*.png/.svg from chickenbutt-light-icon.svg
+and chickenbutt-dark-icon.svg, but nothing in the runtime ever consumed
+them (removed under repository recovery, RR-08).
+"""
+
+from __future__ import annotations
+
+import os
+import shutil
+import sys
+
+import gi
+
+gi.require_version("Rsvg", "2.0")
+gi.require_version("GdkPixbuf", "2.0")
+from gi.repository import GdkPixbuf, Rsvg  # noqa: E402
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ICONS = os.path.join(ROOT, "icons")
+APP_SVG = os.path.join(ICONS, "chickenbutt-dash-desktop-icon.svg")
+HICOLOR = os.path.join(ICONS, "hicolor")
+SIZES = [16, 22, 24, 32, 48, 64, 128, 256]
+
+
+def render_svg(svg_path: str, size: int, out_png: str) -> None:
+    """Rasterize SVG at an exact pixel size (not natural 16px then upscale)."""
+    if not os.path.isfile(svg_path):
+        raise FileNotFoundError(svg_path)
+    # Prefer size-aware load so vectors stay sharp on 22–128px tray/dock sizes.
+    try:
+        pb = GdkPixbuf.Pixbuf.new_from_file_at_size(svg_path, size, size)
+    except Exception:
+        pb = None
+    if pb is None:
+        handle = Rsvg.Handle.new_from_file(svg_path)
+        pb = handle.get_pixbuf()
+        if pb is None:
+            raise RuntimeError(f"Could not render {svg_path}")
+        if pb.get_width() != size or pb.get_height() != size:
+            pb = pb.scale_simple(size, size, GdkPixbuf.InterpType.BILINEAR)
+    elif pb.get_width() != size or pb.get_height() != size:
+        pb = pb.scale_simple(size, size, GdkPixbuf.InterpType.BILINEAR)
+    os.makedirs(os.path.dirname(out_png), exist_ok=True)
+    pb.savev(out_png, "png", [], [])
+    print(f"  {out_png} ({size}x{size})")
+
+
+def main() -> int:
+    if not os.path.isfile(APP_SVG):
+        print(f"Missing source icon: {APP_SVG}", file=sys.stderr)
+        return 1
+
+    print("App icon (dash / window)…")
+    scalable = os.path.join(HICOLOR, "scalable", "apps", "chickenbutt.svg")
+    os.makedirs(os.path.dirname(scalable), exist_ok=True)
+    shutil.copy2(APP_SVG, scalable)
+
+    for size in SIZES:
+        rel = f"{size}x{size}/apps/chickenbutt.png"
+        render_svg(APP_SVG, size, os.path.join(HICOLOR, rel))
+
+    # Ensure index.theme exists for local tree
+    index = os.path.join(HICOLOR, "index.theme")
+    if not os.path.isfile(index):
+        print("  (no index.theme - optional for project tree)")
+
+    print("Done. Regenerated tracked assets under icons/hicolor/.")
+    print("Commit the changes like any other source update.")
+    print("The public installed icon comes from meson install, not this script.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+
+  PASS  [21] generate-icons.py never invokes gtk-update-icon-cache
+  PASS  resolved a single installed lib*/chickenbutt dir — [PosixPath('/tmp/cb-desktop-integration-o27pak9c/prefix/lib')]
+
+[22] The command/private runtime still passes every test_installed_layout.py assertion
+  PASS  [22] scripts/test_installed_layout.py passes in full (independent run) —  points into the installed prefix — /tmp/cb-installed-layout-e5fkuhs7/prefix/lib/x86_64-linux-gnu/chickenbutt/web
+  PASS  [8] transcript_view.WEB_DIR contains index.html — ['OK', '/tmp/cb-installed-layout-e5fkuhs7/prefix/lib/x86_64-linux-gnu/chickenbutt/web', 'True']
+
+[9] Installed tree excludes dev/test-only content
+  PASS  [9] scripts not installed anywhere
+  PASS  [9] HANDOFF.md not installed anywhere
+  PASS  [9] STATUS_REPORT.md not installed anywhere
+  PASS  [9] profiling.py not installed anywhere
+  PASS  [9] profile_ablation.py not installed anywhere
+  PASS  [9] profile_runtime.py not installed anywhere
+  PASS  [9] profile_startup.py not installed anywhere
+  PASS  [9] x11_sidebar.py not installed anywhere
+  PASS  [9] no .git, test_*.py, .db/.sqlite files anywhere in prefix — []
+
+[10] Source-tree ./run.sh --version still works
+  PASS  [10] ./run.sh --version exits 0 and prints 'ChickenButt 0.1.0' — rc=0 stdout='ChickenButt 0.1.0\n' stderr=''
+
+=== Summary ===
+Passed: 47  Failed: 0
+
+
+=== Summary ===
+Passed: 37  Failed: 0
