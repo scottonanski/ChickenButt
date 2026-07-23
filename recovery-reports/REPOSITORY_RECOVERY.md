@@ -65,8 +65,9 @@ target.
 (`message_widgets.py`, live — not dead — code path, active on WebKit-init
 failure or `CHICKENBUTT_TRANSCRIPT=native`). The WebKit page and Python
 communicate through a small bidirectional bridge: 9 Python→page event types,
-6 page→Python intent types actually in use (a 7th, `open_link`, has a
-Python-side handler but is never sent by the current JS — see §4). Settings
+6 page→Python intent types, all actually sent and all actually handled (a
+7th, `open_link`, was a dead handler with no JS sender — removed under
+recovery, RR-05). Settings
 persist via `GLib.get_user_config_dir()/chickenbutt/settings.json`
 (`window.py:52-53`) — XDG-aware, not a hardcoded path; typically resolves to
 `~/.config/chickenbutt/settings.json` unless `XDG_CONFIG_HOME` is set.
@@ -126,122 +127,76 @@ schedule it.
 Rechecked against current code before inclusion here, not carried over from
 any prior document without verification.
 
-### Dead or unreachable code
-- `x11_sidebar.py` — not imported by `main.py`, `window.py`, or any other
-  runtime module (verified: `grep -rn "x11_sidebar"` across all `.py` files
-  finds nothing outside `meson.build:66` and `test_installed_layout.py:64`).
-  Still installed because `meson.build`'s allowlist includes it.
-- `window.py`'s `open_link` intent handler (`elif typ == "open_link":`,
-  around `window.py:2056`) — unreachable. `web/app.js` never sends a
-  `postIntent` with `type: "open_link"` (verified: every literal
-  `postIntent({ type: "..." })` call site grepped; only `ready`,
-  `copy_text`, `regenerate`, `continue`, `delete_message`, `edit_resend`
-  are actually sent). Appears superseded by WebKit-level navigation
-  confinement (`transcript_view.py`'s `decide-policy` hook), which now
-  handles external links directly instead of round-tripping through JS.
-- `tray.py`'s file-based icon lookup branch (`_load_icon_pixmap`,
-  `tray.py:98-113`, `if icon_theme_path:`) — unreachable given the only
-  construction site. `main.py:59` always passes `icon_theme_path=""`
-  (explicit, with the comment "Empty theme path → load from system
-  Adwaita/Yaru icon theme"), and `main.py:93`'s `_resolve_tray_chat_icon`
-  selects a system chat-bubble symbolic icon name, never touching
-  `icons/tray/`'s chicken assets.
-- `main.py:118` `_apply_window_icon`'s file-fallback loop (`for rel in
-  ("icons/hicolor/128x128/apps/chickenbutt.png",
-  "icons/chickenbutt-dash-desktop-icon.svg", "icons/tray/chickenbutt.png")`):
-  the loaded `Gdk.Texture` is provably never applied — the only handling of
-  it is `if texture is not None and hasattr(Gtk, "Window"): pass`, a no-op.
-  The loop's only other effect is calling `window.set_icon_name(APP_ID)`
-  again, redundant with the identical call already made before entering
-  this method; the repository does not establish whether that call has an
-  effect outside the local icon-theme lookup. Both `hicolor/128x128/apps/
-  chickenbutt.png` and `chickenbutt-dash-desktop-icon.svg` exist on disk,
-  so the current first valid asset is expected to succeed first — an
-  exception while loading it would continue the loop rather than stopping
-  it. **Needs a decision: repair this fallback to actually apply a
-  texture, or remove it — currently it does neither.**
+### Resolved during this recovery
 
-### Dead or unreachable assets
-- `chickenbutt-logo.png` (repo root) — zero references in any `.py`/`.md`/
-  `.build` file (verified via `grep -rl`). Not produced by any generator.
-- `icons/chickenbutt-logo.png` — a second, distinct 256×256 PNG nested
-  under `icons/`, found during RR-00 (`recovery-reports/
-  00-initial-file-audit-discovery.md`). Zero references anywhere, same as
-  the root file above but not previously recorded.
-- `icons/hicolor/{16,22,24,32}x{16,22,24,32}/apps/chickenbutt-panel.png`
-  — 4 files (verified: `find icons -iname "*panel*"`, exactly 4 paths, no
-  5th size exists). Zero references anywhere. Not produced by the current
-  `scripts/generate-icons.py` (its hicolor loop only emits
-  `{size}x{size}/apps/chickenbutt.png`, `generate-icons.py:82`) — leftover
-  from something else, not generator drift.
-- `icons/tray/chickenbutt.png` and 9 further files in `icons/tray/`
-  (`chickenbutt.svg`, `chickenbutt@2.png`, `chickenbutt-light.*`,
-  `chickenbutt-dark.*`, `chickenbutt-symbolic.png`): **nine of the ten are
-  unreachable from the current runtime** — their only prospective consumer,
-  `tray.py`'s file-based pixmap lookup, requires a non-empty
-  `icon_theme_path`, while `main.py:59` passes `icon_theme_path=""`.
-  `icons/tray/chickenbutt.png` specifically is **referenced by a live but
-  ineffective fallback path**: `main.py:118`'s `_apply_window_icon` loop
-  can reach it if the two earlier candidates fail to load (both currently
-  exist and are expected to succeed first) — but the resulting
-  `Gdk.Texture` is never applied to anything (confirmed no-op, above). No
-  file in `icons/tray/` currently has a demonstrated functional runtime
-  consumer, but only nine of the ten are unreachable in the strict sense;
-  the tenth is reachable-but-ineffective. **Unlike the panel.png files,
-  all ten ARE actively (re)produced by `scripts/generate-icons.py:90-104`**
-  — the generator is currently generating files nothing effectively
-  consumes.
+Every item below was a live finding earlier in this document, confirmed
+fixed against current `main` (re-verified directly, not cited from memory,
+per Ground-truth rule 9) rather than left in "current problem" framing —
+per rule 1, code outranks documentation, and the code has moved on:
 
-### Stale source comments and docstrings
-- `conversation_store.py:4` — "No multi-chat UI yet." Multi-chat is fully
-  implemented (§3).
-- `x11_sidebar.py:314` — claims `run.sh` sets `GDK_BACKEND=x11`. `run.sh`'s
-  full 6 lines contain no such thing. Wrong independent of the dead-code
-  finding above — would still be wrong even if the file were wired in.
-- `scripts/generate-icons.py`'s module docstring (confirmed) describes
-  `icons/tray/` as a "StatusNotifier IconThemePath" and frames the
-  light/dark chicken SVGs as the tray icons. Current runtime behavior
-  contradicts this: `main.py:59` passes `icon_theme_path=""` to `TrayIcon`,
-  and `main.py:93`'s `_resolve_tray_chat_icon` selects a system chat-bubble
-  symbolic icon name (falling back to `"chat-message-new-symbolic"`) —
-  never touching `icons/tray/`'s chicken assets at all. The generator's
-  stated purpose for that directory no longer matches what the tray
-  actually shows.
-- Three dangling comment references to the now-deleted `HANDOFF.md`
-  (verified via `grep -n "HANDOFF" meson.build scripts/*.py`):
-  `meson.build:17`, `scripts/test_markdown_sanitization.py:276`,
-  `scripts/test_sidebar_interactions.py:231`. Harmless (they don't assert
-  behavior, just point at a file that's gone) but stale, and exactly the
-  kind of thing RR-00's exhaustive pass exists to catch systematically
-  rather than one at a time.
+- **`x11_sidebar.py`** — removed outright (not wired in). PR #7, merged
+  `0d62ed5` (RR-04). `meson.build`'s allowlist entry and
+  `test_installed_layout.py`'s requirement both removed; the test now
+  positively asserts the file's absence instead.
+- **`window.py`'s `open_link` intent handler`** — removed. PR #8, merged
+  `e154054` (RR-05). Confirmed zero references anywhere in runtime/source
+  code (the only remaining mentions are historical, in this document).
+- **`tray.py`'s file-based icon lookup branch`** — removed. PR #11, merged
+  `c0962f9` (RR-12). `TrayIcon`'s public `icon_theme_path` constructor
+  param and the `IconThemePath` DBus property were deliberately kept
+  (StatusNotifierItem interface contract, not dead code) — only the
+  internal dead branch was removed.
+- **`main.py`'s ineffective icon-fallback loop`** — removed (not repaired).
+  PR #9, merged `c3f1289` (RR-06). Confirmed the whole method was a no-op
+  beyond a `set_icon_name(APP_ID)` call already made one line earlier.
+- **`chickenbutt-logo.png` (root), `icons/chickenbutt-logo.png`, and the 4
+  orphaned `icons/hicolor/*/apps/chickenbutt-panel.png` files** — deleted.
+  PR #6, merged `96033ac` (RR-07).
+- **All 10 `icons/tray/` files** — deleted, and `scripts/generate-icons.py`
+  no longer generates them. PR #10, merged `cfa149d` (RR-08). Its module
+  docstring was corrected twice: once to stop describing `icons/tray/` as a
+  live StatusNotifier IconThemePath, and once more (caught during PR
+  review) to stop citing `main.py`'s icon-fallback loop after that loop was
+  separately removed by RR-06.
+- **`conversation_store.py`'s stale "No multi-chat UI yet" docstring** —
+  corrected. PR #12, merged `1bae8d7` (RR-03). `x11_sidebar.py:314`'s
+  `GDK_BACKEND` claim is moot — the file no longer exists (RR-04).
+- **3 dangling comment references to deleted `HANDOFF.md`**
+  (`meson.build:17`, `scripts/test_markdown_sanitization.py:276`,
+  `scripts/test_sidebar_interactions.py:231`) — fixed, substance kept,
+  only the dead pointer removed. PR #14 (new task, RR-14, found during
+  this reconciliation pass) — **open, not yet merged**, unlike everything
+  else in this subsection.
+- **`scripts/test_installed_layout.py:64`'s presence-only assertion for
+  `x11_sidebar.py`** — resolved as part of RR-04 above; the test now
+  asserts absence, in `FORBIDDEN_TOP_LEVEL`.
+- **`HANDOFF.md`, `STATUS_REPORT.md`** — retired (§7 decision, RR-01, PR
+  #3, merged `e49c6d0`).
+- **`requirements-notes.txt`** — its one unique fact (mistune is vendored,
+  no pip needed) folded into `DEPENDENCIES.md`; the file deleted. Direct
+  commit `0991fd3` (RR-02, doc/text-only per §8).
+- **`find_pkglibdir()`'s multiarch libdir bug** — a finding discovered
+  *during* this recovery, not present at RR-00 time, fixed in both
+  `scripts/test_installed_layout.py` and `scripts/test_desktop_integration.py`
+  (which had an independently copy-pasted duplicate of the same bug). PR
+  #13, merged `3034dc4` (RR-13).
 
-### Obsolete or contradictory documentation
-- `HANDOFF.md` — retired under this recovery (§7 decision). Verified
-  pattern behind that decision: a documentation commit recorded a "next
-  task" that a later commit then completed without the label ever being
-  removed; still later commits landed real security work with no
-  corresponding doc update. Two subsequent correction passes on this file
-  each fixed real problems and each still left the `open_link` claim above
-  uncorrected.
-- `STATUS_REPORT.md` — self-declared superseded on its own line 3
-  ("Superseded for handoff: use HANDOFF.md...") while `HANDOFF.md` in turn
-  claims `STATUS_REPORT.md` is the stale one — the two files contradict
-  each other about which is authoritative. Retired under this recovery
-  (§7 decision).
-- `requirements-notes.txt` — compared against `DEPENDENCIES.md` line by
-  line. Its GtkSource-package guidance is fully redundant
-  (`DEPENDENCIES.md:47,102,119` already cover it for both distros). Its
-  mistune-vendoring note ("mistune is vendored under vendor/mistune, no pip
-  required") is **not** present anywhere in `DEPENDENCIES.md` and is
-  independently confirmed true (`vendor/mistune/__init__.py` exists,
-  `message_widgets.py:34-38` sets up the vendored `sys.path` and imports it
-  bare). Recommendation: fold that one line into `DEPENDENCIES.md`, then
-  delete this file (task RR-02, §6).
+### Still open
 
-### Tests that verify presence, not use
-- `scripts/test_installed_layout.py:64` — asserts `x11_sidebar.py` is
-  present in the installed tree. Proves installation, not use. Will need
-  updating in lockstep with any `x11_sidebar.py` removal (task RR-04, §6).
+- **`main.py`'s icon-fallback loop and `icons/tray/`'s disposition** are
+  resolved above — but two decisions from the original "uncertain items"
+  list are not: whether `window.py`/`ChatSidebar` gets decomposed during
+  this recovery (RR-10), and whether manual test enforcement is permanent
+  or CI is required (RR-09). See below.
+- **Vendored `vendor/mistune/` unused surface** — 24 files (23 originally
+  found at RR-00, plus `__main__.py`, found on review — see
+  `recovery-reports/00-initial-file-audit-discovery.md`) that
+  `message_widgets.py:48`'s `plugins=None` call never exercises. Not
+  individually confirmed dead — tracing a vendored third-party library's
+  internal reachability is a different, disproportionate kind of
+  verification from ChickenButt's own code. Still needs Scott's decision:
+  trim to only the exercised surface, or keep as-is (normal to vendor a
+  whole library and use part of it).
 
 ### Architectural concentration
 - `ChatSidebar` (`window.py`, class body lines 495–3763, ~90 methods) —
@@ -260,31 +215,18 @@ any prior document without verification.
 ### Missing automated enforcement
 - No GitHub Actions workflow runs on `main`; the documented suite is
   manually invoked (§3). This document takes no position yet on whether CI
-  is required before recovery can be considered complete — that's a
-  decision point (§6, RR-09).
+  is required before recovery can be considered complete — that's decision
+  point RR-09 (§6), still open — see "Still open" above.
 
-### Uncertain items requiring Scott's decision
-- Whether to remove `x11_sidebar.py` outright or actually wire in
-  edge-docking (currently: definitively dead, not "in progress").
-- Whether to repair or remove `main.py`'s ineffective icon-fallback loop
-  (above), and whether to keep generating the 10 unreachable/ineffective
-  `icons/tray/` files for possible future use or stop and delete them.
-- Whether `window.py` decomposition happens during this recovery at all, or
-  is deferred to product-development work after this document retires.
-- Whether manual test enforcement is acceptable long-term or CI is required
-  before recovery is considered done.
-- Whether the vendored `vendor/mistune/` files that ChickenButt's own call
-  (`message_widgets.py:48`, `plugins=None`) never exercises — 11 plugin
-  files, 8 directive files, 3 alternate renderer files, `toc.py` — should
-  be trimmed to only what's used, or kept as-is on the reasoning that
-  vendoring a whole library and using part of it is normal. Found during
-  RR-00 (`recovery-reports/00-initial-file-audit-discovery.md`); not
-  individually confirmed dead, since that would require tracing a
-  third-party library's internals rather than ChickenButt's own code.
-
-RR-00's classification itself is done — see
-`recovery-reports/00-initial-file-audit-discovery.md` for the full,
-file-by-file table. §4 above now reflects everything it found.
+RR-00's classification is complete and verified against current `main`'s
+reduced 96-file tree — see `recovery-reports/00-initial-file-audit-discovery.md`
+for the full file-by-file table and its closing reconciliation. Every file
+it originally classified as dead or orphaned has since actually been
+removed (18 files: `x11_sidebar.py`, `requirements-notes.txt`, 6 orphaned
+image assets, 10 `icons/tray/` files); zero files exist now that weren't
+present at RR-00 time, aside from this recovery's own documentation
+(`recovery-reports/README.md`). §4 above reflects the current, post-removal
+state.
 
 ## 5. Recovery sequence
 
@@ -301,7 +243,9 @@ Bounded order, derived from the dependencies above — not from convenience:
    categorized per §6.
 3. **Remaining documentation-source cleanup** — RR-02 (fold
    `requirements-notes.txt` into `DEPENDENCIES.md`, delete it), RR-03
-   (reconcile the three stale source docstrings above).
+   (reconcile the three stale source docstrings above), RR-14 (three
+   dangling `HANDOFF.md` comment references, added after this document's
+   post-PR-batch reconciliation pass surfaced them as still unresolved).
 4. **Dead-code removal** — RR-04 (`x11_sidebar.py`), RR-05 (`open_link`
    handler), RR-06 (icon-fallback loop), RR-12 (`tray.py`'s dead file-based
    icon lookup, added after RR-08 surfaced it). Independent of each other.
@@ -327,7 +271,7 @@ restructuring, and none is proposed — nothing found in §4 requires one.
 | ID | Scope | Evidence | Status | Branch/PR | Verification required | Decision owner |
 |----|-------|----------|--------|-----------|------------------------|-----------------|
 | RR-01 | Delete `HANDOFF.md`, `STATUS_REPORT.md`; add `REPOSITORY_RECOVERY.md`; update `README.md`'s "Project status" pointer; close PR #2 unmerged; delete `docs/handoff-audit` branch (local+remote) | §4 "Obsolete or contradictory documentation"; §7 decision log | verified complete | PR #3 (`docs/repository-recovery-bootstrap`), merged as `e49c6d0` | `git status` clean (confirmed); no `HANDOFF.md`/`STATUS_REPORT.md` in tree (confirmed); `README.md` contains no dead link (confirmed); `origin/main` confirmed at `e49c6d0` immediately after the PR #3 merge (confirmed via `git ls-remote`, not a local-checkout claim); `docs/handoff-audit` and `docs/repository-recovery-bootstrap` both deleted locally and remotely (confirmed) | Scott (approved and merged) |
-| RR-00 | Classify every tracked file and generator output against current `main` into: runtime, build/install, test/tooling, vendor, documentation, intentional asset, dead, or decision-pending | Full table: `recovery-reports/00-initial-file-audit-discovery.md`, all 112 tracked files | active — report written, awaiting Scott's review | `recovery/rr-00-file-audit` | full classification present, no gaps left unaccounted for; found one new orphaned asset (`icons/chickenbutt-logo.png`) and flagged vendored `mistune`'s unused-plugin surface as decision-pending, neither previously recorded in §4 | Scott (this PR) |
+| RR-00 | Classify every tracked file and generator output against current `main` into: runtime, build/install, test/tooling, vendor, documentation, intentional asset, dead, or decision-pending | Full table: `recovery-reports/00-initial-file-audit-discovery.md` | verified complete | direct commit `774f7d6` (doc-only per §8); a since-closed PR #5 attempted to route this same report through a branch/PR and was correctly closed unmerged once it landed directly instead | Full classification of the 114-file baseline (corrected from an initially-miscounted 112) drove every later cleanup task (RR-02 through RR-14). Reconciled against current `main`'s 96-file tree: the 18-file delta is fully accounted for (`x11_sidebar.py`, `requirements-notes.txt`, 6 orphaned image assets, 10 `icons/tray/` files — every one independently confirmed removed, §4); zero untracked/unclassified new files exist beyond this recovery's own `recovery-reports/README.md`. The one still-open decision RR-00 surfaced (vendored `mistune`'s unused surface) remains open, tracked in §4 "Still open" | Scott (classification complete; the one remaining decision it raised is unresolved, not this task) |
 | RR-02 | Fold mistune-vendoring line into `DEPENDENCIES.md`; delete `requirements-notes.txt` | §4, line-by-line comparison above | verified complete | direct commit `0991fd3` (doc/text-only per §8, no PR) | grep confirmed zero remaining references to `requirements-notes.txt` before deletion; 13/15 test scripts run directly, 0 failures | Scott (recommendation pre-existed in this document; executed per Scott's 2026-07-23 instruction to proceed without further review, §7) |
 | RR-03 | Reconcile stale source documentation: `conversation_store.py`'s module docstring; `x11_sidebar.py`'s `GDK_BACKEND` comment only if that file is retained (moot if removed by RR-04); `generate-icons.py`'s module docstring describing `icons/tray/` as the live tray IconThemePath, which current runtime behavior contradicts | §4 "Stale source comments and docstrings" | verified complete | PR #12 (`recovery/rr-03-stale-docstrings`), merged as `1bae8d7`; `generate-icons.py`'s docstring already corrected in PR #10 (RR-08) | direct read confirms corrected `conversation_store.py` text matches actual behavior (`create_conversation`/`list_conversations`/`delete_conversation`/`export_dict`/`export_markdown` all verified present); `x11_sidebar.py:314` moot, file removed in PR #7 (RR-04); 13/15 test scripts run directly, 0 failures | Scott (merge) |
 | RR-04 | Remove `x11_sidebar.py`; remove its `meson.build` allowlist entry; update `test_installed_layout.py:64` | §4 "Dead or unreachable code" | verified complete | PR #7 (`recovery/rr-04-remove-x11-sidebar`), merged as `0d62ed5` | `test_installed_layout.py` updated to positively assert absence (moved to `FORBIDDEN_TOP_LEVEL`) rather than just dropping the requirement; 13/15 test scripts run directly, 0 failures; real `meson install` still pending — meson/ninja unavailable in the environment this was executed in, no passwordless sudo to install them | Scott decided "remove" was correct in principle (§4's own framing: "definitively dead, not in progress"); Claude executed under Scott's 2026-07-23 instruction to proceed without per-item confirmation (§7) — merge is the actual approval gate |
@@ -340,6 +284,7 @@ restructuring, and none is proposed — nothing found in §4 requires one.
 | RR-11 | Final repository verification | all prior tasks | blocked — depends on RR-00 through RR-10 (and RR-12, RR-13) each reaching verified-complete, explicitly-retained, or explicitly-deferred status (§7) | none yet | full test run recorded, real build/install/run, `main` synced with `origin` | verification only |
 | RR-12 | Remove `tray.py`'s dead file-based icon lookup branch inside `_load_icon_pixmap` (`if icon_theme_path:` block, ~lines 99-117) | §4 "Dead or unreachable code" listed this finding (`tray.py`'s `_load_icon_pixmap`, `tray.py:98-113`) but it was never assigned a ticket in this ledger — found and fixed while executing RR-08; added here now | verified complete | PR #11 (`recovery/rr-12-remove-tray-file-lookup`), merged as `c0962f9` | confirmed `main.py`'s only `TrayIcon` construction site passes `icon_theme_path=""`, so the branch never executes; `TrayIcon`'s public `icon_theme_path` constructor param, `self._icon_theme_path`, and the `IconThemePath` DBus property left untouched (StatusNotifierItem interface contract, not dead code); 13/15 test scripts run directly, 0 failures | Scott (merge) |
 | RR-13 | Fix `find_pkglibdir()`: its glob only searched one directory level below any `lib*` root, so it never found the installed `chickenbutt/` dir on Debian/Ubuntu's multiarch libdir layout (e.g. `lib/x86_64-linux-gnu/chickenbutt`, two levels down). Fixed in both `scripts/test_installed_layout.py` **and** `scripts/test_desktop_integration.py`, which had a separately copy-pasted duplicate of the same function with the identical bug | Newly discovered — not previously in §4. Scott ran `test_installed_layout.py`/`test_desktop_integration.py` directly against unmerged `main` on his own machine (installing meson/ninja himself) and hit this; confirmed pre-existing and unrelated to RR-04/RR-08 — fails identically on unmodified `main` | verified complete | PR #13 (`recovery/rr-13-fix-pkglibdir-multiarch`), merged as `3034dc4` | meson/ninja became available in the execution environment partway through this task (Scott installed them); real verification then performed directly: `test_installed_layout.py` → 47 passed, 0 failed; `test_desktop_integration.py` → 37 passed, 0 failed; all 13 other test scripts re-run clean — all 15/15 scripts in the documented suite genuinely pass now, not skipped | Scott (merge) |
+| RR-14 | Remove 3 dangling comment references to deleted `HANDOFF.md`: `meson.build:17`, `scripts/test_markdown_sanitization.py:276`, `scripts/test_sidebar_interactions.py:231` | §4 "Resolved during this recovery" — flagged since RR-00, never had its own ticket; surfaced again during this document's post-8-PR-batch reconciliation pass | code complete, PR open, awaiting Scott's merge | PR #14 (`recovery/rr-14-fix-dangling-handoff-comments`) | zero remaining `HANDOFF.md` references outside the expected `FORBIDDEN_TOP_LEVEL` assertion; substance of both test comments (a real timing gotcha) kept, only the dead pointer removed; all 15/15 test scripts pass for real, including a genuine meson install (47/0, 37/0) | Scott (merge) |
 
 ## 7. Decision log
 
@@ -353,6 +298,7 @@ restructuring, and none is proposed — nothing found in §4 requires one.
 | 2026-07-23 | Under the above instruction, Claude executed RR-02, RR-03, RR-05, RR-07 as written (no real decision needed — recommendation already in this document or "no decision needed" per §5/§6), and made three default judgment calls on items §4/§6 had marked as needing Scott's decision: RR-04 removed `x11_sidebar.py` (this document's own §4 already characterized it as "definitively dead, not in progress"); RR-06 removed rather than repaired the icon-fallback loop (repairing means inventing new apply-texture behavior nobody requested — feature work, out of scope while product development is paused per §1); RR-08 stopped generating and deleted the 10 `icons/tray/` files rather than wiring a real consumer (same reasoning — wiring one in is new feature work). None of these three are irreversible: each is on its own open PR (#7, #9, #10) and Scott's merge is the actual approval gate, not this log entry. This entry records that Claude made the call, not that Scott separately reviewed each one — per Ground-truth rule 7, that distinction has to be explicit rather than implied. | RR-04, RR-06, RR-08 |
 | 2026-07-23 | Added RR-12 to the ledger: `tray.py`'s dead file-based icon-lookup branch, a finding §4 already listed but which was never assigned a ticket in §6. Found and fixed while executing RR-08 (same tray-icon theme), scoped as its own PR since it's a different file/code path — not bundled into RR-08 per §8's "one bounded concern per change." | A real gap in this document's own tracking, not a new finding about the code — the dead-code evidence itself was already in §4. | RR-12 |
 | 2026-07-23 | Added RR-13: fixed `find_pkglibdir()`'s single-level-deep glob, which silently skipped a large block of `test_installed_layout.py`'s own checks on any Debian/Ubuntu multiarch libdir install. Genuinely new — not in §4 before today. Scott discovered it by actually installing meson/ninja and running the meson-dependent tests directly against unmerged `main`, something the environment executing RR-02 through RR-12 could not do (no meson, no passwordless sudo to install it). | Confirms a real local run catches things sandbox verification alone cannot. | RR-13 |
+| 2026-07-23 | After all 8 open PRs (RR-03 through RR-08, RR-12, RR-13) merged, reconciled §3 and §4 against current `main` instead of leaving them describing already-fixed problems as current. Dispositioned RR-00 as verified complete: its 114-file baseline reconciles exactly against current `main`'s 96 files (an 18-file delta, every file independently confirmed removed — no unexplained gap, no unclassified new file). Added RR-14 for 3 dangling `HANDOFF.md` comment references, found still-unresolved during this pass. | Ground-truth rule 1 (code outranks documentation) and rule 8 (this document is not itself proof a claim remains true) — §4 had drifted into describing a repository state several merges out of date. | RR-00, RR-14, §3, §4 |
 
 Disposition of `requirements-notes.txt` was a recommendation in this
 document; it is now resolved — see RR-02 above.
