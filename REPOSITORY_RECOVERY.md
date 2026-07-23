@@ -182,6 +182,13 @@ any prior document without verification.
   never touching `icons/tray/`'s chicken assets at all. The generator's
   stated purpose for that directory no longer matches what the tray
   actually shows.
+- Three dangling comment references to the now-deleted `HANDOFF.md`
+  (verified via `grep -n "HANDOFF" meson.build scripts/*.py`):
+  `meson.build:17`, `scripts/test_markdown_sanitization.py:276`,
+  `scripts/test_sidebar_interactions.py:231`. Harmless (they don't assert
+  behavior, just point at a file that's gone) but stale, and exactly the
+  kind of thing RR-00's exhaustive pass exists to catch systematically
+  rather than one at a time.
 
 ### Obsolete or contradictory documentation
 - `HANDOFF.md` — retired under this recovery (§7 decision). Verified
