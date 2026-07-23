@@ -392,9 +392,23 @@ For that second kind of change:
 - Run the relevant tests and record the actual command and actual result
   in this document's task ledger. Never state a test passed without having
   just run it in that change.
-- Update this document's task ledger and, if relevant, §4's inventory
-  *inside that same PR* — never as a separate follow-up PR whose only
-  content is a status update.
+- Update this document's task ledger and, if relevant, §4's inventory as
+  part of that PR's own commits, to record the PR's pre-merge status
+  (code complete, tests run, ready for review) — never open a *second PR*
+  later just to say the first one is done. That's two different edits at
+  two different times, and they're not handled the same way:
+  - The **pre-merge status** (what the change is, that tests were run and
+    passed) is written as a commit on the PR's own branch, alongside the
+    code change, so a reviewer sees the claim and the diff together.
+  - The **post-merge confirmation** (status flips to "verified complete",
+    the real merge commit SHA gets recorded) can only be written after the
+    merge actually happens — that SHA doesn't exist before then, so it
+    can never literally be "inside" the PR that produces it (see RR-01's
+    own ledger row: `merged as e49c6d0` was necessarily added this way).
+    This step is a markdown-only edit with no code/test/asset content, so
+    it follows the direct-to-`main` rule above: committed straight to
+    `main`, no branch, no PR. That is not "a separate follow-up PR" —
+    it is not a PR at all, which is exactly what makes it allowed.
 - No separate handoff, status, or inventory files are created. Ever, while
   this document is open.
 - No unrelated refactoring rides along with a bounded task.
