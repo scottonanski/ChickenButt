@@ -1,25 +1,33 @@
 # ChickenButt — Repository Recovery
 
-## 1. Mission and temporary status
+> **CLOSED, 2026-07-23.** Every exit condition in §9 was met and verified
+> (RR-11, commit `a042364`). This document is retained from here on only as
+> a **historical record** of what recovery found and fixed — it is no
+> longer an active status authority, and product development is no longer
+> paused. Nothing below should be read as current status; treat every
+> "blocked," "open," or "awaiting" phrasing as describing a past state, not
+> a live one. Per §10, a separate, fresh document governs product
+> development going forward — this one does not quietly become that
+> document.
 
-This temporary document governs recovery because the repository currently
-contains contradictory documentation, confirmed dead code and assets,
+## 1. Mission and temporary status (historical — recovery is closed)
+
+This temporary document governed recovery because the repository had
+contained contradictory documentation, confirmed dead code and assets,
 stale source claims, and no reliable single recovery ledger.
 
-This document is temporary. It exists only to take the repository from its
-current unreliable state to a clean, verified, maintainable baseline. It is
-not a handoff mechanism, not an architecture reference, not a product
-roadmap, not a session diary, and not a place to record stash or
-working-tree state.
+This document was temporary. It existed only to take the repository from
+its unreliable state to a clean, verified, maintainable baseline. It was
+never a handoff mechanism, an architecture reference, a product roadmap, a
+session diary, or a place to record stash or working-tree state.
 
-**Product development is paused.** No feature work, no product-facing
-change, proceeds while this document is open, unless Scott explicitly
-authorizes a specific exception in the Decision log (§7).
+**Product development was paused** for the duration of recovery — no
+longer, now that recovery is closed.
 
-When every exit condition in §9 is met, this document is closed and
-retired. A separate, permanent north-star document for product development
-will be designed afterward, from scratch — this document must not quietly
-turn into that document.
+Every exit condition in §9 was met and verified (RR-11). Per §10, a
+separate, permanent north-star document for product development is
+designed next, from scratch — this document does not quietly turn into
+that document.
 
 ## 2. Ground-truth rules
 
@@ -399,3 +407,13 @@ Once every condition in §9 is met, this document is closed and retired —
 not archived as ongoing reference, not left open "just in case." Only then
 does work begin on a separate, permanent north-star document for normal
 product development, designed fresh rather than evolved from this one.
+
+---
+
+**Closure confirmed, 2026-07-23.** Every §9 condition was checked directly
+against `main` at RR-11 (commit `a042364`) and satisfied — see RR-11's
+ledger row (§6) for the specifics. This document is now closed per the
+rule above: retained as historical record only, not archived as ongoing
+reference and not left open "just in case." A fresh, separate document
+for normal product development is designed next, starting from scratch —
+not by evolving this one.

@@ -1,16 +1,12 @@
 # Recovery Reports — Index
 
-This directory holds the detailed deliverables for individual recovery
-tasks listed in `REPOSITORY_RECOVERY.md`'s task ledger (§6).
-
-This file is an index, not a second authority. `REPOSITORY_RECOVERY.md`
-remains the only place status, decisions, and the task ledger live —
-nothing here duplicates or overrides that. If this table and
-`REPOSITORY_RECOVERY.md` ever disagree, `REPOSITORY_RECOVERY.md` is right.
+**Recovery closed 2026-07-23.** This directory holds the historical
+deliverables from the repository-recovery effort — `REPOSITORY_RECOVERY.md`
+and the individual task reports listed below. Neither this index nor
+`REPOSITORY_RECOVERY.md` is an active status authority anymore; recovery
+is finished, and product development is no longer paused. Both are kept
+as a record of what was found and fixed, not as ongoing references.
 
 | Report | Task | What it is |
 |---|---|---|
 | `00-initial-file-audit-discovery.md` | RR-00 | Full file-by-file classification of every tracked file |
-
-When a new report is added, add one row here — filename, task ID, one-line
-description. Nothing else belongs in this file.

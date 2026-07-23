@@ -116,11 +116,11 @@ python3 scripts/test_dependency_declaration.py
 
 ## Project status
 
-ChickenButt is currently in a repository-recovery phase — feature work is
-paused while known documentation, dead-code, and dead-asset debt is
-cleaned up under a verified baseline. See
+ChickenButt's repository-recovery phase is complete — the documentation,
+dead-code, and dead-asset debt that prompted it has been cleaned up under
+a verified baseline, and feature work is no longer paused. See
 [recovery-reports/REPOSITORY_RECOVERY.md](recovery-reports/REPOSITORY_RECOVERY.md)
-for the current recovery ledger and status.
+for the historical record of what recovery found and fixed.
 
 ## License
 
