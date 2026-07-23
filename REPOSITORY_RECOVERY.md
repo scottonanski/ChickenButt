@@ -339,18 +339,21 @@ authorizes RR-02.
 Two kinds of change happen while this document is open, and they are not
 handled the same way.
 
-**Plain documentation edits** — fixing a typo, correcting a stale citation,
-adding a finding to §4, updating a ledger row's status once real work has
-already landed — are edited directly on `main` and committed straight, no
-branch, no PR. Nothing in this category touches code, tests, or assets, so
-there is nothing to review. **A PR whose only content is a status/ledger
-update is not allowed** — fold that update into whichever real task's PR
-made the update true, never spin it into a separate PR afterward.
+**Any documentation or report change** — a typo fix, a stale citation
+correction, a finding added to §4, a ledger status update, a brand-new
+audit/classification report like RR-00's, an index like
+`recovery-reports/README.md` — is a `.md` file with no code/test/asset
+impact. All of it is edited directly on `main` and committed straight, no
+branch, no PR, no matter how large or how much work went into it. **The
+task number does not matter — RR-00 is not special.** If the change is a
+markdown file, it never gets a PR. **A PR whose only content is
+documentation is not allowed**, full stop.
 
-**Everything else** — any change to actual code, tests, assets,
-`meson.build`, generators, or anything RR-00 onward touches — goes through
-a branch, a PR, Scott's review, and Scott's merge, same as always. That is
-where a mistake actually costs something.
+**Everything else** — any change to actual `.py` code, tests, `meson.build`,
+icons, or other real assets — goes through a branch, a PR, Scott's review,
+and Scott's merge, same as always. That is where a mistake actually costs
+something: broken imports, broken tests, deleted files that turn out to
+matter.
 
 For that second kind of change:
 
