@@ -319,6 +319,24 @@ authorizes RR-02.
 
 ## 8. Rules for every recovery change
 
+Two kinds of change happen while this document is open, and they are not
+handled the same way.
+
+**Plain documentation edits** — fixing a typo, correcting a stale citation,
+adding a finding to §4, updating a ledger row's status once real work has
+already landed — are edited directly on `main` and committed straight, no
+branch, no PR. Nothing in this category touches code, tests, or assets, so
+there is nothing to review. **A PR whose only content is a status/ledger
+update is not allowed** — fold that update into whichever real task's PR
+made the update true, never spin it into a separate PR afterward.
+
+**Everything else** — any change to actual code, tests, assets,
+`meson.build`, generators, or anything RR-00 onward touches — goes through
+a branch, a PR, Scott's review, and Scott's merge, same as always. That is
+where a mistake actually costs something.
+
+For that second kind of change:
+
 - Branch fresh from verified current `main` — check `git log`/`git status`
   first, not from what this document assumed at authoring time.
 - One bounded concern per change. No unrelated cleanup riding along.
@@ -331,8 +349,9 @@ authorizes RR-02.
 - Run the relevant tests and record the actual command and actual result
   in this document's task ledger. Never state a test passed without having
   just run it in that change.
-- Update this document's task ledger and, if relevant, §4's inventory in
-  the *same* PR as the change — not afterward.
+- Update this document's task ledger and, if relevant, §4's inventory
+  *inside that same PR* — never as a separate follow-up PR whose only
+  content is a status update.
 - No separate handoff, status, or inventory files are created. Ever, while
   this document is open.
 - No unrelated refactoring rides along with a bounded task.
