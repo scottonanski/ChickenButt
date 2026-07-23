@@ -29,6 +29,16 @@ runtime.
 | meson >= 0.64.0 | Build system (`meson.build`); `>=0.64.0` for `install_data(..., preserve_path: true)` |
 | ninja | Meson's build backend |
 
+Optional validation tools (checked under `--build`, never fail a normal
+source build — CI should install them):
+
+| Tool | What it validates |
+|---|---|
+| `desktop-file-validate` | The installed `.desktop` entry against the Desktop Entry Specification. `scripts/test_desktop_integration.py` runs it against the real installed file when present. |
+| `appstreamcli` | The installed AppStream metainfo file. `scripts/test_desktop_integration.py` runs `appstreamcli validate` (non-strict, so only real errors fail — the intentionally-missing release/screenshot data only produces pedantic warnings) against the real installed file when present. |
+
+Fedora: `desktop-file-utils appstream`. Ubuntu: `desktop-file-utils appstream`.
+
 ## 3. Optional integration
 
 | Dependency | What it enables | What happens without it |
@@ -90,6 +100,7 @@ Optional:
 
 ```bash
 sudo dnf install gtksourceview5 gnome-shell-extension-appindicator
+sudo dnf install desktop-file-utils appstream   # validation tools, --build only
 ```
 
 ### Ubuntu 24.04 LTS or newer
@@ -106,6 +117,7 @@ Optional:
 
 ```bash
 sudo apt install gir1.2-gtksource-5 gnome-shell-extension-appindicator
+sudo apt install desktop-file-utils appstream   # validation tools, --build only
 ```
 
 ### Other distributions

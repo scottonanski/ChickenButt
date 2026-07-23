@@ -1,22 +1,31 @@
 #!/usr/bin/env python3
-"""Install ChickenButt icons for GNOME (FreeDesktop hicolor layout).
+"""Regenerate ChickenButt's tracked private icon assets (FreeDesktop hicolor
+layout) from their SVG sources. Source-asset generator only — it writes
+exclusively into the tracked project tree (icons/hicolor/, icons/tray/) and
+never touches the user's home directory or system icon caches. Commit the
+regenerated files like any other source change.
+
+The public, installed application icon is a separate concern: Meson installs
+icons/chickenbutt-dash-desktop-icon.svg directly under
+share/icons/hicolor/scalable/apps/<APP_ID>.svg at `meson install` time (see
+meson.build) and runs gtk-update-icon-cache there when available — this
+script has nothing to do with that path.
 
 Sources (in icons/):
   chickenbutt-dash-desktop-icon.svg  → app grid / window icon (full color)
   chickenbutt-light-icon.svg         → tray on dark panels (white chick)
   chickenbutt-dark-icon.svg          → tray on light panels (black chick)
 
-Installs into:
-  icons/hicolor/...          (project tree)
+Regenerates (in icons/, tracked in git):
+  icons/hicolor/...          (private project-tree mirror; see main.py's
+                               APP_DIR-relative fallback icon paths)
   icons/tray/...             (StatusNotifier IconThemePath)
-  ~/.local/share/icons/hicolor/...
 """
 
 from __future__ import annotations
 
 import os
 import shutil
-import subprocess
 import sys
 
 import gi
@@ -31,7 +40,6 @@ APP_SVG = os.path.join(ICONS, "chickenbutt-dash-desktop-icon.svg")
 TRAY_LIGHT = os.path.join(ICONS, "chickenbutt-light-icon.svg")
 TRAY_DARK = os.path.join(ICONS, "chickenbutt-dark-icon.svg")
 HICOLOR = os.path.join(ICONS, "hicolor")
-USER_HICOLOR = os.path.expanduser("~/.local/share/icons/hicolor")
 TRAY_DIR = os.path.join(ICONS, "tray")
 SIZES = [16, 22, 24, 32, 48, 64, 128, 256]
 
@@ -69,14 +77,10 @@ def main() -> int:
     scalable = os.path.join(HICOLOR, "scalable", "apps", "chickenbutt.svg")
     os.makedirs(os.path.dirname(scalable), exist_ok=True)
     shutil.copy2(APP_SVG, scalable)
-    user_svg = os.path.join(USER_HICOLOR, "scalable", "apps", "chickenbutt.svg")
-    os.makedirs(os.path.dirname(user_svg), exist_ok=True)
-    shutil.copy2(APP_SVG, user_svg)
 
     for size in SIZES:
         rel = f"{size}x{size}/apps/chickenbutt.png"
         render_svg(APP_SVG, size, os.path.join(HICOLOR, rel))
-        render_svg(APP_SVG, size, os.path.join(USER_HICOLOR, rel))
 
     print("Tray icons…")
     os.makedirs(TRAY_DIR, exist_ok=True)
@@ -104,16 +108,9 @@ def main() -> int:
     if not os.path.isfile(index):
         print("  (no index.theme - optional for project tree)")
 
-    cache = shutil.which("gtk-update-icon-cache")
-    if cache:
-        subprocess.run(
-            [cache, "-f", "-t", USER_HICOLOR],
-            check=False,
-            capture_output=True,
-        )
-        print("Updated user icon cache.")
-
-    print("Done. Desktop entry should use: Icon=chickenbutt")
+    print("Done. Regenerated tracked assets under icons/hicolor/ and icons/tray/.")
+    print("Commit the changes like any other source update.")
+    print("The public installed icon comes from meson install, not this script.")
     return 0
 
 

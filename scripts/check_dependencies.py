@@ -113,6 +113,28 @@ def check_ninja(r: Reporter) -> None:
     r.required("ninja", path is not None, path or "not found on PATH")
 
 
+def check_desktop_file_validate(r: Reporter) -> None:
+    path = shutil.which("desktop-file-validate")
+    r.optional(
+        "desktop-file-validate",
+        path is not None,
+        path or "not found — optional; validates the installed .desktop "
+        "file (scripts/test_desktop_integration.py uses it when present). "
+        "CI should install it.",
+    )
+
+
+def check_appstreamcli(r: Reporter) -> None:
+    path = shutil.which("appstreamcli")
+    r.optional(
+        "appstreamcli",
+        path is not None,
+        path or "not found — optional; validates the installed AppStream "
+        "metainfo file (scripts/test_desktop_integration.py uses it when "
+        "present). CI should install it.",
+    )
+
+
 def check_meson(r: Reporter) -> None:
     path = shutil.which("meson")
     label = f"meson >= {'.'.join(map(str, MIN_MESON))}"
@@ -158,6 +180,10 @@ def main() -> int:
         check_git(r)
         check_meson(r)
         check_ninja(r)
+
+        print("\n=== Optional validation tools (--build) ===", flush=True)
+        check_desktop_file_validate(r)
+        check_appstreamcli(r)
 
     print("\n=== Summary ===", flush=True)
     if r.failures:

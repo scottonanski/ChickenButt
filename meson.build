@@ -4,20 +4,51 @@ project('chickenbutt', meson_version: '>=0.64.0')
 # be the file's first statement, before any run_command()), and a literal
 # here would be a second, driftable copy of the same number.
 
-# Bounded installed-runtime task: a private application directory under
-# <prefix>/<libdir>/chickenbutt/, mirroring the source tree's existing
-# relative-resource layout (web/, vendor/, icons/ sit beside the Python
-# modules exactly as they do in the checkout) so transcript_view.py's
-# WEB_DIR, message_widgets.py's vendor/mistune sys.path insert, and the
-# WebKit page's ../icons/ references all keep working unmodified.
+# Private application directory under <prefix>/<libdir>/chickenbutt/,
+# mirroring the source tree's existing relative-resource layout (web/,
+# vendor/, icons/ sit beside the Python modules exactly as they do in the
+# checkout) so transcript_view.py's WEB_DIR, message_widgets.py's
+# vendor/mistune sys.path insert, and the WebKit page's ../icons/
+# references all keep working unmodified. Plus the public desktop entry,
+# AppStream metainfo and hicolor icon that let an installed ChickenButt
+# show up in the desktop application grid.
 #
-# Desktop entry / AppStream / icon-theme / Flatpak integration are
-# deliberately NOT part of this step — see HANDOFF.md.
+# Flatpak packaging, screenshot/release AppStream data and CI remain
+# separate follow-up work — see HANDOFF.md.
 
 python3 = find_program('python3')
 
 pkglibdir = get_option('prefix') / get_option('libdir') / 'chickenbutt'
 bindir = get_option('prefix') / get_option('bindir')
+datadir = get_option('prefix') / get_option('datadir')
+
+# APP_ID / APP_NAME come from release_info.py — the single source of truth
+# already established for the launcher's --version output. Do not
+# duplicate them as a second, driftable copy here.
+release_identity = run_command(
+  python3, '-c',
+  'import sys\n' +
+  'sys.path.insert(0, ".")\n' +
+  'import release_info\n' +
+  'print(release_info.APP_ID)\n' +
+  'print(release_info.APP_NAME)\n',
+  check: false,
+)
+if release_identity.returncode() != 0
+  error(
+    'meson.build: could not read APP_ID/APP_NAME from release_info.py: '
+    + release_identity.stderr()
+  )
+endif
+identity_lines = release_identity.stdout().strip().split('\n')
+if identity_lines.length() != 2 or identity_lines[0] == '' or identity_lines[1] == ''
+  error(
+    'meson.build: release_info.py did not produce both APP_ID and APP_NAME — got: '
+    + release_identity.stdout()
+  )
+endif
+app_id = identity_lines[0]
+app_name = identity_lines[1]
 
 # Explicit allowlist — do not glob *.py. In particular this keeps the
 # untracked, dev-only profiling.py (and anything else not listed here) out
@@ -82,4 +113,47 @@ configure_file(
   install: true,
   install_dir: bindir,
   install_mode: 'rwxr-xr-x',
+)
+
+# ---- Desktop integration: entry, AppStream metainfo, public icon ----
+# APP_ID-derived filenames throughout, per the desktop-entry spec (the
+# desktop filename IS the desktop-file ID) and AppStream's launchable
+# element, which must name that exact installed filename.
+identity_conf = configuration_data()
+identity_conf.set('APP_ID', app_id)
+identity_conf.set('APP_NAME', app_name)
+
+configure_file(
+  input: 'data/io.github.scottonanski.ChickenButt.desktop.in',
+  output: '@0@.desktop'.format(app_id),
+  configuration: identity_conf,
+  install: true,
+  install_dir: datadir / 'applications',
+)
+
+configure_file(
+  input: 'data/io.github.scottonanski.ChickenButt.metainfo.xml.in',
+  output: '@0@.metainfo.xml'.format(app_id),
+  configuration: identity_conf,
+  install: true,
+  install_dir: datadir / 'metainfo',
+)
+
+# Public app icon: the existing tracked SVG, installed under the app-ID
+# filename hicolor expects — no generated raster copies at install time.
+# The private icons/ runtime directory (installed above via install_subdir)
+# is untouched and unrelated; the transcript/fallback paths still use it.
+install_data(
+  'icons/chickenbutt-dash-desktop-icon.svg',
+  install_dir: datadir / 'icons/hicolor/scalable/apps',
+  rename: '@0@.svg'.format(app_id),
+)
+
+# Update the desktop database and icon cache on install/uninstall when the
+# relevant system utilities are available; this is a no-op (not an error)
+# when they aren't, e.g. inside this project's own temporary-prefix tests.
+gnome = import('gnome')
+gnome.post_install(
+  update_desktop_database: true,
+  gtk_update_icon_cache: true,
 )

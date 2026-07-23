@@ -66,8 +66,9 @@ If you seed a conversation into the DB and then construct a fresh `ChatSidebar`,
 # Optional fallback — native GTK bubble renderer
 CHICKENBUTT_TRANSCRIPT=native ./run.sh
 
-# Icons (FreeDesktop name chickenbutt, lowercase)
-python3 scripts/install-icons.py
+# Regenerate tracked source icon assets (icons/hicolor, icons/tray) —
+# source-asset generator only, never writes outside the repo tree
+python3 scripts/generate-icons.py
 
 # Regression (see "Quick health check" below for the full current list)
 python3 scripts/smoke_gui.py              # ~25 checks — expect all PASS
@@ -80,7 +81,7 @@ python3 scripts/test_ollama_health.py
 |------|--------|
 | App ID | `io.github.scottonanski.ChickenButt` (must match desktop entry) |
 | Version | `0.1.0` |
-| Desktop entry | `python3 scripts/install-desktop-entry.py` → `~/.local/share/applications/` |
+| Desktop entry | Installed by Meson from `data/*.desktop.in` → `<prefix>/share/applications/io.github.scottonanski.ChickenButt.desktop` |
 | SQLite DB | `~/.local/share/chickenbutt/conversations.db` (`CHICKENBUTT_DB` override) |
 | Settings | `~/.config/chickenbutt/settings.json` (last model only — sidebar-open state is no longer persisted; the sidebar always starts closed) |
 
@@ -120,9 +121,85 @@ meson install -C build
 
 **The installed launcher resolves `python3` from the runtime environment's own `PATH`** (`exec python3 '@PKGLIBDIR@/main.py' "$@"`), not the interpreter Meson happened to find at configure time. Meson itself is often run from a disposable build-tool venv (`find_program('python3')` in `meson.build` is only used for enumerating vendor files at configure time) — embedding `python3.full_path()` into the launcher would have permanently tied an installed ChickenButt to that venv, breaking the moment it's deleted. `scripts/test_installed_layout.py` proves this: it configures with a fake, uniquely-pathed `python3` wrapper first on `PATH`, confirms Meson actually used it, confirms it never appears anywhere in the generated launcher, deletes that fake venv entirely, and *then* confirms the installed `chickenbutt --version` still works.
 
-**Not yet done, on purpose** (separate follow-up commits): desktop entry installation via Meson, AppStream metadata, public hicolor icon-theme installation, Flatpak manifest, CI.
+**Not yet done, on purpose** (separate follow-up work): screenshot/release-history metadata in the AppStream file, a tagged 0.1.0 release, Flatpak manifest, CI.
 
 Regression: `scripts/test_installed_layout.py` — does a real `meson setup`/`meson install` into a temporary prefix and runs the installed launcher from an unrelated directory. It builds from `git write-tree` + `git archive` (what would actually be committed), not the raw working directory — the working tree can carry uncommitted profiling instrumentation in `main.py` that would otherwise install a `main.py` requiring a `profiling` module that must never ship. Skips cleanly (exit 0, clear message) if `meson` isn't on `PATH`, so it doesn't block the rest of the suite on machines without it. **CI must install `meson`/`ninja` once CI exists — this test cannot remain silently skipped there.**
+
+### Desktop integration (Meson) — app-grid entry, public icon, AppStream metadata
+
+Meson now installs the pieces needed for ChickenButt to show up as a normal
+GNOME application, not just a `chickenbutt` terminal command:
+
+```text
+<prefix>/share/applications/io.github.scottonanski.ChickenButt.desktop
+<prefix>/share/icons/hicolor/scalable/apps/io.github.scottonanski.ChickenButt.svg
+<prefix>/share/metainfo/io.github.scottonanski.ChickenButt.metainfo.xml
+```
+
+Canonical, tracked templates (Meson substitutes `@APP_ID@`/`@APP_NAME@` at
+configure time, read from `release_info.py` via the same `python3`
+`meson.build` already uses for vendor-file enumeration — configuration
+fails clearly if that read fails, so there is no second, hand-maintained
+copy of the app identity):
+
+- `data/io.github.scottonanski.ChickenButt.desktop.in` — `Exec=chickenbutt` /
+  `TryExec=chickenbutt` (unqualified — resolved via `PATH`, not baked to an
+  absolute install path), `Icon=@APP_ID@`, `StartupWMClass=@APP_ID@`,
+  `DBusActivatable=false` (no D-Bus activation was added).
+- `data/io.github.scottonanski.ChickenButt.metainfo.xml.in` — id, licenses,
+  developer, description, `<launchable type="desktop-id">`, `<provides>`
+  binary, urls, OARS content rating. Deliberately **no** `<screenshots>` or
+  `<releases>` — there is no tagged release or hosted screenshot yet, and
+  fabricating either would be worse than omitting them.
+- The public icon is the existing `icons/chickenbutt-dash-desktop-icon.svg`,
+  installed (not regenerated) under `hicolor/scalable/apps/` renamed to
+  `<APP_ID>.svg`. The private `icons/` runtime directory (used for the
+  tray and in-tree fallbacks — see "Installed runtime layout" above) is
+  untouched.
+- `meson.build` calls `import('gnome').post_install(update_desktop_database:
+  true, gtk_update_icon_cache: true)` so a real `meson install` refreshes
+  the desktop/icon caches; this is scoped to whatever prefix was installed
+  into, same as everything else here.
+- `main.py`'s window-icon calls (`set_icon_name`, the `theme.has_icon(...)`
+  check, and the fallback loop) all use `APP_ID` from `release_info` now,
+  not a literal `"chickenbutt"` string — the private-file fallback paths
+  themselves are unchanged.
+
+**Retired, on purpose:** the old clone-bound install path — the tracked
+root `io.github.scottonanski.ChickenButt.desktop` file and
+`scripts/install-desktop-entry.py` (which wrote into
+`~/.local/share/applications/` relative to wherever the repo happened to
+be cloned) are both gone. `scripts/install-icons.py` is renamed to
+**`scripts/generate-icons.py`** and is now a **source-asset generator
+only** — it may still regenerate the tracked `icons/hicolor/` and
+`icons/tray/` files from the SVG source, but every write into
+`~/.local/share/icons` and every user icon-cache update was removed; it
+must never touch `$HOME`. The public icon a user actually gets now comes
+from `meson install`, not a separate helper script run against the
+source tree.
+
+Regression: `scripts/test_desktop_integration.py` (37 checks) — same
+`git write-tree` + `git archive` clean-export pattern as
+`test_installed_layout.py` (so profiling dirt in the working tree can't
+leak into the installed files), then a real `meson setup`/`meson
+install` into a temp prefix. Verifies the desktop file's filename/
+`Exec`/`TryExec`/`Icon`/`StartupWMClass`/`DBusActivatable` and that it
+has no leaked absolute paths; runs real `desktop-file-validate` and
+`appstreamcli validate --no-net` against the installed files when those
+tools are present (optional — see `DEPENDENCIES.md`), treating only
+genuine errors as failures and explicitly surfacing (not silently
+swallowing) the expected pre-release pedantic warnings
+(`cid-contains-uppercase-letter`, `releases-info-missing`); checks the
+SVG lands at exactly `<APP_ID>.svg` with no `chickenbutt.svg` alias;
+checks the metainfo file's `<id>`, launchable, binary provider, licenses,
+developer/url/OARS elements, and that no screenshots/releases were
+fabricated; confirms `main.py` uses `APP_ID` for the window icon;
+confirms the old root `.desktop` file and `install-desktop-entry.py` are
+both absent and `generate-icons.py` has no home-directory install path;
+and re-runs `test_installed_layout.py` as a subprocess at the end to
+prove the private-runtime install still passes every one of its own
+assertions unchanged. Skips cleanly if `meson` isn't on `PATH`, same as
+`test_installed_layout.py`.
 
 ### System dependencies and reproducible installation
 
@@ -135,7 +212,7 @@ python3 scripts/check_dependencies.py --build     # also requires git/meson/ninj
 
 Stdlib-only until it starts probing; no GTK init, no window, no `DISPLAY`/`WAYLAND_DISPLAY`/D-Bus session requirement, no distro detection, no package-manager execution, no pip invocation. Regression: `scripts/test_dependency_declaration.py` (headless run, shadowed `gi`/`dasbus` modules that fail clearly, a too-old fake `meson` correctly rejected by the version gate, GtkSource/Ollama absence never fail it, README/DEPENDENCIES.md content checks).
 
-README now documents the full reproducible source-install path (`meson setup build --prefix="$HOME/.local"` → `meson install -C build` → `chickenbutt --version`), rebuilding (`meson setup --reconfigure`), uninstalling (`ninja -C build uninstall`), and running Ollama — while being explicit that desktop-entry/icon-theme/AppStream integration isn't installed by Meson yet, so the installed app is launched via `chickenbutt` from a terminal for now, not an app grid.
+README now documents the full reproducible source-install path (`meson setup build --prefix="$HOME/.local"` → `meson install -C build` → `chickenbutt --version`), rebuilding (`meson setup --reconfigure`), uninstalling (`ninja -C build uninstall`), and running Ollama — and now that the desktop entry/public icon/AppStream metadata are installed by Meson (see "Desktop integration" above), it says installed ChickenButt should appear in the GNOME app grid, while noting screenshot/release metadata and Flatpak packaging remain unfinished.
 
 ### Stuck launch / desktop spinner
 
@@ -240,7 +317,7 @@ Type in the message box and Enter:
 
 ### Branding & tray
 - Empty-state mark: tight `chickenbutt-light-icon.svg` / `dark-icon.svg` (not 1920×1080 logos).
-- Dock/app icon: FreeDesktop `chickenbutt` via `scripts/install-icons.py`.
+- Dock/app icon: FreeDesktop icon-theme name `APP_ID`, installed publicly by `meson install` (see "Desktop integration" above); `scripts/generate-icons.py` only regenerates the tracked source assets, it does not install anything.
 - **Tray / top-bar:** system **chat-bubble** symbolic + embedded IconPixmap (not the chicken).
 - Close window → hide to tray.
 
@@ -267,11 +344,12 @@ Type in the message box and Enter:
 | `x11_sidebar.py` | X11 helpers (support) |
 | `release_info.py` | Single source of truth: `APP_ID`, `APP_NAME`, `VERSION` |
 | `meson.build` | Installed runtime layout — see "Installed runtime layout" above |
+| `data/*.desktop.in`, `data/*.metainfo.xml.in` | Canonical desktop-entry/AppStream templates — see "Desktop integration" above |
 | `packaging/chickenbutt.in` | Launcher template, configured by Meson into `<prefix>/bin/chickenbutt` |
 | `scripts/check_dependencies.py` | System-dependency checker — see "System dependencies" above |
 | `DEPENDENCIES.md` | Canonical dependency list + Fedora/Ubuntu install commands |
 | `profiling.py` | Untracked. Measurement-only, no-ops unless `CHICKENBUTT_PROFILE=1` |
-| `scripts/` | install-icons, smoke_gui, feature tests, `profile_*.py` benchmark drivers (untracked) |
+| `scripts/` | generate-icons (source-asset generator only), smoke_gui, feature tests, `profile_*.py` benchmark drivers (untracked) |
 | `icons/` | Brand SVGs, hicolor, tray PNGs |
 | `STATUS_REPORT.md` | Stale mid-session snapshot — **HANDOFF.md (this file) is authoritative** |
 
@@ -300,7 +378,7 @@ Chat / composer clamp           768px (~48rem WebKit column)
 1. **Batch `wireCodeUi()` during restoration** — see "Next task" above. Bounded, already measured, ready to implement.
 2. Longer-term, only if still needed after #1: transcript virtualization or incremental history loading for very large (1000+ message) code-heavy histories.
 3. Markdown sanitization — `renderMarkdown()` pipes model output through `marked.parse()` straight into `innerHTML`, no sanitizer, no CSP. Flagged, not yet acted on. Matters more once cloud models / attachments / copied web content are in play.
-4. Installation reproducibility — largely done: a real installed runtime via Meson, a system-dependency checker (`scripts/check_dependencies.py`), a canonical dependency doc (`DEPENDENCIES.md`, with verified Fedora/Ubuntu package names), and README documents the full source-install path. Still open: no desktop entry installed by Meson, no AppStream metadata, no public icon-theme installation, no Flatpak manifest, no CI (so `test_installed_layout.py` / `test_dependency_declaration.py` aren't yet continuously exercised against a real meson/ninja install). `./run.sh` remains the source-tree dev launcher.
+4. Installation reproducibility — largely done: a real installed runtime via Meson, a desktop entry / public icon / AppStream metadata installed by Meson (see "Desktop integration" above), a system-dependency checker (`scripts/check_dependencies.py`), a canonical dependency doc (`DEPENDENCIES.md`, with verified Fedora/Ubuntu package names), and README documents the full source-install path. Still open: no screenshot/release-history metadata in the AppStream file, no tagged release, no Flatpak manifest, no CI (so `test_installed_layout.py` / `test_desktop_integration.py` / `test_dependency_declaration.py` aren't yet continuously exercised against a real meson/ninja install). `./run.sh` remains the source-tree dev launcher.
 5. `STATUS_REPORT.md` vs this file — this file is authoritative; `STATUS_REPORT.md` is a stale mid-session snapshot. Consider deleting it rather than maintaining two.
 
 ### Product work (resume once the above is settled)
@@ -344,7 +422,7 @@ Ordered roughly by value:
 - Empty conversations must not clutter Recent (respect prune rules).  
 - **Pull via HTTP API only** — never dump raw CLI ANSI into the transcript.  
 - Icon art: **tight square** SVGs; avoid huge padded artboards for UI marks.  
-- After icon changes: `python3 scripts/install-icons.py` and fully quit/restart for tray.  
+- After icon changes: `python3 scripts/generate-icons.py` to regenerate tracked source assets, then fully quit/restart for tray. The public app-grid/dock icon comes from `meson install` (see "Desktop integration" above), not from this script.
 - Extend `scripts/smoke_gui.py` / feature tests when changing load/history/health/commands.  
 - This **HANDOFF.md** is the authoritative status snapshot for handoff.
 - **Commit discipline established this session, keep following it:** single-purpose commits. When a fix and an unrelated cleanup/test-stability change land in the same working-tree session, split them (see `406df07` pulled out of `62b207d`, or how `81f666c` was built from `git show HEAD:web/app.js` + just the fix lines to keep uncommitted profiling instrumentation out of it). Don't commit or push without being asked each time, even after doing so earlier in the same session.
@@ -375,10 +453,11 @@ python3 scripts/test_wire_code_ui_batch.py           # 8 checks — restore wire
 python3 scripts/test_markdown_sanitization.py        # 84 checks — DOMPurify sanitization boundary
 python3 scripts/test_web_navigation_policy.py        # 56 checks — WebKit decide-policy confinement
 python3 scripts/test_web_content_security_policy.py  # 53 checks — transcript CSP
-python3 scripts/test_release_identity.py             # 15 checks — APP_ID/desktop-entry/version consistency
+python3 scripts/test_release_identity.py             # 8 checks — APP_ID/version consistency, old desktop-install path retired
 python3 scripts/test_sidebar_interactions.py         # 37 checks — pointer cursor, model selector, sidebar state
 python3 scripts/test_installed_layout.py             # 47 checks — real `meson install`; skips if meson isn't on PATH
-python3 scripts/test_dependency_declaration.py       # 42 checks — check_dependencies.py + doc content
+python3 scripts/test_desktop_integration.py          # 37 checks — real `meson install`; desktop entry/icon/AppStream; skips if meson isn't on PATH
+python3 scripts/test_dependency_declaration.py       # 50 checks — check_dependencies.py + doc content
 
 ./run.sh --version   # → "ChickenButt 0.1.0", no window
 python3 scripts/check_dependencies.py                # → all required deps satisfied
