@@ -6,9 +6,10 @@ implementation on their own. Do not create competing status, handoff, or
 roadmap files — update this document instead.
 
 Status as of 2026-07-23: **research complete through ten review rounds;
-implementation has begun.** Phase 1 is merged and verified. It added
-characterization tests only; no application code has changed. Unstarted
-phases remain proposals until work begins on their bounded phase branch.
+implementation has begun.** Phases 1 and 2 are merged and verified:
+settings behavior is characterized and its implementation now lives in
+`app_settings.py` behind compatible `window` delegators. Unstarted phases
+remain proposals until work begins on their bounded phase branch.
 
 The phase plan below has gone through ten review rounds. Rounds 1-7
 were Codex/ChatGPT reviews against the actual source, independently
@@ -135,8 +136,8 @@ branches; and Phase 25 omitted buffer/transcript ordering in `_send`.
 implementation sequence below: standalone characterization before every
 extraction, exact behavior preservation, explicit ownership/interfaces,
 and staged migrations governed by a general invariant where immediate
-cutover is not possible. Phase 1 is complete. The remaining phase rows
-stay proposals until started, and the combined result receives a
+cutover is not possible. Phases 1 and 2 are complete. The remaining phase
+rows stay proposals until started, and the combined result receives a
 comprehensive audit after all phases are complete.
 
 ## Objective
@@ -194,7 +195,7 @@ extraction phase has its own standalone characterization phase
 immediately before it — no bundled exceptions, **26 phases in 13
 test/extract pairs** (the transcript-adapter phase pair from round 6 is
 now three pairs, per round 7's finding that it was itself oversized).
-Phase 1 is complete. Unstarted rows remain proposals that Scott may
+Phases 1 and 2 are complete. Unstarted rows remain proposals that Scott may
 approve, reorder, split, or reject. He may also choose to merge a test
 phase and its following extraction phase into one reviewed PR where the
 combined diff stays small (see audit §7 closing note) — that is a
@@ -221,8 +222,8 @@ consumers.
 
 | # | Phase | Depends on | Risk | Status |
 |---|---|---|---|---|
-| 1 | **Completed 2026-07-23** — Settings characterization (test-only), [PR #16](https://github.com/scottonanski/ChickenButt/pull/16), merge `fae375b748814c657615b616cdcd9d4c3bb27119`. Actual scope: 22 settings assertions added to `scripts/test_sidebar_interactions.py`; no production-code changes. Verification: targeted test 59/0; all 15 documented scripts passed locally, including Meson-backed 47/0 and 37/0 checks with no skips; exact-head PR `Tests` CI and synchronized-`main` [CI run 30069334589](https://github.com/scottonanski/ChickenButt/actions/runs/30069334589) passed. Preserved guarantee: current settings read/write-failure handling, last-model load/save whitespace and no-op semantics, and startup-model exact/soft/fallback selection are locked before extraction. Remaining dependency: Phase 2 is unstarted. No scope deviation; Scott authorized the single-Codex per-phase review workflow with a comprehensive audit after all phases. | — | n/a | Completed |
-| 2 | Settings extraction (group A subset) → own module | Phase 1 | Negligible | Not yet |
+| 1 | **Completed 2026-07-23** — Settings characterization (test-only), [PR #16](https://github.com/scottonanski/ChickenButt/pull/16), merge `fae375b748814c657615b616cdcd9d4c3bb27119`. Actual scope: 22 settings assertions added to `scripts/test_sidebar_interactions.py`; no production-code changes. Verification: targeted test 59/0; all 15 documented scripts passed locally, including Meson-backed 47/0 and 37/0 checks with no skips; exact-head PR `Tests` CI and synchronized-`main` [CI run 30069334589](https://github.com/scottonanski/ChickenButt/actions/runs/30069334589) passed. Preserved guarantee: current settings read/write-failure handling, last-model load/save whitespace and no-op semantics, and startup-model exact/soft/fallback selection were locked before extraction. Its Phase 2 dependency is complete. No scope deviation; Scott authorized the single-Codex per-phase review workflow with a comprehensive audit after all phases. | — | n/a | Completed |
+| 2 | **Completed 2026-07-23** — Settings extraction, [PR #17](https://github.com/scottonanski/ChickenButt/pull/17), merge `0bf6ad9b16a0913a4dd598790c835ec66a57b5b5`. Actual scope: moved the five settings helpers into new runtime module `app_settings.py`; retained thin `window.py` compatibility delegators and path injection; added the module to `meson.build` and the installed-layout import check. Verification: Python compilation and diff checks passed; unchanged Phase 1 characterization passed 59/0; all 15 documented scripts passed in both implementation and review runs, including Meson-backed 48/0 and 37/0 checks with no skips; exact-head [PR CI run 30070001028](https://github.com/scottonanski/ChickenButt/actions/runs/30070001028) and synchronized-`main` [CI run 30070222489](https://github.com/scottonanski/ChickenButt/actions/runs/30070222489) passed. Preserved guarantee: settings read/write failures, last-model persistence/no-ops, startup exact/soft/fallback selection, imports from `window`, and installed runtime behavior remain unchanged. Remaining compatibility: the intentional `window` delegators and `_SETTINGS_DIR`/`_SETTINGS_PATH` path seam remain for existing callers and Phase 1 isolation. No scope deviation. | Phase 1 | Negligible | Completed |
 | 3 | Composer geometry characterization (test-only) — full scope of Phase 4's move: sizing, char-cap truncation, placeholder visibility, scrollbar-policy transitions, the alignment-callback interaction, **surface-layout hook retry/idempotence/immediate reapply/layout-event behavior, and line/content/window-size fallbacks** | — | n/a | Not yet |
 | 4 | Composer geometry/character-cap extraction *only* — explicit interface for `_placeholder` injection, `_composer_truncating`/`_composer_layout_hooked` ownership, the alignment callback, and **narrow surface/height/default-size providers**; explicitly rewires the initial height application plus buffer `changed`/`insert-text` and window `realize`/`map` connections | Phase 3 | Low | Not yet |
 | 5 | Export characterization (test-only) — both formats, format normalization/fallback, basename/title fallback, missing-conversation no-op, dialog cancellation/non-cancellation errors, `None` file/missing-path no-ops, successful UTF-8 write, and write-failure logging/dialog behavior | — | n/a | Not yet |
