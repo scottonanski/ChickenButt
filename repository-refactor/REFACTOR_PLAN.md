@@ -5,10 +5,10 @@ reports under `research/` provide evidence; they do not authorize
 implementation on their own. Do not create competing status, handoff, or
 roadmap files — update this document instead.
 
-Status as of 2026-07-23: **research complete, through ten rounds of
-cross-review, awaiting Scott's decision.** No application code has been
-changed. Nothing below is authorized to start until Scott approves it
-explicitly.
+Status as of 2026-07-23: **research complete through ten review rounds;
+implementation has begun.** Phase 1 is merged and verified. It added
+characterization tests only; no application code has changed. Unstarted
+phases remain proposals until work begins on their bounded phase branch.
 
 The phase plan below has gone through ten review rounds. Rounds 1-7
 were Codex/ChatGPT reviews against the actual source, independently
@@ -131,16 +131,13 @@ Phase 21 did not fully characterize the lifecycle helpers Phase 22 moves;
 Phases 22, 24, and 26 omitted inbound caller/delegator lifecycles; Phase
 23 did not enumerate all eight moved message-action methods and their
 branches; and Phase 25 omitted buffer/transcript ordering in `_send`.
-**What's actually agreed right now:** the findings from all ten rounds,
-and the general direction (standalone characterization phase before
-every extraction with no exceptions, exact behavior preservation with
-nothing folded into an extraction phase, explicit ownership/interfaces,
-and staged migrations governed by a general invariant where an immediate
-cutover isn't possible).
-**What's not yet locked:** the precise phase table is now on its tenth
-revision and may see further changes if another review pass finds
-something; treat it as the current best draft, not a settled agreement,
-until it survives a review round with no further findings.
+**What's agreed:** the findings from all ten rounds and the 26-phase
+implementation sequence below: standalone characterization before every
+extraction, exact behavior preservation, explicit ownership/interfaces,
+and staged migrations governed by a general invariant where immediate
+cutover is not possible. Phase 1 is complete. The remaining phase rows
+stay proposals until started, and the combined result receives a
+comprehensive audit after all phases are complete.
 
 ## Objective
 
@@ -177,17 +174,19 @@ Documentation-only audit findings and plan corrections do not require a
 PR. After their factual basis and diff are checked, they may be committed
 directly to `main` with Scott's authorization.
 
-For each implementation phase, one person is implementer and another is
-independent reviewer; roles can switch between phases. Never both edit
-the same branch at once. The reviewer inspects the actual diff and reruns
-the tests themselves — a clean review does not itself authorize a merge.
-Every implementation merge decision is presented to Scott (reviewed head
-SHA, test results, risks, recommendation) and requires his explicit
-go-ahead.
+Use one short-lived branch and one PR per phase, created sequentially from
+the clean, synchronized `main` produced by the preceding phase. A single
+Codex working session may implement and review that phase. Its explicit
+review must inspect the actual diff and rerun the required tests; exact-head
+GitHub Actions must also pass. A clean review does not itself authorize a
+merge: Scott must authorize the phase merge, either specifically or through
+advance conditional authorization. After all phases are complete, perform
+a comprehensive audit of the combined refactor and resolve any findings in
+new bounded PRs.
 
 ---
 
-## Proposed phase sequence (from `research/00-window-audit.md` §7, round 10)
+## Phase sequence (from `research/00-window-audit.md` §7, round 10)
 
 Ordered lowest-coupling/highest-existing-coverage first so the extraction
 pattern is proven before it's applied to the most entangled groups. Every
@@ -195,12 +194,11 @@ extraction phase has its own standalone characterization phase
 immediately before it — no bundled exceptions, **26 phases in 13
 test/extract pairs** (the transcript-adapter phase pair from round 6 is
 now three pairs, per round 7's finding that it was itself oversized).
-None of these are approved yet — this table exists so Scott can approve,
-reorder, split, or reject phases individually; he may also choose to
-merge a test phase and its following extraction phase into one reviewed
-PR at approval time where the combined diff stays small (see audit §7
-closing note) — that's a PR-packaging choice, not a change to whether the
-test must exist first.
+Phase 1 is complete. Unstarted rows remain proposals that Scott may
+approve, reorder, split, or reject. He may also choose to merge a test
+phase and its following extraction phase into one reviewed PR where the
+combined diff stays small (see audit §7 closing note) — that is a
+PR-packaging choice, not a change to whether the test must exist first.
 
 **"Depends on" lists ordering/interface prerequisites, not every
 collaborator a phase's code calls** — `_send` (Phase 26) alone touches
@@ -221,9 +219,9 @@ removed only after a direct-reference inventory across the *whole file*
 — not just the phases assumed to touch it — proves zero remaining
 consumers.
 
-| # | Phase | Depends on | Risk | Approved? |
+| # | Phase | Depends on | Risk | Status |
 |---|---|---|---|---|
-| 1 | Settings characterization (test-only) — covers *every* moved behavior: read/write-failure handling, `_load_last_model`, `_save_last_model` whitespace/no-op, `_pick_startup_model` | — | n/a | Not yet |
+| 1 | **Completed 2026-07-23** — Settings characterization (test-only), [PR #16](https://github.com/scottonanski/ChickenButt/pull/16), merge `fae375b748814c657615b616cdcd9d4c3bb27119`. Actual scope: 22 settings assertions added to `scripts/test_sidebar_interactions.py`; no production-code changes. Verification: targeted test 59/0; all 15 documented scripts passed locally, including Meson-backed 47/0 and 37/0 checks with no skips; exact-head PR `Tests` CI and synchronized-`main` [CI run 30069334589](https://github.com/scottonanski/ChickenButt/actions/runs/30069334589) passed. Preserved guarantee: current settings read/write-failure handling, last-model load/save whitespace and no-op semantics, and startup-model exact/soft/fallback selection are locked before extraction. Remaining dependency: Phase 2 is unstarted. No scope deviation; Scott authorized the single-Codex per-phase review workflow with a comprehensive audit after all phases. | — | n/a | Completed |
 | 2 | Settings extraction (group A subset) → own module | Phase 1 | Negligible | Not yet |
 | 3 | Composer geometry characterization (test-only) — full scope of Phase 4's move: sizing, char-cap truncation, placeholder visibility, scrollbar-policy transitions, the alignment-callback interaction, **surface-layout hook retry/idempotence/immediate reapply/layout-event behavior, and line/content/window-size fallbacks** | — | n/a | Not yet |
 | 4 | Composer geometry/character-cap extraction *only* — explicit interface for `_placeholder` injection, `_composer_truncating`/`_composer_layout_hooked` ownership, the alignment callback, and **narrow surface/height/default-size providers**; explicitly rewires the initial height application plus buffer `changed`/`insert-text` and window `realize`/`map` connections | Phase 3 | Low | Not yet |
