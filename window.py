@@ -19,6 +19,7 @@ gi.require_version("Gdk", "4.0")
 
 from gi.repository import Adw, Gdk, Gio, GLib, Gtk, Pango
 
+import app_settings as _app_settings
 from conversation_store import ConversationStore
 from message_widgets import MessageBody, ensure_md_css
 from ollama_client import OllamaClient, OllamaError
@@ -49,61 +50,31 @@ COMPOSER_CHAR_LIMIT = 64_000
 COMPOSER_COUNTER_SHOW_RATIO = 0.85
 
 # Prefer last successfully loaded model on next launch
-_SETTINGS_DIR = Path(GLib.get_user_config_dir()) / "chickenbutt"
-_SETTINGS_PATH = _SETTINGS_DIR / "settings.json"
+_SETTINGS_DIR = _app_settings._SETTINGS_DIR
+_SETTINGS_PATH = _app_settings._SETTINGS_PATH
 
 
 def _read_settings() -> dict:
-    try:
-        if _SETTINGS_PATH.is_file():
-            data = json.loads(_SETTINGS_PATH.read_text(encoding="utf-8"))
-            if isinstance(data, dict):
-                return data
-    except (OSError, json.JSONDecodeError, TypeError):
-        pass
-    return {}
+    """Compatibility delegator for callers importing this helper from window."""
+    return _app_settings._read_settings(_SETTINGS_PATH)
 
 
 def _write_settings(data: dict) -> None:
-    try:
-        _SETTINGS_DIR.mkdir(parents=True, exist_ok=True)
-        _SETTINGS_PATH.write_text(
-            json.dumps(data, indent=2, ensure_ascii=False) + "\n",
-            encoding="utf-8",
-        )
-    except OSError as exc:
-        print(f"settings save failed: {exc}", flush=True)
+    """Compatibility delegator for callers importing this helper from window."""
+    _app_settings._write_settings(data, _SETTINGS_DIR, _SETTINGS_PATH)
 
 
 def _load_last_model() -> str | None:
-    name = _read_settings().get("last_model")
-    return name if isinstance(name, str) and name.strip() else None
+    """Compatibility delegator for callers importing this helper from window."""
+    return _app_settings._load_last_model(_SETTINGS_PATH)
 
 
 def _save_last_model(model: str) -> None:
-    if not model or not model.strip():
-        return
-    data = _read_settings()
-    if data.get("last_model") == model:
-        return
-    data["last_model"] = model
-    _write_settings(data)
+    """Compatibility delegator for callers importing this helper from window."""
+    _app_settings._save_last_model(model, _SETTINGS_DIR, _SETTINGS_PATH)
 
 
-
-def _pick_startup_model(models: list[str], preferred: str | None) -> int:
-    """Index of last-loaded model if still installed; else 0."""
-    if not models:
-        return 0
-    if preferred and preferred in models:
-        return models.index(preferred)
-    # Soft match: same base name (e.g. tag drift :latest vs :8b)
-    if preferred:
-        base = preferred.split(":")[0]
-        for i, name in enumerate(models):
-            if name == preferred or name.split(":")[0] == base:
-                return i
-    return 0
+_pick_startup_model = _app_settings._pick_startup_model
 
 
 def _transcript_mode() -> str:
