@@ -985,6 +985,463 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
     )
 
 
+def characterize_export(results: Results, tmp: Path) -> None:
+    """Lock down the complete Phase-6 export extraction surface."""
+    print("\n[0c] Export characterization", flush=True)
+
+    class Conversation:
+        def __init__(self, title: str) -> None:
+            self.title = title
+
+    class Message:
+        def __init__(self, role: str, content: str) -> None:
+            self.role = role
+            self.content = content
+
+    class TitleStore:
+        def __init__(
+            self,
+            *,
+            title: str = "",
+            messages: list[Message] | None = None,
+            fail: bool = False,
+        ) -> None:
+            self.title = title
+            self.messages = messages or []
+            self.fail = fail
+
+        def get_conversation(self, _conversation_id: str):
+            if self.fail:
+                raise RuntimeError("forced title-store failure")
+            return Conversation(self.title)
+
+        def list_messages(self, _conversation_id: str) -> list[Message]:
+            return self.messages
+
+    stored_title_owner = type(
+        "StoredTitleOwner",
+        (),
+        {
+            "_store": TitleStore(title="  Stored title  "),
+            "_conversation_id": "other",
+            "_messages": [],
+        },
+    )()
+    results.check(
+        "display title prefers and trims the stored conversation title",
+        ChatSidebar._conversation_display_title(stored_title_owner, "conv")
+        == "Stored title",
+    )
+
+    excerpt = "x" * 90 + "\nignored second line"
+    stored_excerpt_owner = type(
+        "StoredExcerptOwner",
+        (),
+        {
+            "_store": TitleStore(
+                messages=[
+                    Message("assistant", "ignored"),
+                    Message("user", "   "),
+                    Message("user", f"  {excerpt}  "),
+                ]
+            ),
+            "_conversation_id": "other",
+            "_messages": [],
+        },
+    )()
+    results.check(
+        "display title falls back to the first stored user-message line at 80 chars",
+        ChatSidebar._conversation_display_title(stored_excerpt_owner, "conv")
+        == "x" * 80,
+    )
+
+    active_fallback_owner = type(
+        "ActiveFallbackOwner",
+        (),
+        {
+            "_store": TitleStore(fail=True),
+            "_conversation_id": "active",
+            "_messages": [
+                {"role": "assistant", "content": "ignored"},
+                {"role": "user", "content": "  Active fallback\nsecond line  "},
+            ],
+        },
+    )()
+    results.check(
+        "display title falls back to the active in-memory user message",
+        ChatSidebar._conversation_display_title(active_fallback_owner, "active")
+        == "Active fallback",
+    )
+    results.check(
+        "display title uses the generic fallback for missing inactive conversations",
+        ChatSidebar._conversation_display_title(active_fallback_owner, "missing")
+        == "this chat",
+    )
+
+    class BasenameOwner:
+        def __init__(self, title: str) -> None:
+            self.title = title
+
+        def _conversation_display_title(self, _conversation_id: str) -> str:
+            return self.title
+
+    results.check(
+        "export basename replaces punctuation and collapses whitespace",
+        ChatSidebar._safe_export_basename(
+            BasenameOwner("  Alpha/Beta: test?  "),
+            "conv",
+        )
+        == "chickenbutt-Alpha-Beta--test",
+    )
+    results.check(
+        "export basename maps generic and punctuation-only titles to chat",
+        ChatSidebar._safe_export_basename(BasenameOwner("this chat"), "conv")
+        == "chickenbutt-chat"
+        and ChatSidebar._safe_export_basename(BasenameOwner("///"), "conv")
+        == "chickenbutt-chat",
+    )
+    long_basename = ChatSidebar._safe_export_basename(
+        BasenameOwner("a" * 60),
+        "conv",
+    )
+    results.check(
+        "export basename truncates the sanitized title to 48 characters",
+        long_basename == f"chickenbutt-{'a' * 48}",
+    )
+
+    class FakeStore:
+        def __init__(
+            self,
+            *,
+            json_payload: dict | None = None,
+            markdown_body: str | None = None,
+        ) -> None:
+            self.json_payload = json_payload
+            self.markdown_body = markdown_body
+            self.calls: list[tuple[str, str]] = []
+
+        def export_dict(self, conversation_id: str) -> dict | None:
+            self.calls.append(("json", conversation_id))
+            return self.json_payload
+
+        def export_markdown(self, conversation_id: str) -> str | None:
+            self.calls.append(("md", conversation_id))
+            return self.markdown_body
+
+    class FakeFile:
+        def __init__(self, path: str | None) -> None:
+            self.path = path
+
+        def get_path(self) -> str | None:
+            return self.path
+
+    class FakeSaveResult:
+        def __init__(
+            self,
+            *,
+            file: FakeFile | None = None,
+            error: GLib.Error | None = None,
+        ) -> None:
+            self.file = file
+            self.error = error
+
+    class FakeFileFilter:
+        def __init__(self) -> None:
+            self.name = ""
+            self.patterns: list[str] = []
+            self.mime_types: list[str] = []
+
+        def set_name(self, name: str) -> None:
+            self.name = name
+
+        def add_pattern(self, pattern: str) -> None:
+            self.patterns.append(pattern)
+
+        def add_mime_type(self, mime_type: str) -> None:
+            self.mime_types.append(mime_type)
+
+    class FakeListStore(list):
+        @classmethod
+        def new(cls, _item_type):
+            return cls()
+
+        def append(self, item) -> None:
+            super().append(item)
+
+    class FakeFileDialog:
+        instances: list["FakeFileDialog"] = []
+
+        def __init__(self) -> None:
+            self.title = ""
+            self.initial_name = ""
+            self.filters = None
+            self.default_filter = None
+            self.parent = None
+            self.cancellable = "unset"
+            self.callback = None
+            self.__class__.instances.append(self)
+
+        def set_title(self, title: str) -> None:
+            self.title = title
+
+        def set_initial_name(self, name: str) -> None:
+            self.initial_name = name
+
+        def set_filters(self, filters) -> None:
+            self.filters = filters
+
+        def set_default_filter(self, filt) -> None:
+            self.default_filter = filt
+
+        def save(self, parent, cancellable, callback) -> None:
+            self.parent = parent
+            self.cancellable = cancellable
+            self.callback = callback
+
+        def save_finish(self, result: FakeSaveResult) -> FakeFile | None:
+            if result.error is not None:
+                raise result.error
+            return result.file
+
+    class FakeMessageDialog:
+        instances: list["FakeMessageDialog"] = []
+
+        def __init__(self, *, transient_for, heading: str, body: str) -> None:
+            self.transient_for = transient_for
+            self.heading = heading
+            self.body = body
+            self.responses: list[tuple[str, str]] = []
+            self.presented = False
+            self.__class__.instances.append(self)
+
+        def add_response(self, response_id: str, label: str) -> None:
+            self.responses.append((response_id, label))
+
+        def present(self) -> None:
+            self.presented = True
+
+    class FakeGtk:
+        FileDialog = FakeFileDialog
+        FileFilter = FakeFileFilter
+
+    class FakeGio:
+        ListStore = FakeListStore
+        IOErrorEnum = Gio.IOErrorEnum
+        io_error_quark = staticmethod(Gio.io_error_quark)
+
+    class FakeAdw:
+        MessageDialog = FakeMessageDialog
+
+    class ExportOwner:
+        def __init__(self, store: FakeStore) -> None:
+            self._store = store
+
+        def _safe_export_basename(self, _conversation_id: str) -> str:
+            return "chickenbutt-fixture"
+
+    def start_export(fmt, store: FakeStore):
+        owner = ExportOwner(store)
+        stdout = io.StringIO()
+        with contextlib.redirect_stdout(stdout):
+            ChatSidebar.export_conversation(owner, "conv-id", fmt)
+        dialog = (
+            FakeFileDialog.instances[-1]
+            if FakeFileDialog.instances
+            and FakeFileDialog.instances[-1].parent is owner
+            else None
+        )
+        return owner, dialog, stdout.getvalue()
+
+    original_gtk = window_module.Gtk
+    original_gio = window_module.Gio
+    original_adw = window_module.Adw
+    window_module.Gtk = FakeGtk
+    window_module.Gio = FakeGio
+    window_module.Adw = FakeAdw
+    try:
+        json_store = FakeStore(json_payload={"title": "café", "mark": "✓"})
+        json_owner, json_dialog, json_output = start_export(".JSON", json_store)
+        json_filter = json_dialog.default_filter
+        results.check(
+            "JSON format normalization configures its filename, filter, and dialog",
+            json_store.calls == [("json", "conv-id")]
+            and json_dialog.title == "Export chat"
+            and json_dialog.initial_name == "chickenbutt-fixture.json"
+            and json_filter.name == "JSON"
+            and json_filter.patterns == ["*.json"]
+            and json_filter.mime_types == ["application/json"]
+            and json_dialog.filters == [json_filter]
+            and json_dialog.parent is json_owner
+            and json_dialog.cancellable is None
+            and callable(json_dialog.callback)
+            and json_output == "",
+        )
+
+        markdown_store = FakeStore(markdown_body="# Héllo ✓\n")
+        markdown_owner, markdown_dialog, _ = start_export(
+            "markdown",
+            markdown_store,
+        )
+        markdown_filter = markdown_dialog.default_filter
+        results.check(
+            "Markdown alias configures its filename, filter, and dialog",
+            markdown_store.calls == [("md", "conv-id")]
+            and markdown_dialog.initial_name == "chickenbutt-fixture.md"
+            and markdown_filter.name == "Markdown"
+            and markdown_filter.patterns == ["*.md"]
+            and markdown_filter.mime_types == ["text/markdown"],
+        )
+
+        unsupported_store = FakeStore(markdown_body="fallback\n")
+        _, unsupported_dialog, _ = start_export("pdf", unsupported_store)
+        none_store = FakeStore(markdown_body="default\n")
+        _, none_dialog, _ = start_export(None, none_store)
+        whitespace_store = FakeStore(markdown_body="whitespace fallback\n")
+        _, whitespace_dialog, _ = start_export(" JSON ", whitespace_store)
+        results.check(
+            "unsupported, empty, and whitespace-padded formats fall back to Markdown",
+            unsupported_store.calls == [("md", "conv-id")]
+            and unsupported_dialog.initial_name.endswith(".md")
+            and none_store.calls == [("md", "conv-id")]
+            and none_dialog.initial_name.endswith(".md")
+            and whitespace_store.calls == [("md", "conv-id")]
+            and whitespace_dialog.initial_name.endswith(".md"),
+        )
+
+        dialog_count = len(FakeFileDialog.instances)
+        missing_json = FakeStore(json_payload=None)
+        missing_md = FakeStore(markdown_body=None)
+        missing_output = io.StringIO()
+        with contextlib.redirect_stdout(missing_output):
+            ChatSidebar.export_conversation(
+                ExportOwner(missing_json),
+                "missing-json",
+                "json",
+            )
+            ChatSidebar.export_conversation(
+                ExportOwner(missing_md),
+                "missing-md",
+                "md",
+            )
+        results.check(
+            "missing conversations log and return before opening a dialog",
+            missing_json.calls == [("json", "missing-json")]
+            and missing_md.calls == [("md", "missing-md")]
+            and len(FakeFileDialog.instances) == dialog_count
+            and missing_output.getvalue().count(
+                "export: conversation not found\n"
+            )
+            == 2,
+        )
+
+        cancelled = GLib.Error.new_literal(
+            Gio.io_error_quark(),
+            "cancelled",
+            Gio.IOErrorEnum.CANCELLED,
+        )
+        callback_output = io.StringIO()
+        with contextlib.redirect_stdout(callback_output):
+            markdown_dialog.callback(
+                markdown_dialog,
+                FakeSaveResult(error=cancelled),
+            )
+        results.check(
+            "dialog cancellation is a silent no-op",
+            callback_output.getvalue() == ""
+            and FakeMessageDialog.instances == [],
+        )
+
+        dialog_error = GLib.Error.new_literal(
+            Gio.io_error_quark(),
+            "forced dialog failure",
+            Gio.IOErrorEnum.FAILED,
+        )
+        callback_output = io.StringIO()
+        with contextlib.redirect_stdout(callback_output):
+            markdown_dialog.callback(
+                markdown_dialog,
+                FakeSaveResult(error=dialog_error),
+            )
+        results.check(
+            "non-cancellation dialog errors are logged without a write attempt",
+            callback_output.getvalue().startswith("export dialog:")
+            and "forced dialog failure" in callback_output.getvalue()
+            and FakeMessageDialog.instances == [],
+        )
+
+        callback_output = io.StringIO()
+        with contextlib.redirect_stdout(callback_output):
+            markdown_dialog.callback(
+                markdown_dialog,
+                FakeSaveResult(file=None),
+            )
+        results.check(
+            "a None file result is a silent no-op",
+            callback_output.getvalue() == "",
+        )
+
+        callback_output = io.StringIO()
+        with contextlib.redirect_stdout(callback_output):
+            markdown_dialog.callback(
+                markdown_dialog,
+                FakeSaveResult(file=FakeFile(None)),
+            )
+        results.check(
+            "a file without a local path logs and returns",
+            callback_output.getvalue() == "export: no path\n",
+        )
+
+        json_path = tmp / "phase5-export.json"
+        callback_output = io.StringIO()
+        with contextlib.redirect_stdout(callback_output):
+            json_dialog.callback(
+                json_dialog,
+                FakeSaveResult(file=FakeFile(str(json_path))),
+            )
+        results.check(
+            "successful JSON export writes indented UTF-8 with a trailing newline",
+            json_path.read_text(encoding="utf-8")
+            == '{\n  "title": "café",\n  "mark": "✓"\n}\n'
+            and callback_output.getvalue()
+            == f"Exported json → {json_path}\n",
+        )
+
+        markdown_path = tmp / "phase5-export.md"
+        callback_output = io.StringIO()
+        with contextlib.redirect_stdout(callback_output):
+            markdown_dialog.callback(
+                markdown_dialog,
+                FakeSaveResult(file=FakeFile(str(markdown_path))),
+            )
+        results.check(
+            "successful Markdown export writes its UTF-8 body unchanged",
+            markdown_path.read_text(encoding="utf-8") == "# Héllo ✓\n"
+            and callback_output.getvalue()
+            == f"Exported md → {markdown_path}\n",
+        )
+
+        callback_output = io.StringIO()
+        with contextlib.redirect_stdout(callback_output):
+            markdown_dialog.callback(
+                markdown_dialog,
+                FakeSaveResult(file=FakeFile(str(tmp))),
+            )
+        error_dialog = FakeMessageDialog.instances[-1]
+        results.check(
+            "write failures are logged and shown in a user-visible error dialog",
+            "export write failed:" in callback_output.getvalue()
+            and error_dialog.transient_for is markdown_owner
+            and error_dialog.heading == "Export failed"
+            and error_dialog.body
+            and error_dialog.responses == [("ok", "OK")]
+            and error_dialog.presented is True,
+        )
+    finally:
+        window_module.Gtk = original_gtk
+        window_module.Gio = original_gio
+        window_module.Adw = original_adw
+
+
 def main() -> int:
     results = Results()
 
@@ -1023,6 +1480,7 @@ def main() -> int:
     assert win is not None
     pump(0.5)
     characterize_composer_geometry(results, win)
+    characterize_export(results, TMP)
 
     # === [1] Startup: sidebar hidden, toggle inactive ===
     print("\n[1] Startup sidebar state (despite a stale sidebar_open=true settings file)", flush=True)
