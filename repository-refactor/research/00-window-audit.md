@@ -299,6 +299,24 @@ stable delegator. The corrections are folded into §7 and the matrix
 without changing the 26-phase order. The ninth revision remains a
 proposal; no implementation is authorized.
 
+**Revision note (round 10):** a remote Grok pass audited Phases 21-26 at
+published commit `607b818`. Local verification rejected two proposed
+structural corrections: empty-chat pruning was already required by
+Phase 21, Phase-9 tests already protect greeting-reset placement through
+the Phase-22 move, and concurrent message-ID allocation is not a current
+contract. `_history_restored` write assertions are useful precision for
+the already-recorded preserve decision, not a separate structural gap.
+The local call-graph and test audit found six actual omissions: (1) Phase
+21 did not fully characterize `_ensure_conversation`/`_persist_message`;
+(2) Phase 22 lacked constructor/UI/test and retained-controller inbound
+lifecycles; (3) Phase 23 did not enumerate all eight moved helpers/actions
+and their material branches; (4) Phase 24 omitted group M's surviving
+`_api_messages`/`_find_message_index` calls; (5) Phase 25 omitted buffer
+clear and transcript insertion from `_send`'s exact success order; and
+(6) Phase 26 omitted stable UI/test entrypoints and left `_set_status`
+ownership ambiguous. The corrections below preserve the 26-phase order.
+No implementation is authorized.
+
 ---
 
 ## 1. What window.py currently is
@@ -1103,6 +1121,13 @@ Phase 8 (shares the health-state interface for load failures, and is the
 phase whose callback wiring gets migrated here). Risk: medium.
 Verification: full suite + Phase 9 tests passing unmodified.
 
+**Correction (round 10):** `_on_model_load_finished` also calls
+`_ensure_conversation()` before persisting the selected model
+(`window.py:2833-2834`). The loader therefore receives a narrow
+`ensure_conversation` provider at extraction time, initially bound to the
+unchanged window method and explicitly re-bound to Phase 22's lifecycle
+owner. It does not receive the projection or a broad window reference.
+
 **Phase 11 — Transcript reset/replay/removal characterization
 (test-only).** First of three native-transcript slices (**correction,
 round 7**: what was one oversized Phase 11/12 pair — 13 methods, ~705
@@ -1477,6 +1502,28 @@ specific current behavior under a simulated store failure. Risk: n/a
 (test-only). Verification: new tests pass against current `main`
 unmodified.
 
+**Correction (round 10) — characterize the complete Phase-22 move.**
+Empty-chat pruning was already required above, and Phase 9 already
+protects the exact greeting-reset branch positions; those tests remain
+authoritative and must pass through Phase 22 rather than being duplicated
+here. Add the missing lifecycle-helper coverage:
+
+- `_ensure_conversation` reuses an existing ID without touching the
+  store, or calls `ensure_active(model=current_model)`, records, and
+  returns the resulting ID.
+- `_persist_message` forwards the supplied message ID, performs ensure
+  before append, marks history dirty and schedules title refresh only
+  after a successful user append, does neither for assistant messages,
+  and logs/continues on ensure or append failure.
+- `_next_msg_id` preserves sequential counter progression and the exact
+  prefix/counter/six-hex-suffix format. No concurrent-allocation guarantee
+  is added: every current allocation occurs on the UI path, before worker
+  dispatch or inside a main-loop callback.
+- `_history_restored` retains its exact true/false writes on successful,
+  empty, new-chat, switch, and failure paths even though it remains
+  write-only. This is precision coverage for the already-recorded
+  preservation decision.
+
 **Phase 22 — Conversation-lifecycle extraction, establishing the
 canonical message-state owner with a staged migration (not an immediate
 cutover), message-ID allocation, and an explicit decision on
@@ -1648,6 +1695,26 @@ owner and removes Phase 18's shorter-lived mark/rebuild window delegators
 after a caller inventory proves group F was their last consumer. These
 are required cutover steps, not follow-up cleanup.
 
+**Correction (round 10) — inbound lifecycle and stable window surface.**
+Moving lifecycle methods does not invalidate the constructor call to
+`_restore_history`, group-C clear/new buttons and actions, Phase-18
+activate/delete callbacks, Phase-10 model-persistence ensure provider,
+Phase-26 send persistence, or enforced tests that call
+`switch_conversation`/`_persist_message` directly. Phase 22:
+
+- constructs the owner before history restoration and points the
+  constructor restore call at it;
+- re-binds Phase 10's `ensure_conversation` provider and Phase 18's
+  activate/delete callbacks directly;
+- retains intentional, state-free `ChatSidebar` delegators for lifecycle
+  commands and `_persist_message`, so already-connected UI callbacks and
+  characterization tests keep their signatures;
+- gives group M a narrow persistence interface immediately, which Phase
+  26 later consumes directly.
+
+These delegators are stable boundary methods, not temporary duplicated
+ownership. Private helpers with no retained caller are not exposed.
+
 **Correction (round 7) — message-ID allocation and `_history_restored`.**
 `_next_msg_id`/`_msg_counter` (`window.py:2071-2073`) were previously
 misassigned to the message-action phase; verified their five call sites
@@ -1711,6 +1778,18 @@ the final in-memory content and the persisted row match, for both
 branches. Risk: n/a (test-only). Verification: new tests pass against
 current `main` unmodified.
 
+**Correction (round 10) — cover all eight moved methods, not only four
+top-level actions.** Phase 23 explicitly exercises `_find_message_index`,
+`_api_messages`, `_clipboard_set`, and `_drop_messages_from` as well as
+delete/regenerate/edit/continue. Cover missing/empty IDs; streaming,
+loading, and missing-model guards; user/assistant/unsupported roles;
+latest-assistant-only continue; API filtering of roles and `None`
+content; absent-display clipboard behavior; delete/drop store failures
+with continued UI cleanup; `keep_ui_id`; edit trimming, invalid role,
+store failure, and both-backend UI replacement; plus each new/replace/
+continue start payload. Completed replace/continue persistence remains
+required as specified above.
+
 **Phase 24 — Message-action extraction (group L), native-rendering
 methods excluded, message-ID allocation excluded, migrating onto Phase
 22's message-state interface.** `_find_message_index`, `_api_messages`,
@@ -1736,8 +1815,19 @@ unmodified.
 **Correction (round 9):** this phase rebinds Phase 16's `on_intent`
 provider to the extracted group-L owner. After both WebKit and native
 dispatch terminate there, it inventories and removes the now-unused
-window action/removal delegators; any transcript delegator still needed
-by group M remains until Phase 26.
+transcript-native action/removal delegators; any transcript delegator
+still needed by group M remains until Phase 26. Round 10 separately
+defines the stable business-action window entrypoints retained for tests
+and dispatch.
+
+**Correction (round 10):** group M is not only a raw-messages-facade
+consumer here. Its `_start_assistant_stream` still calls
+`_api_messages()` (`window.py:3519`), and `_commit_assistant_result`
+still calls `_find_message_index()` (`3686`). Phase 24 immediately
+rewires both calls to the message-action controller interface; Phase 26
+preserves that interface. Intentional thin `ChatSidebar` action
+delegators remain so Phase-23 tests and stable dispatch signatures pass
+unmodified, but they own no state.
 
 **Phase 25 — Streaming characterization (test-only), covering `_send`
 itself, not only mid-stream errors.** `test_generation_lifecycle.py`
@@ -1764,6 +1854,14 @@ successful path's exact append/persist/start sequence (user message
 appended to in-memory state, persisted, composer hint synced, stream
 started — in that order). Risk: n/a (test-only). Verification: new tests
 pass against current `main` unmodified.
+
+**Correction (round 10):** “exact append/persist/start sequence” also
+includes the operations before the in-memory append. Characterize buffer
+clearing after all guards, message-ID forwarding, and transcript
+insertion in both WebKit and native modes before the projection append,
+followed by persistence, composer-hint synchronization, and stream start
+(`window.py:3142-3159`). These are new direct `_send` assertions, not a
+claim that re-running the existing lifecycle helper supplies coverage.
 
 **Phase 26 — Streaming-engine extraction (group M), last, migrating onto
 Phase 22's message-state interface and retiring its facade.** `_send`,
@@ -1795,6 +1893,23 @@ migrated, a whole-file inventory gates removal of the last transcript,
 sidebar/title, and model-session compatibility delegators/properties as
 well as the Phase-22 messages facade; compatibility is removed only when
 that inventory proves zero callers.
+
+**Correction (round 10) — preserve inbound UI/test entrypoints and settle
+status ownership.** Group-C Send/Stop button callbacks, retained
+`_on_input_key`, Phase-22 cancel hooks, Phase-24 start-stream hooks, and
+the enforced generation-lifecycle tests all call group-M window methods.
+Phase 26 rebinds the extracted-controller callbacks directly, but keeps
+intentional state-free `ChatSidebar` delegators for `_send`,
+`_start_assistant_stream`, `_request_stop`, and
+`_invalidate_active_stream`; the already-connected UI and tests therefore
+remain valid without a second streaming owner.
+
+`_set_status` does not move into the engine. It remains the stable window
+presenter supplied to Phases 8/10/20/26, and Phase 26 rewires its model,
+streaming, and title reads to the Phase-10, Phase-26, and Phase-18
+interfaces respectively. The engine calls that presenter through its
+injected status callback. This resolves its prior ambiguous “Phase 26”
+matrix wording without expanding group M.
 
 **Correction (round 6):** round 5 assigned this phase an "inventory and
 migrate every remaining reader" step, on the theory that readers were
