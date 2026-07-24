@@ -56,6 +56,7 @@ app_name = identity_lines[1]
 runtime_python_sources = files(
   'main.py',
   'app_settings.py',
+  'composer_geometry.py',
   'conversation_store.py',
   'message_widgets.py',
   'ollama_client.py',

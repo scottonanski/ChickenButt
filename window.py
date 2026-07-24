@@ -20,6 +20,15 @@ gi.require_version("Gdk", "4.0")
 from gi.repository import Adw, Gdk, Gio, GLib, Gtk, Pango
 
 import app_settings as _app_settings
+from composer_geometry import (
+    COMPOSER_CHAR_LIMIT,
+    COMPOSER_COMPACT_MAX_LINES,
+    COMPOSER_COMPACT_WINDOW_HEIGHT,
+    COMPOSER_COUNTER_SHOW_RATIO,
+    COMPOSER_MAX_LINES,
+    COMPOSER_MIN_LINES,
+    ComposerGeometry,
+)
 from conversation_store import ConversationStore
 from message_widgets import MessageBody, ensure_md_css
 from ollama_client import OllamaClient, OllamaError
@@ -35,19 +44,6 @@ from ollama_health import (
 DEFAULT_WIDTH = 780
 DEFAULT_HEIGHT = 720
 SIDEBAR_WIDTH = 220
-
-# Composer: visible height vs content length are independent.
-# Grow 1→N lines, then scroll inside; paste may be huge without eating the window.
-COMPOSER_MIN_LINES = 1
-COMPOSER_MAX_LINES = 8
-COMPOSER_COMPACT_MAX_LINES = 6
-# Window height at/below this uses the compact line cap (small displays / short windows).
-COMPOSER_COMPACT_WINDOW_HEIGHT = 560
-# Hard technical safety cap (not a product "short prompt" limit).
-COMPOSER_CHAR_LIMIT = 64_000
-# Show a character counter once the draft is this fraction of the hard cap.
-# (Later: also surface near selected model context capacity.)
-COMPOSER_COUNTER_SHOW_RATIO = 0.85
 
 # Prefer last successfully loaded model on next launch
 _SETTINGS_DIR = _app_settings._SETTINGS_DIR
@@ -502,7 +498,7 @@ class ChatSidebar(Adw.ApplicationWindow):
         self._composer_char_label: Gtk.Label | None = None
         self._composer_hint: Gtk.Label | None = None
         self._composer_hint_fade_id: int = 0
-        self._composer_truncating = False
+        self._composer_geometry: ComposerGeometry | None = None
         self._empty_icon: Gtk.Widget | None = None
         self._refresh_btn: Gtk.Button | None = None
         self._clear_btn: Gtk.Button | None = None
@@ -833,7 +829,6 @@ class ChatSidebar(Adw.ApplicationWindow):
         self._input_scroll.set_valign(Gtk.Align.CENTER)
         self._input_scroll.add_css_class("composer-scroll")
         self._input_scroll.set_child(self.input)
-        self._apply_composer_height()
 
         # Placeholder via overlay-ish label is hard; set buffer notify for empty look
         self._placeholder = Gtk.Label(label="Message…")
@@ -849,10 +844,6 @@ class ChatSidebar(Adw.ApplicationWindow):
         input_overlay.set_hexpand(True)
         input_overlay.set_vexpand(False)
         input_overlay.set_valign(Gtk.Align.CENTER)
-
-        buf = self.input.get_buffer()
-        buf.connect("changed", self._on_buffer_changed)
-        buf.connect("insert-text", self._on_composer_insert_text)
 
         input_key = Gtk.EventControllerKey()
         input_key.connect("key-pressed", self._on_input_key)
@@ -923,13 +914,30 @@ class ChatSidebar(Adw.ApplicationWindow):
         meta_row.set_hexpand(True)
         meta_row.append(self._composer_char_label)
 
+        self._composer_geometry = ComposerGeometry(
+            input_view=self.input,
+            input_scroll=self._input_scroll,
+            placeholder=self._placeholder,
+            char_label=self._composer_char_label,
+            align_callback=self._sync_composer_action_valign,
+            surface_provider=self.get_surface,
+            height_provider=self.get_height,
+            default_size_provider=self.get_default_size,
+            fallback_window_height=DEFAULT_HEIGHT,
+        )
+        self._composer_geometry._apply_composer_height()
+
+        buf = self.input.get_buffer()
+        buf.connect("changed", self._composer_geometry._on_buffer_changed)
+        buf.connect("insert-text", self._composer_geometry._on_composer_insert_text)
+
         composer_inner.append(self._composer_hint)
         composer_inner.append(shell)
         composer_inner.append(meta_row)
 
         # Recompute line cap when mapped/resized (compact vs normal max lines).
-        self.connect("realize", self._hook_composer_surface_layout)
-        self.connect("map", lambda *_: self._apply_composer_height())
+        self.connect("realize", self._composer_geometry._hook_composer_surface_layout)
+        self.connect("map", lambda *_: self._composer_geometry._apply_composer_height())
 
         composer_clamp = Adw.Clamp()
         composer_clamp.set_maximum_size(768)
@@ -1207,94 +1215,15 @@ class ChatSidebar(Adw.ApplicationWindow):
         self._load_overlay = veil
         self._load_spinner = spinner
 
-    def _hook_composer_surface_layout(self, *_args) -> None:
-        """Follow window height changes so compact max-lines kicks in on resize."""
-        if getattr(self, "_composer_layout_hooked", False):
-            return
-        surface = self.get_surface()
-        if surface is None:
-            return
-        surface.connect("layout", lambda *_: self._apply_composer_height())
-        self._composer_layout_hooked = True
-        self._apply_composer_height()
-
-    def _composer_line_height_px(self) -> int:
-        """Approximate one text line in the composer (font + line spacing)."""
-        if self.input is None:
-            return 22
-        try:
-            layout = self.input.create_pango_layout("Mg")
-            _w, h = layout.get_pixel_size()
-            spacing = (
-                int(self.input.get_pixels_above_lines())
-                + int(self.input.get_pixels_below_lines())
-            )
-            return max(18, int(h) + spacing)
-        except Exception:  # noqa: BLE001
-            return 22
-
-    def _composer_max_visible_lines(self) -> int:
-        """8 lines normally; 6 on short windows so the composer cannot dominate."""
-        try:
-            h = int(self.get_height() or 0)
-        except Exception:  # noqa: BLE001
-            h = 0
-        if h <= 0:
-            try:
-                h = int(self.get_default_size()[1] or DEFAULT_HEIGHT)
-            except Exception:  # noqa: BLE001
-                h = DEFAULT_HEIGHT
-        if h <= COMPOSER_COMPACT_WINDOW_HEIGHT:
-            return COMPOSER_COMPACT_MAX_LINES
-        return COMPOSER_MAX_LINES
-
-    def _composer_content_height_px(self) -> int:
-        """Natural height of the text view at its current width (wrapped lines)."""
-        if self.input is None:
-            return 36
-        w = int(self.input.get_width() or 0)
-        if w <= 1 and self._input_scroll is not None:
-            w = int(self._input_scroll.get_width() or 0)
-        if w <= 1:
-            w = 400
-        try:
-            _mn, nat, _mn_b, _nat_b = self.input.measure(Gtk.Orientation.VERTICAL, w)
-            return max(1, int(nat))
-        except Exception:  # noqa: BLE001
-            return 36
-
-    def _apply_composer_height(self, *_args) -> None:
-        """Cap visible composer height; content may be longer and scrolls inside."""
-        if self._input_scroll is None or self.input is None:
-            return
-        line = self._composer_line_height_px()
-        pad = int(self.input.get_top_margin()) + int(self.input.get_bottom_margin())
-        # Match circular send button (~36px) so a one-line shell looks balanced.
-        min_h = max(36, pad + line * COMPOSER_MIN_LINES)
-        max_h = max(min_h, pad + line * self._composer_max_visible_lines())
-        content_h = self._composer_content_height_px()
-        target = max(min_h, min(content_h, max_h))
-        needs_scroll = content_h > max_h
-        # Only enable a vertical scrollbar once we hit the visible-line cap.
-        # AUTOMATIC while short reserves scrollbar chrome and un-centers the send button.
-        self._input_scroll.set_policy(
-            Gtk.PolicyType.NEVER,
-            Gtk.PolicyType.AUTOMATIC if needs_scroll else Gtk.PolicyType.NEVER,
-        )
-        self._input_scroll.set_min_content_height(target)
-        self._input_scroll.set_max_content_height(max_h)
-        self._input_scroll.set_size_request(-1, target)
-        parent = self._input_scroll.get_parent()
-        if parent is not None:
-            parent.set_size_request(-1, target)
-        self._sync_composer_action_valign(content_h=content_h, min_h=min_h)
-
     def _sync_composer_action_valign(
         self, content_h: int | None = None, min_h: int | None = None
     ) -> None:
         """Center send/stop on one line; pin to bottom once the composer grows."""
         if content_h is None:
-            content_h = self._composer_content_height_px()
+            if self._composer_geometry is None:
+                content_h = 36
+            else:
+                content_h = self._composer_geometry._composer_content_height_px()
         if min_h is None and self._input_scroll is not None:
             min_h = int(self._input_scroll.get_min_content_height() or 36)
         if min_h is None:
@@ -1304,24 +1233,6 @@ class ChatSidebar(Adw.ApplicationWindow):
         for btn in (self.send_btn, self.stop_btn):
             if btn is not None:
                 btn.set_valign(align)
-
-    def _update_composer_char_counter(self, n: int) -> None:
-        lab = self._composer_char_label
-        if lab is None:
-            return
-        show = n >= int(COMPOSER_CHAR_LIMIT * COMPOSER_COUNTER_SHOW_RATIO)
-        lab.set_visible(show)
-        if not show:
-            return
-        lab.set_text(f"{n:,} / {COMPOSER_CHAR_LIMIT:,}")
-        if n >= COMPOSER_CHAR_LIMIT:
-            lab.add_css_class("warning")
-            lab.set_tooltip_text("Character safety limit reached")
-        else:
-            lab.remove_css_class("warning")
-            lab.set_tooltip_text(
-                f"Hard safety limit is {COMPOSER_CHAR_LIMIT:,} characters"
-            )
 
     def _composer_hint_should_show(self) -> bool:
         """Show keyboard hint only before the conversation has real turns."""
@@ -1359,49 +1270,6 @@ class ChatSidebar(Adw.ApplicationWindow):
             return False
 
         self._composer_hint_fade_id = GLib.timeout_add(300, _hide)
-
-    def _on_composer_insert_text(
-        self, buf: Gtk.TextBuffer, _location, text: str, _length: int
-    ) -> None:
-        """Enforce the hard character safety cap at insert time (paste-friendly)."""
-        if self._composer_truncating or not text:
-            return
-        current = buf.get_char_count()
-        remaining = COMPOSER_CHAR_LIMIT - current
-        if remaining <= 0:
-            buf.stop_emission_by_name("insert-text")
-            self._update_composer_char_counter(current)
-            return
-        # text may be str; clamp oversized pastes instead of rejecting entirely
-        if len(text) > remaining:
-            buf.stop_emission_by_name("insert-text")
-            self._composer_truncating = True
-            try:
-                buf.insert(_location, text[:remaining])
-            finally:
-                self._composer_truncating = False
-
-    def _on_buffer_changed(self, buf: Gtk.TextBuffer) -> None:
-        if self._composer_truncating:
-            return
-        n = buf.get_char_count()
-        if n > COMPOSER_CHAR_LIMIT:
-            self._composer_truncating = True
-            try:
-                start = buf.get_iter_at_offset(COMPOSER_CHAR_LIMIT)
-                end = buf.get_end_iter()
-                buf.delete(start, end)
-                n = COMPOSER_CHAR_LIMIT
-            finally:
-                self._composer_truncating = False
-        text = buf.get_text(buf.get_start_iter(), buf.get_end_iter(), False)
-        if self._placeholder is not None:
-            self._placeholder.set_visible(len(text) == 0)
-        self._update_composer_char_counter(n)
-        # Natural height can change as lines wrap; keep min/max in sync after font ready.
-        self._apply_composer_height()
-        # Height allocation updates next frame — re-check button valign after layout.
-        GLib.idle_add(self._sync_composer_action_valign)
 
     def _brand_icon_path(self, *, for_dark_ui: bool | None = None) -> Path:
         """Empty/greeting mark: tight icon SVGs (not 1920x1080 logos).

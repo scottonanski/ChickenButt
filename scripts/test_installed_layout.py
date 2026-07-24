@@ -54,6 +54,7 @@ class Results:
 REQUIRED_PY_MODULES = [
     "main.py",
     "app_settings.py",
+    "composer_geometry.py",
     "conversation_store.py",
     "message_widgets.py",
     "ollama_client.py",
@@ -273,8 +274,9 @@ def main() -> int:
                     sys.executable,
                     "-c",
                     "import sys; sys.path.insert(0, sys.argv[1]); "
-                    "import release_info, app_settings, conversation_store, "
-                    "ollama_client, message_widgets, transcript_view; "
+                    "import release_info, app_settings, composer_geometry, "
+                    "conversation_store, ollama_client, message_widgets, "
+                    "transcript_view; "
                     "print('OK'); "
                     "print(str(transcript_view.WEB_DIR)); "
                     "print((transcript_view.WEB_DIR / 'index.html').is_file())",
@@ -285,8 +287,9 @@ def main() -> int:
             )
             out_lines = import_check.stdout.strip().splitlines()
             results.check(
-                "[7] release_info/app_settings/conversation_store/ollama_client/"
-                "message_widgets/transcript_view all import",
+                "[7] release_info/app_settings/composer_geometry/"
+                "conversation_store/ollama_client/message_widgets/"
+                "transcript_view all import",
                 import_check.returncode == 0 and out_lines[:1] == ["OK"],
                 import_check.stderr[-500:],
             )

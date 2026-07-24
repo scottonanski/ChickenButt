@@ -33,6 +33,7 @@ gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 from gi.repository import Adw, Gio, GLib, Gtk  # noqa: E402
 
+from composer_geometry import ComposerGeometry  # noqa: E402
 from ollama_client import OllamaClient  # noqa: E402
 import window as window_module  # noqa: E402
 from window import ChatSidebar  # noqa: E402
@@ -311,23 +312,21 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
         def __init__(self) -> None:
             self.surface = None
             self.apply_calls = 0
-
-        def get_surface(self):
-            return self.surface
+            self._composer_layout_hooked = False
+            self._surface_provider = lambda: self.surface
 
         def _apply_composer_height(self) -> None:
             self.apply_calls += 1
 
     hook_owner = HookOwner()
-    ChatSidebar._hook_composer_surface_layout(hook_owner)
+    ComposerGeometry._hook_composer_surface_layout(hook_owner)
     results.check(
         "surface hook retries when no surface is available",
-        not hasattr(hook_owner, "_composer_layout_hooked")
-        and hook_owner.apply_calls == 0,
+        hook_owner._composer_layout_hooked is False and hook_owner.apply_calls == 0,
     )
     surface = FakeSurface()
     hook_owner.surface = surface
-    ChatSidebar._hook_composer_surface_layout(hook_owner)
+    ComposerGeometry._hook_composer_surface_layout(hook_owner)
     results.check(
         "surface hook connects one layout callback and marks itself hooked",
         hook_owner._composer_layout_hooked
@@ -338,7 +337,7 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
         hook_owner.apply_calls == 1,
         str(hook_owner.apply_calls),
     )
-    ChatSidebar._hook_composer_surface_layout(hook_owner)
+    ComposerGeometry._hook_composer_surface_layout(hook_owner)
     results.check(
         "surface hook is idempotent after connection",
         len(surface.connections) == 1 and hook_owner.apply_calls == 1,
@@ -376,12 +375,12 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
     no_line_input = type("NoLineInput", (), {"input": None})()
     results.check(
         "line height falls back to 22px without an input widget",
-        ChatSidebar._composer_line_height_px(no_line_input) == 22,
+        ComposerGeometry._composer_line_height_px(no_line_input) == 22,
     )
     measured_line = type("MeasuredLine", (), {"input": LineInput()})()
     results.check(
         "line height includes Pango height and line spacing",
-        ChatSidebar._composer_line_height_px(measured_line) == 28,
+        ComposerGeometry._composer_line_height_px(measured_line) == 28,
     )
     minimum_line = type(
         "MinimumLine",
@@ -390,12 +389,12 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
     )()
     results.check(
         "line height is clamped to an 18px minimum",
-        ChatSidebar._composer_line_height_px(minimum_line) == 18,
+        ComposerGeometry._composer_line_height_px(minimum_line) == 18,
     )
     failed_line = type("FailedLine", (), {"input": LineInput(fail=True)})()
     results.check(
         "line height falls back to 22px when measurement fails",
-        ChatSidebar._composer_line_height_px(failed_line) == 22,
+        ComposerGeometry._composer_line_height_px(failed_line) == 22,
     )
 
     class WindowGeometry:
@@ -411,6 +410,9 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
             self.default_height = default_height
             self.height_fails = height_fails
             self.default_fails = default_fails
+            self._height_provider = self.get_height
+            self._default_size_provider = self.get_default_size
+            self._fallback_window_height = window_module.DEFAULT_HEIGHT
 
         def get_height(self) -> int:
             if self.height_fails:
@@ -424,27 +426,27 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
 
     results.check(
         "short current windows use the compact six-line cap",
-        ChatSidebar._composer_max_visible_lines(WindowGeometry(500))
+        ComposerGeometry._composer_max_visible_lines(WindowGeometry(500))
         == window_module.COMPOSER_COMPACT_MAX_LINES,
     )
     results.check(
         "tall current windows use the normal eight-line cap",
-        ChatSidebar._composer_max_visible_lines(WindowGeometry(700))
+        ComposerGeometry._composer_max_visible_lines(WindowGeometry(700))
         == window_module.COMPOSER_MAX_LINES,
     )
     results.check(
         "unallocated windows fall back to their short default height",
-        ChatSidebar._composer_max_visible_lines(WindowGeometry(0, 500))
+        ComposerGeometry._composer_max_visible_lines(WindowGeometry(0, 500))
         == window_module.COMPOSER_COMPACT_MAX_LINES,
     )
     results.check(
         "zero default-window height falls back to DEFAULT_HEIGHT",
-        ChatSidebar._composer_max_visible_lines(WindowGeometry(0, 0))
+        ComposerGeometry._composer_max_visible_lines(WindowGeometry(0, 0))
         == window_module.COMPOSER_MAX_LINES,
     )
     results.check(
         "window-height provider failures fall back to DEFAULT_HEIGHT",
-        ChatSidebar._composer_max_visible_lines(
+        ComposerGeometry._composer_max_visible_lines(
             WindowGeometry(0, height_fails=True, default_fails=True)
         )
         == window_module.COMPOSER_MAX_LINES,
@@ -487,7 +489,7 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
     )()
     results.check(
         "content height falls back to 36px without an input widget",
-        ChatSidebar._composer_content_height_px(no_content_input) == 36,
+        ComposerGeometry._composer_content_height_px(no_content_input) == 36,
     )
     own_width_input = MeasureInput(250, 80)
     own_width_owner = type(
@@ -497,7 +499,7 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
     )()
     results.check(
         "content measurement uses the allocated input width",
-        ChatSidebar._composer_content_height_px(own_width_owner) == 80
+        ComposerGeometry._composer_content_height_px(own_width_owner) == 80
         and own_width_input.measured_widths == [250],
     )
     scroll_width_input = MeasureInput(0, 70)
@@ -508,7 +510,7 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
     )()
     results.check(
         "content measurement falls back to the scroller width",
-        ChatSidebar._composer_content_height_px(scroll_width_owner) == 70
+        ComposerGeometry._composer_content_height_px(scroll_width_owner) == 70
         and scroll_width_input.measured_widths == [320],
     )
     default_width_input = MeasureInput(0, 0)
@@ -519,7 +521,7 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
     )()
     results.check(
         "content measurement falls back to 400px and floors natural height at one",
-        ChatSidebar._composer_content_height_px(default_width_owner) == 1
+        ComposerGeometry._composer_content_height_px(default_width_owner) == 1
         and default_width_input.measured_widths == [400],
     )
     failed_content_owner = type(
@@ -532,7 +534,7 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
     )()
     results.check(
         "content height falls back to 36px when measurement fails",
-        ChatSidebar._composer_content_height_px(failed_content_owner) == 36,
+        ComposerGeometry._composer_content_height_px(failed_content_owner) == 36,
     )
 
     class MarginInput:
@@ -585,7 +587,7 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
         def _composer_content_height_px(self) -> int:
             return self.content_height
 
-        def _sync_composer_action_valign(
+        def _align_callback(
             self,
             *,
             content_h: int,
@@ -598,14 +600,14 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
         (),
         {"input": None, "_input_scroll": None},
     )()
-    ChatSidebar._apply_composer_height(missing_geometry)
+    ComposerGeometry._apply_composer_height(missing_geometry)
     results.check(
         "height application is a no-op until both widgets exist",
         missing_geometry.input is None and missing_geometry._input_scroll is None,
     )
 
     short_owner = ApplyOwner(20)
-    ChatSidebar._apply_composer_height(short_owner)
+    ComposerGeometry._apply_composer_height(short_owner)
     short_scroll = short_owner._input_scroll
     results.check(
         "short content uses the 36px minimum without a scrollbar",
@@ -619,7 +621,7 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
     )
 
     medium_owner = ApplyOwner(80)
-    ChatSidebar._apply_composer_height(medium_owner)
+    ComposerGeometry._apply_composer_height(medium_owner)
     results.check(
         "medium content uses its natural height without a scrollbar",
         medium_owner._input_scroll.min_heights == [80]
@@ -628,7 +630,7 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
     )
 
     tall_owner = ApplyOwner(200)
-    ChatSidebar._apply_composer_height(tall_owner)
+    ComposerGeometry._apply_composer_height(tall_owner)
     results.check(
         "over-cap content is clamped and enables automatic vertical scrolling",
         tall_owner._input_scroll.min_heights == [136]
@@ -670,12 +672,12 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
         window_module.COMPOSER_CHAR_LIMIT
         * window_module.COMPOSER_COUNTER_SHOW_RATIO
     )
-    ChatSidebar._update_composer_char_counter(counter_owner, threshold - 1)
+    ComposerGeometry._update_composer_char_counter(counter_owner, threshold - 1)
     results.check(
         "character counter stays hidden below the warning threshold",
         label.visible is False,
     )
-    ChatSidebar._update_composer_char_counter(counter_owner, threshold)
+    ComposerGeometry._update_composer_char_counter(counter_owner, threshold)
     results.check(
         "character counter appears at the threshold with normal styling",
         label.visible
@@ -688,7 +690,7 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
             f"{window_module.COMPOSER_CHAR_LIMIT:,} characters"
         ),
     )
-    ChatSidebar._update_composer_char_counter(
+    ComposerGeometry._update_composer_char_counter(
         counter_owner,
         window_module.COMPOSER_CHAR_LIMIT,
     )
@@ -729,14 +731,14 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
 
     guarded_owner = InsertOwner(truncating=True)
     guarded_buffer = InsertBuffer(10)
-    ChatSidebar._on_composer_insert_text(
+    ComposerGeometry._on_composer_insert_text(
         guarded_owner,
         guarded_buffer,
         "loc",
         "ignored",
         7,
     )
-    ChatSidebar._on_composer_insert_text(
+    ComposerGeometry._on_composer_insert_text(
         InsertOwner(),
         guarded_buffer,
         "loc",
@@ -750,7 +752,7 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
 
     full_owner = InsertOwner()
     full_buffer = InsertBuffer(window_module.COMPOSER_CHAR_LIMIT)
-    ChatSidebar._on_composer_insert_text(
+    ComposerGeometry._on_composer_insert_text(
         full_owner,
         full_buffer,
         "loc",
@@ -767,7 +769,7 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
 
     paste_owner = InsertOwner()
     paste_buffer = InsertBuffer(window_module.COMPOSER_CHAR_LIMIT - 3)
-    ChatSidebar._on_composer_insert_text(
+    ComposerGeometry._on_composer_insert_text(
         paste_owner,
         paste_buffer,
         "loc",
@@ -783,7 +785,7 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
 
     fitting_owner = InsertOwner()
     fitting_buffer = InsertBuffer(10)
-    ChatSidebar._on_composer_insert_text(
+    ComposerGeometry._on_composer_insert_text(
         fitting_owner,
         fitting_buffer,
         "loc",
@@ -840,13 +842,13 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
         def _apply_composer_height(self) -> None:
             self.apply_calls += 1
 
-        def _sync_composer_action_valign(self) -> bool:
+        def _align_callback(self) -> bool:
             self.idle_align_calls += 1
             return False
 
     guarded_changed_owner = ChangedOwner(truncating=True)
     guarded_changed_buffer = ChangedBuffer("ignored")
-    ChatSidebar._on_buffer_changed(
+    ComposerGeometry._on_buffer_changed(
         guarded_changed_owner,
         guarded_changed_buffer,
     )
@@ -860,7 +862,7 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
     over_limit_buffer = ChangedBuffer(
         "x" * (window_module.COMPOSER_CHAR_LIMIT + 5)
     )
-    ChatSidebar._on_buffer_changed(over_limit_owner, over_limit_buffer)
+    ComposerGeometry._on_buffer_changed(over_limit_owner, over_limit_buffer)
     pump(0.05)
     results.check(
         "changed handler deletes text beyond the hard cap and restores its guard",
@@ -884,7 +886,7 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
     )
 
     empty_owner = ChangedOwner()
-    ChatSidebar._on_buffer_changed(empty_owner, ChangedBuffer(""))
+    ComposerGeometry._on_buffer_changed(empty_owner, ChangedBuffer(""))
     pump(0.05)
     results.check(
         "empty changed buffers show the placeholder and report zero characters",
@@ -895,8 +897,17 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
     )
 
     results.check(
+        "composer controller owns its private flags instead of the window",
+        win._composer_geometry is not None
+        and win._composer_geometry._composer_truncating is False
+        and win._composer_geometry._composer_layout_hooked is True
+        and not hasattr(win, "_composer_truncating")
+        and not hasattr(win, "_composer_layout_hooked"),
+    )
+    results.check(
         "realized composer connects its surface-layout hook",
-        getattr(win, "_composer_layout_hooked", False) is True,
+        win._composer_geometry is not None
+        and win._composer_geometry._composer_layout_hooked is True,
     )
     initial_request = win._input_scroll.get_size_request()
     results.check(
@@ -909,14 +920,17 @@ def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
     )
 
     map_calls: list[str] = []
-    win._apply_composer_height = lambda *_args: map_calls.append("map")
+    original_apply_height = win._composer_geometry._apply_composer_height
+    win._composer_geometry._apply_composer_height = (
+        lambda *_args: map_calls.append("map")
+    )
     map_error = ""
     try:
         win.emit("map")
     except Exception as exc:  # noqa: BLE001
         map_error = repr(exc)
     finally:
-        del win._apply_composer_height
+        win._composer_geometry._apply_composer_height = original_apply_height
     results.check(
         "window map signal is wired to composer-height reapplication",
         map_calls == ["map"] and not map_error,
