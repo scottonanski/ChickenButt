@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
-"""Regression: sidebar interaction polish — pointer cursors on clickable
-controls, the model selector living in the sidebar (not under the header),
-and the sidebar always starting closed regardless of a stale settings file.
+"""Regression: settings, composer geometry, and sidebar interaction behavior.
+
+Covers the Phase-1 settings seam, the complete Phase-3 composer
+characterization surface, pointer cursors on clickable controls, the model
+selector living in the sidebar (not under the header), and the sidebar always
+starting closed regardless of a stale settings file.
 
 Real ChatSidebar + real WebKit view + real GLib loop, same pattern as the
 other scripts/test_*.py files. Model refresh/load network calls are
@@ -28,7 +31,7 @@ import gi  # noqa: E402
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
-from gi.repository import Adw, Gio, GLib  # noqa: E402
+from gi.repository import Adw, Gio, GLib, Gtk  # noqa: E402
 
 from ollama_client import OllamaClient  # noqa: E402
 import window as window_module  # noqa: E402
@@ -292,6 +295,682 @@ def characterize_settings(
     window_module._SETTINGS_PATH = settings_path
 
 
+def characterize_composer_geometry(results: Results, win: ChatSidebar) -> None:
+    """Lock down the complete Phase-4 composer-geometry extraction surface."""
+    print("\n[0b] Composer geometry characterization", flush=True)
+
+    class FakeSurface:
+        def __init__(self) -> None:
+            self.connections: list[tuple[str, object]] = []
+
+        def connect(self, signal: str, callback) -> int:
+            self.connections.append((signal, callback))
+            return len(self.connections)
+
+    class HookOwner:
+        def __init__(self) -> None:
+            self.surface = None
+            self.apply_calls = 0
+
+        def get_surface(self):
+            return self.surface
+
+        def _apply_composer_height(self) -> None:
+            self.apply_calls += 1
+
+    hook_owner = HookOwner()
+    ChatSidebar._hook_composer_surface_layout(hook_owner)
+    results.check(
+        "surface hook retries when no surface is available",
+        not hasattr(hook_owner, "_composer_layout_hooked")
+        and hook_owner.apply_calls == 0,
+    )
+    surface = FakeSurface()
+    hook_owner.surface = surface
+    ChatSidebar._hook_composer_surface_layout(hook_owner)
+    results.check(
+        "surface hook connects one layout callback and marks itself hooked",
+        hook_owner._composer_layout_hooked
+        and [signal for signal, _callback in surface.connections] == ["layout"],
+    )
+    results.check(
+        "surface hook immediately reapplies composer height",
+        hook_owner.apply_calls == 1,
+        str(hook_owner.apply_calls),
+    )
+    ChatSidebar._hook_composer_surface_layout(hook_owner)
+    results.check(
+        "surface hook is idempotent after connection",
+        len(surface.connections) == 1 and hook_owner.apply_calls == 1,
+    )
+    surface.connections[0][1](surface)
+    results.check(
+        "surface layout events reapply composer height",
+        hook_owner.apply_calls == 2,
+        str(hook_owner.apply_calls),
+    )
+
+    class LineLayout:
+        def __init__(self, height: int) -> None:
+            self.height = height
+
+        def get_pixel_size(self) -> tuple[int, int]:
+            return 10, self.height
+
+    class LineInput:
+        def __init__(self, *, height: int = 25, fail: bool = False) -> None:
+            self.height = height
+            self.fail = fail
+
+        def create_pango_layout(self, _text: str) -> LineLayout:
+            if self.fail:
+                raise RuntimeError("forced layout failure")
+            return LineLayout(self.height)
+
+        def get_pixels_above_lines(self) -> int:
+            return 1
+
+        def get_pixels_below_lines(self) -> int:
+            return 2
+
+    no_line_input = type("NoLineInput", (), {"input": None})()
+    results.check(
+        "line height falls back to 22px without an input widget",
+        ChatSidebar._composer_line_height_px(no_line_input) == 22,
+    )
+    measured_line = type("MeasuredLine", (), {"input": LineInput()})()
+    results.check(
+        "line height includes Pango height and line spacing",
+        ChatSidebar._composer_line_height_px(measured_line) == 28,
+    )
+    minimum_line = type(
+        "MinimumLine",
+        (),
+        {"input": LineInput(height=10)},
+    )()
+    results.check(
+        "line height is clamped to an 18px minimum",
+        ChatSidebar._composer_line_height_px(minimum_line) == 18,
+    )
+    failed_line = type("FailedLine", (), {"input": LineInput(fail=True)})()
+    results.check(
+        "line height falls back to 22px when measurement fails",
+        ChatSidebar._composer_line_height_px(failed_line) == 22,
+    )
+
+    class WindowGeometry:
+        def __init__(
+            self,
+            height: int,
+            default_height: int = window_module.DEFAULT_HEIGHT,
+            *,
+            height_fails: bool = False,
+            default_fails: bool = False,
+        ) -> None:
+            self.height = height
+            self.default_height = default_height
+            self.height_fails = height_fails
+            self.default_fails = default_fails
+
+        def get_height(self) -> int:
+            if self.height_fails:
+                raise RuntimeError("forced height failure")
+            return self.height
+
+        def get_default_size(self) -> tuple[int, int]:
+            if self.default_fails:
+                raise RuntimeError("forced default-size failure")
+            return 780, self.default_height
+
+    results.check(
+        "short current windows use the compact six-line cap",
+        ChatSidebar._composer_max_visible_lines(WindowGeometry(500))
+        == window_module.COMPOSER_COMPACT_MAX_LINES,
+    )
+    results.check(
+        "tall current windows use the normal eight-line cap",
+        ChatSidebar._composer_max_visible_lines(WindowGeometry(700))
+        == window_module.COMPOSER_MAX_LINES,
+    )
+    results.check(
+        "unallocated windows fall back to their short default height",
+        ChatSidebar._composer_max_visible_lines(WindowGeometry(0, 500))
+        == window_module.COMPOSER_COMPACT_MAX_LINES,
+    )
+    results.check(
+        "zero default-window height falls back to DEFAULT_HEIGHT",
+        ChatSidebar._composer_max_visible_lines(WindowGeometry(0, 0))
+        == window_module.COMPOSER_MAX_LINES,
+    )
+    results.check(
+        "window-height provider failures fall back to DEFAULT_HEIGHT",
+        ChatSidebar._composer_max_visible_lines(
+            WindowGeometry(0, height_fails=True, default_fails=True)
+        )
+        == window_module.COMPOSER_MAX_LINES,
+    )
+
+    class WidthProvider:
+        def __init__(self, width: int) -> None:
+            self.width = width
+
+        def get_width(self) -> int:
+            return self.width
+
+    class MeasureInput:
+        def __init__(
+            self,
+            width: int,
+            natural_height: int,
+            *,
+            fail: bool = False,
+        ) -> None:
+            self.width = width
+            self.natural_height = natural_height
+            self.fail = fail
+            self.measured_widths: list[int] = []
+
+        def get_width(self) -> int:
+            return self.width
+
+        def measure(self, orientation, width: int) -> tuple[int, int, int, int]:
+            if self.fail:
+                raise RuntimeError("forced content measurement failure")
+            self.measured_widths.append(width)
+            assert orientation == Gtk.Orientation.VERTICAL
+            return 1, self.natural_height, -1, -1
+
+    no_content_input = type(
+        "NoContentInput",
+        (),
+        {"input": None, "_input_scroll": None},
+    )()
+    results.check(
+        "content height falls back to 36px without an input widget",
+        ChatSidebar._composer_content_height_px(no_content_input) == 36,
+    )
+    own_width_input = MeasureInput(250, 80)
+    own_width_owner = type(
+        "OwnWidthOwner",
+        (),
+        {"input": own_width_input, "_input_scroll": WidthProvider(320)},
+    )()
+    results.check(
+        "content measurement uses the allocated input width",
+        ChatSidebar._composer_content_height_px(own_width_owner) == 80
+        and own_width_input.measured_widths == [250],
+    )
+    scroll_width_input = MeasureInput(0, 70)
+    scroll_width_owner = type(
+        "ScrollWidthOwner",
+        (),
+        {"input": scroll_width_input, "_input_scroll": WidthProvider(320)},
+    )()
+    results.check(
+        "content measurement falls back to the scroller width",
+        ChatSidebar._composer_content_height_px(scroll_width_owner) == 70
+        and scroll_width_input.measured_widths == [320],
+    )
+    default_width_input = MeasureInput(0, 0)
+    default_width_owner = type(
+        "DefaultWidthOwner",
+        (),
+        {"input": default_width_input, "_input_scroll": WidthProvider(0)},
+    )()
+    results.check(
+        "content measurement falls back to 400px and floors natural height at one",
+        ChatSidebar._composer_content_height_px(default_width_owner) == 1
+        and default_width_input.measured_widths == [400],
+    )
+    failed_content_owner = type(
+        "FailedContentOwner",
+        (),
+        {
+            "input": MeasureInput(250, 80, fail=True),
+            "_input_scroll": WidthProvider(320),
+        },
+    )()
+    results.check(
+        "content height falls back to 36px when measurement fails",
+        ChatSidebar._composer_content_height_px(failed_content_owner) == 36,
+    )
+
+    class MarginInput:
+        def get_top_margin(self) -> int:
+            return 8
+
+        def get_bottom_margin(self) -> int:
+            return 8
+
+    class SizeTarget:
+        def __init__(self) -> None:
+            self.requests: list[tuple[int, int]] = []
+
+        def set_size_request(self, width: int, height: int) -> None:
+            self.requests.append((width, height))
+
+    class GeometryScroll(SizeTarget):
+        def __init__(self) -> None:
+            super().__init__()
+            self.policies: list[tuple[Gtk.PolicyType, Gtk.PolicyType]] = []
+            self.min_heights: list[int] = []
+            self.max_heights: list[int] = []
+            self.parent = SizeTarget()
+
+        def set_policy(self, horizontal, vertical) -> None:
+            self.policies.append((horizontal, vertical))
+
+        def set_min_content_height(self, height: int) -> None:
+            self.min_heights.append(height)
+
+        def set_max_content_height(self, height: int) -> None:
+            self.max_heights.append(height)
+
+        def get_parent(self) -> SizeTarget:
+            return self.parent
+
+    class ApplyOwner:
+        def __init__(self, content_height: int) -> None:
+            self.input = MarginInput()
+            self._input_scroll = GeometryScroll()
+            self.content_height = content_height
+            self.sync_calls: list[tuple[int, int]] = []
+
+        def _composer_line_height_px(self) -> int:
+            return 20
+
+        def _composer_max_visible_lines(self) -> int:
+            return 6
+
+        def _composer_content_height_px(self) -> int:
+            return self.content_height
+
+        def _sync_composer_action_valign(
+            self,
+            *,
+            content_h: int,
+            min_h: int,
+        ) -> None:
+            self.sync_calls.append((content_h, min_h))
+
+    missing_geometry = type(
+        "MissingGeometry",
+        (),
+        {"input": None, "_input_scroll": None},
+    )()
+    ChatSidebar._apply_composer_height(missing_geometry)
+    results.check(
+        "height application is a no-op until both widgets exist",
+        missing_geometry.input is None and missing_geometry._input_scroll is None,
+    )
+
+    short_owner = ApplyOwner(20)
+    ChatSidebar._apply_composer_height(short_owner)
+    short_scroll = short_owner._input_scroll
+    results.check(
+        "short content uses the 36px minimum without a scrollbar",
+        short_scroll.policies
+        == [(Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER)]
+        and short_scroll.min_heights == [36]
+        and short_scroll.max_heights == [136]
+        and short_scroll.requests == [(-1, 36)]
+        and short_scroll.parent.requests == [(-1, 36)]
+        and short_owner.sync_calls == [(20, 36)],
+    )
+
+    medium_owner = ApplyOwner(80)
+    ChatSidebar._apply_composer_height(medium_owner)
+    results.check(
+        "medium content uses its natural height without a scrollbar",
+        medium_owner._input_scroll.min_heights == [80]
+        and medium_owner._input_scroll.policies
+        == [(Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER)],
+    )
+
+    tall_owner = ApplyOwner(200)
+    ChatSidebar._apply_composer_height(tall_owner)
+    results.check(
+        "over-cap content is clamped and enables automatic vertical scrolling",
+        tall_owner._input_scroll.min_heights == [136]
+        and tall_owner._input_scroll.max_heights == [136]
+        and tall_owner._input_scroll.policies
+        == [(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)]
+        and tall_owner.sync_calls == [(200, 36)],
+    )
+
+    class FakeLabel:
+        def __init__(self) -> None:
+            self.visible = False
+            self.text = ""
+            self.classes: set[str] = set()
+            self.tooltip = ""
+
+        def set_visible(self, visible: bool) -> None:
+            self.visible = visible
+
+        def set_text(self, text: str) -> None:
+            self.text = text
+
+        def add_css_class(self, name: str) -> None:
+            self.classes.add(name)
+
+        def remove_css_class(self, name: str) -> None:
+            self.classes.discard(name)
+
+        def set_tooltip_text(self, text: str) -> None:
+            self.tooltip = text
+
+    label = FakeLabel()
+    counter_owner = type(
+        "CounterOwner",
+        (),
+        {"_composer_char_label": label},
+    )()
+    threshold = int(
+        window_module.COMPOSER_CHAR_LIMIT
+        * window_module.COMPOSER_COUNTER_SHOW_RATIO
+    )
+    ChatSidebar._update_composer_char_counter(counter_owner, threshold - 1)
+    results.check(
+        "character counter stays hidden below the warning threshold",
+        label.visible is False,
+    )
+    ChatSidebar._update_composer_char_counter(counter_owner, threshold)
+    results.check(
+        "character counter appears at the threshold with normal styling",
+        label.visible
+        and label.text
+        == f"{threshold:,} / {window_module.COMPOSER_CHAR_LIMIT:,}"
+        and "warning" not in label.classes
+        and label.tooltip
+        == (
+            "Hard safety limit is "
+            f"{window_module.COMPOSER_CHAR_LIMIT:,} characters"
+        ),
+    )
+    ChatSidebar._update_composer_char_counter(
+        counter_owner,
+        window_module.COMPOSER_CHAR_LIMIT,
+    )
+    results.check(
+        "character counter warns at the hard cap",
+        label.text
+        == (
+            f"{window_module.COMPOSER_CHAR_LIMIT:,} / "
+            f"{window_module.COMPOSER_CHAR_LIMIT:,}"
+        )
+        and "warning" in label.classes
+        and label.tooltip == "Character safety limit reached",
+    )
+
+    class InsertBuffer:
+        def __init__(self, count: int) -> None:
+            self.count = count
+            self.stopped: list[str] = []
+            self.inserted: list[tuple[object, str]] = []
+
+        def get_char_count(self) -> int:
+            return self.count
+
+        def stop_emission_by_name(self, name: str) -> None:
+            self.stopped.append(name)
+
+        def insert(self, location, text: str) -> None:
+            self.inserted.append((location, text))
+            self.count += len(text)
+
+    class InsertOwner:
+        def __init__(self, truncating: bool = False) -> None:
+            self._composer_truncating = truncating
+            self.counter_updates: list[int] = []
+
+        def _update_composer_char_counter(self, count: int) -> None:
+            self.counter_updates.append(count)
+
+    guarded_owner = InsertOwner(truncating=True)
+    guarded_buffer = InsertBuffer(10)
+    ChatSidebar._on_composer_insert_text(
+        guarded_owner,
+        guarded_buffer,
+        "loc",
+        "ignored",
+        7,
+    )
+    ChatSidebar._on_composer_insert_text(
+        InsertOwner(),
+        guarded_buffer,
+        "loc",
+        "",
+        0,
+    )
+    results.check(
+        "insert handler ignores reentrant and empty insertions",
+        guarded_buffer.stopped == [] and guarded_buffer.inserted == [],
+    )
+
+    full_owner = InsertOwner()
+    full_buffer = InsertBuffer(window_module.COMPOSER_CHAR_LIMIT)
+    ChatSidebar._on_composer_insert_text(
+        full_owner,
+        full_buffer,
+        "loc",
+        "x",
+        1,
+    )
+    results.check(
+        "insertions at the hard cap are stopped and refresh the counter",
+        full_buffer.stopped == ["insert-text"]
+        and full_buffer.inserted == []
+        and full_owner.counter_updates
+        == [window_module.COMPOSER_CHAR_LIMIT],
+    )
+
+    paste_owner = InsertOwner()
+    paste_buffer = InsertBuffer(window_module.COMPOSER_CHAR_LIMIT - 3)
+    ChatSidebar._on_composer_insert_text(
+        paste_owner,
+        paste_buffer,
+        "loc",
+        "abcdef",
+        6,
+    )
+    results.check(
+        "oversized pastes are clamped and the reentrancy guard is restored",
+        paste_buffer.stopped == ["insert-text"]
+        and paste_buffer.inserted == [("loc", "abc")]
+        and paste_owner._composer_truncating is False,
+    )
+
+    fitting_owner = InsertOwner()
+    fitting_buffer = InsertBuffer(10)
+    ChatSidebar._on_composer_insert_text(
+        fitting_owner,
+        fitting_buffer,
+        "loc",
+        "fits",
+        4,
+    )
+    results.check(
+        "in-range insertions are left to the default buffer handler",
+        fitting_buffer.stopped == [] and fitting_buffer.inserted == [],
+    )
+
+    class ChangedBuffer:
+        def __init__(self, text: str) -> None:
+            self.text = text
+            self.deletions: list[tuple[int, int]] = []
+
+        def get_char_count(self) -> int:
+            return len(self.text)
+
+        def get_iter_at_offset(self, offset: int) -> int:
+            return offset
+
+        def get_end_iter(self) -> int:
+            return len(self.text)
+
+        def delete(self, start: int, end: int) -> None:
+            self.deletions.append((start, end))
+            self.text = self.text[:start] + self.text[end:]
+
+        def get_start_iter(self) -> int:
+            return 0
+
+        def get_text(self, start: int, end: int, _include_hidden: bool) -> str:
+            return self.text[start:end]
+
+    class VisibilityTarget:
+        def __init__(self) -> None:
+            self.visible = None
+
+        def set_visible(self, visible: bool) -> None:
+            self.visible = visible
+
+    class ChangedOwner:
+        def __init__(self, truncating: bool = False) -> None:
+            self._composer_truncating = truncating
+            self._placeholder = VisibilityTarget()
+            self.counter_updates: list[int] = []
+            self.apply_calls = 0
+            self.idle_align_calls = 0
+
+        def _update_composer_char_counter(self, count: int) -> None:
+            self.counter_updates.append(count)
+
+        def _apply_composer_height(self) -> None:
+            self.apply_calls += 1
+
+        def _sync_composer_action_valign(self) -> bool:
+            self.idle_align_calls += 1
+            return False
+
+    guarded_changed_owner = ChangedOwner(truncating=True)
+    guarded_changed_buffer = ChangedBuffer("ignored")
+    ChatSidebar._on_buffer_changed(
+        guarded_changed_owner,
+        guarded_changed_buffer,
+    )
+    results.check(
+        "changed handler ignores reentrant buffer mutations",
+        guarded_changed_owner.counter_updates == []
+        and guarded_changed_owner.apply_calls == 0,
+    )
+
+    over_limit_owner = ChangedOwner()
+    over_limit_buffer = ChangedBuffer(
+        "x" * (window_module.COMPOSER_CHAR_LIMIT + 5)
+    )
+    ChatSidebar._on_buffer_changed(over_limit_owner, over_limit_buffer)
+    pump(0.05)
+    results.check(
+        "changed handler deletes text beyond the hard cap and restores its guard",
+        len(over_limit_buffer.text) == window_module.COMPOSER_CHAR_LIMIT
+        and over_limit_buffer.deletions
+        == [
+            (
+                window_module.COMPOSER_CHAR_LIMIT,
+                window_module.COMPOSER_CHAR_LIMIT + 5,
+            )
+        ]
+        and over_limit_owner._composer_truncating is False,
+    )
+    results.check(
+        "changed handler updates placeholder, counter, height, and idle alignment",
+        over_limit_owner._placeholder.visible is False
+        and over_limit_owner.counter_updates
+        == [window_module.COMPOSER_CHAR_LIMIT]
+        and over_limit_owner.apply_calls == 1
+        and over_limit_owner.idle_align_calls == 1,
+    )
+
+    empty_owner = ChangedOwner()
+    ChatSidebar._on_buffer_changed(empty_owner, ChangedBuffer(""))
+    pump(0.05)
+    results.check(
+        "empty changed buffers show the placeholder and report zero characters",
+        empty_owner._placeholder.visible is True
+        and empty_owner.counter_updates == [0]
+        and empty_owner.apply_calls == 1
+        and empty_owner.idle_align_calls == 1,
+    )
+
+    results.check(
+        "realized composer connects its surface-layout hook",
+        getattr(win, "_composer_layout_hooked", False) is True,
+    )
+    initial_request = win._input_scroll.get_size_request()
+    results.check(
+        "construction applies an initial composer height",
+        win._input_scroll.get_min_content_height() >= 36
+        and win._input_scroll.get_max_content_height()
+        >= win._input_scroll.get_min_content_height()
+        and initial_request[1] >= 36,
+        str(initial_request),
+    )
+
+    map_calls: list[str] = []
+    win._apply_composer_height = lambda *_args: map_calls.append("map")
+    map_error = ""
+    try:
+        win.emit("map")
+    except Exception as exc:  # noqa: BLE001
+        map_error = repr(exc)
+    finally:
+        del win._apply_composer_height
+    results.check(
+        "window map signal is wired to composer-height reapplication",
+        map_calls == ["map"] and not map_error,
+        map_error or repr(map_calls),
+    )
+
+    real_buffer = win.input.get_buffer()
+    real_buffer.set_text("")
+    pump(0.05)
+    results.check(
+        "real changed signal shows the placeholder for an empty buffer",
+        win._placeholder.get_visible() is True,
+    )
+    real_buffer.set_text("hello")
+    pump(0.05)
+    results.check(
+        "real changed signal hides the placeholder for nonempty text",
+        win._placeholder.get_visible() is False,
+    )
+
+    real_buffer.set_text("x" * window_module.COMPOSER_CHAR_LIMIT)
+    pump(0.05)
+    results.check(
+        "real changed signal presents the hard-cap counter warning",
+        real_buffer.get_char_count() == window_module.COMPOSER_CHAR_LIMIT
+        and win._composer_char_label.get_visible()
+        and win._composer_char_label.has_css_class("warning"),
+    )
+
+    real_buffer.set_text("x" * (window_module.COMPOSER_CHAR_LIMIT - 2))
+    end = real_buffer.get_end_iter()
+    real_buffer.insert(end, "wxyz")
+    pump(0.05)
+    real_text = real_buffer.get_text(
+        real_buffer.get_start_iter(),
+        real_buffer.get_end_iter(),
+        False,
+    )
+    results.check(
+        "real insert-text signal clamps an oversized paste at the hard cap",
+        real_buffer.get_char_count() == window_module.COMPOSER_CHAR_LIMIT
+        and real_text.endswith("wx"),
+    )
+
+    real_buffer.set_text("")
+    pump(0.05)
+    results.check(
+        "composer test restores the real buffer to its empty startup state",
+        real_buffer.get_char_count() == 0
+        and win._placeholder.get_visible() is True
+        and win._composer_char_label.get_visible() is False,
+    )
+
+
 def main() -> int:
     results = Results()
 
@@ -329,6 +1008,7 @@ def main() -> int:
     win: ChatSidebar = holder["win"]
     assert win is not None
     pump(0.5)
+    characterize_composer_geometry(results, win)
 
     # === [1] Startup: sidebar hidden, toggle inactive ===
     print("\n[1] Startup sidebar state (despite a stale sidebar_open=true settings file)", flush=True)
