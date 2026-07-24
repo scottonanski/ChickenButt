@@ -55,6 +55,7 @@ app_name = identity_lines[1]
 # of the installed tree.
 runtime_python_sources = files(
   'main.py',
+  'app_settings.py',
   'conversation_store.py',
   'message_widgets.py',
   'ollama_client.py',
