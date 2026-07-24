@@ -12,6 +12,8 @@ needing a real Ollama server.
 """
 from __future__ import annotations
 
+import contextlib
+import io
 import json
 import os
 import sys
@@ -29,6 +31,7 @@ gi.require_version("Adw", "1")
 from gi.repository import Adw, Gio, GLib  # noqa: E402
 
 from ollama_client import OllamaClient  # noqa: E402
+import window as window_module  # noqa: E402
 from window import ChatSidebar  # noqa: E402
 
 
@@ -131,6 +134,164 @@ def eval_js_value(web, js: str, captured: dict, timeout: float = 10.0):
     return None
 
 
+def characterize_settings(
+    results: Results,
+    settings_dir: Path,
+    settings_path: Path,
+) -> None:
+    """Lock down the settings helpers before their Phase-2 extraction."""
+    print("\n[0] Settings helper characterization", flush=True)
+
+    window_module._SETTINGS_DIR = settings_dir
+    window_module._SETTINGS_PATH = settings_path
+
+    results.check(
+        "missing settings file reads as an empty mapping",
+        window_module._read_settings() == {},
+    )
+
+    settings_dir.mkdir(parents=True, exist_ok=True)
+    settings_path.write_text('["not", "a", "mapping"]', encoding="utf-8")
+    results.check(
+        "valid non-object JSON is ignored",
+        window_module._read_settings() == {},
+    )
+    settings_path.write_text("{broken", encoding="utf-8")
+    results.check(
+        "malformed JSON is ignored",
+        window_module._read_settings() == {},
+    )
+    settings_path.write_text(
+        json.dumps({"last_model": "model-a", "keep": "value"}),
+        encoding="utf-8",
+    )
+    results.check(
+        "valid settings objects are returned intact",
+        window_module._read_settings()
+        == {"last_model": "model-a", "keep": "value"},
+    )
+
+    class ReadFailurePath:
+        def is_file(self) -> bool:
+            return True
+
+        def read_text(self, *, encoding: str) -> str:
+            raise OSError("forced read failure")
+
+    window_module._SETTINGS_PATH = ReadFailurePath()
+    results.check(
+        "settings read failures are ignored",
+        window_module._read_settings() == {},
+    )
+
+    class TypeFailurePath:
+        def is_file(self) -> bool:
+            return True
+
+        def read_text(self, *, encoding: str):
+            return object()
+
+    window_module._SETTINGS_PATH = TypeFailurePath()
+    results.check(
+        "settings read type failures are ignored",
+        window_module._read_settings() == {},
+    )
+
+    window_module._SETTINGS_PATH = settings_path
+    window_module._write_settings({"unicode": "✓", "nested": {"value": 1}})
+    written = settings_path.read_text(encoding="utf-8")
+    results.check(
+        "settings writes are UTF-8 JSON objects with a trailing newline",
+        written.endswith("\n")
+        and json.loads(written) == {"unicode": "✓", "nested": {"value": 1}},
+    )
+
+    class WriteFailurePath:
+        def write_text(self, *_args, **_kwargs) -> None:
+            raise OSError("forced write failure")
+
+    window_module._SETTINGS_PATH = WriteFailurePath()
+    captured = io.StringIO()
+    with contextlib.redirect_stdout(captured):
+        window_module._write_settings({"last_model": "model-a"})
+    results.check(
+        "settings write failures are reported and suppressed",
+        "settings save failed: forced write failure" in captured.getvalue(),
+        captured.getvalue().strip(),
+    )
+
+    window_module._SETTINGS_PATH = settings_path
+    for value, expected, label in (
+        (None, None, "missing last_model returns None"),
+        (7, None, "non-string last_model returns None"),
+        ("", None, "empty last_model returns None"),
+        ("   ", None, "whitespace-only last_model returns None"),
+        ("  model-b  ", "  model-b  ", "nonblank last_model is returned untrimmed"),
+    ):
+        settings_path.write_text(
+            json.dumps({"last_model": value}),
+            encoding="utf-8",
+        )
+        actual = window_module._load_last_model()
+        results.check(label, actual == expected, repr(actual))
+
+    settings_path.write_text(
+        json.dumps({"last_model": "same", "keep": "value"}),
+        encoding="utf-8",
+    )
+    before = settings_path.read_text(encoding="utf-8")
+    window_module._save_last_model("")
+    window_module._save_last_model("   ")
+    results.check(
+        "empty and whitespace-only saves are no-ops",
+        settings_path.read_text(encoding="utf-8") == before,
+    )
+    window_module._save_last_model("same")
+    results.check(
+        "saving the exact existing model is a no-op",
+        settings_path.read_text(encoding="utf-8") == before,
+    )
+    window_module._save_last_model("  changed:model  ")
+    saved = json.loads(settings_path.read_text(encoding="utf-8"))
+    results.check(
+        "saving a changed model preserves other keys and does not trim",
+        saved == {"last_model": "  changed:model  ", "keep": "value"},
+        repr(saved),
+    )
+
+    startup_cases = (
+        ([], "model-a", 0, "empty model list selects index zero"),
+        (["model-a", "model-b"], None, 0, "missing preference selects index zero"),
+        (["model-a", "model-b"], "model-b", 1, "exact preference wins"),
+        (
+            ["model-a:8b", "model-a:latest"],
+            "model-a:latest",
+            1,
+            "exact tagged preference wins over an earlier soft match",
+        ),
+        (
+            ["other:latest", "model-a:8b", "model-a:latest"],
+            "model-a:q4",
+            1,
+            "tag drift soft-matches the first installed base name",
+        ),
+        (
+            ["model-a", "model-b"],
+            "missing",
+            0,
+            "uninstalled preference falls back to index zero",
+        ),
+    )
+    for models, preferred, expected, label in startup_cases:
+        actual = window_module._pick_startup_model(models, preferred)
+        results.check(label, actual == expected, str(actual))
+
+    # Leave the production globals pointed at this test's isolated files for
+    # the real ChatSidebar model-load/persistence checks below.
+    window_module._SETTINGS_DIR = settings_dir
+    window_module._SETTINGS_PATH = settings_path
+
+
 def main() -> int:
     results = Results()
 
@@ -139,12 +300,15 @@ def main() -> int:
     os.environ["XDG_CONFIG_HOME"] = str(TMP / "config")
     os.environ["XDG_DATA_HOME"] = str(TMP / "data")
 
+    settings_dir = TMP / "config" / "chickenbutt"
+    settings_path = settings_dir / "settings.json"
+    characterize_settings(results, settings_dir, settings_path)
+
     # Seed a stale settings file with the old, no-longer-read sidebar_open
     # key set to true, BEFORE constructing any window — proves it's ignored
     # rather than merely untested.
-    settings_dir = TMP / "config" / "chickenbutt"
     settings_dir.mkdir(parents=True, exist_ok=True)
-    (settings_dir / "settings.json").write_text(
+    settings_path.write_text(
         json.dumps({"sidebar_open": True}), encoding="utf-8"
     )
 
@@ -351,7 +515,6 @@ def main() -> int:
     print("\n[9] A fresh ChatSidebar construction starts closed again", flush=True)
     # Re-assert the stale flag right before this specific construction, in
     # case anything upstream rewrote settings.json without it.
-    settings_path = TMP / "config" / "chickenbutt" / "settings.json"
     data = json.loads(settings_path.read_text(encoding="utf-8")) if settings_path.is_file() else {}
     data["sidebar_open"] = True
     settings_path.write_text(json.dumps(data), encoding="utf-8")
