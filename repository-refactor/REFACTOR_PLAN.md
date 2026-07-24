@@ -5,23 +5,28 @@ reports under `research/` provide evidence; they do not authorize
 implementation on their own. Do not create competing status, handoff, or
 roadmap files — update this document instead.
 
-Status as of 2026-07-23: **research complete, through seven rounds of
+Status as of 2026-07-23: **research complete, through eight rounds of
 cross-review, awaiting Scott's decision.** No application code has been
 changed. Nothing below is authorized to start until Scott approves it
 explicitly.
 
-The phase plan below has gone through seven review rounds, all from
-Codex/ChatGPT against the actual source, all independently verified by
-Claude before being folded in by checking source claims directly against
-`window.py` (and, where a claim was about test behavior, against the
-relevant `scripts/test_*.py` file) each round. The full suite was run
-once, during round 1, to establish the verified baseline (15/15 passing,
-`test_installed_layout.py` 47/47, `test_desktop_integration.py` 37/37,
-zero skips); rounds 2-7 were documentation-only revisions with no
-application-code changes to re-verify against, so they relied on that
-already-established baseline rather than re-running it. See
-`research/00-window-audit.md` revision notes for the full findings list
-of all seven rounds.
+The phase plan below has gone through eight review rounds. Rounds 1-7
+were Codex/ChatGPT reviews against the actual source, independently
+verified by Claude before being folded in by checking source claims
+directly against `window.py` (and, where a claim was about test behavior,
+against the relevant `scripts/test_*.py` file). Round 8 was an independent
+browser-GPT review of immutable published commit `6040d39`, followed by
+local Codex verification of every candidate finding against the clean,
+synchronized checkout; six structural findings were confirmed, while
+the proposed settings finding was reclassified as useful enumeration
+already covered by Phase 1's exhaustive requirement, not a blocker. The
+full suite was run once, during round 1, to establish the verified
+baseline (15/15 passing, `test_installed_layout.py` 47/47,
+`test_desktop_integration.py` 37/37, zero skips); rounds 2-8 were
+documentation-only revisions with no application-code changes to
+re-verify against, so they relied on that already-established baseline
+rather than re-running it. See `research/00-window-audit.md` revision
+notes for the full findings list of all eight rounds.
 **Round 1** fixed oversized phases (~500-750 method-lines each) and a
 monolithic characterization phase. **Round 2** found the round-1 fix had
 recreated the same monolithic-test problem in one place, an
@@ -98,14 +103,27 @@ every method in the transcript-adapter phase, re-reading
 `_next_msg_id` call site. Given how many rounds running had found the
 same class of cross-phase attribution error, round 7 also adds the
 **ownership/migration matrix** below, so these relationships are checked
-mechanically instead of re-derived from prose each round. **What's
-actually agreed right now:** the findings from all seven rounds, and the
-general direction (standalone characterization phase before every
-extraction with no exceptions, exact behavior preservation with nothing
-folded into an extraction PR, explicit ownership/interfaces — including
-staged migrations governed by a general invariant where an immediate
-cutover isn't possible — for every seam this audit found ambiguous).
-**What's not yet locked:** the precise phase table is now on its seventh
+mechanically instead of re-derived from prose each round. **Round 8**
+found six more structural gaps in Phases 3-10: the Phase-10
+`_greeted_models` ownership interval was invalid until Phase 22; the
+model-session compatibility inventory omitted live consumers and any
+removal lifecycle; three loader-private state fields and their behavior
+were missing from Phases 9/10; Phase 8's callback/provider contract and
+`_suppress_model_select` ownership were incomplete; export omitted
+dialog/write branches and a caller/delegator lifecycle; and composer
+geometry omitted its window-geometry providers and build-time signal
+migration. The browser reviewer also proposed more settings assertions,
+but local verification found that Phase 1 already requires every moved
+settings behavior and Phase 2 already preserves re-export compatibility,
+so that item is precision guidance rather than a seventh structural
+defect. **What's actually agreed right now:** the findings from all
+eight rounds, and the general direction (standalone characterization
+phase before every extraction with no exceptions, exact behavior
+preservation with nothing folded into an extraction PR, explicit
+ownership/interfaces — including staged migrations governed by a
+general invariant where an immediate cutover isn't possible — for every
+seam this audit found ambiguous).
+**What's not yet locked:** the precise phase table is now on its eighth
 revision and may see further changes if another review pass finds
 something; treat it as the current best draft, not a settled agreement,
 until it survives a review round with no further findings.
@@ -155,7 +173,7 @@ go-ahead.
 
 ---
 
-## Proposed phase sequence (from `research/00-window-audit.md` §7, round 7)
+## Proposed phase sequence (from `research/00-window-audit.md` §7, round 8)
 
 Ordered lowest-coupling/highest-existing-coverage first so the extraction
 pattern is proven before it's applied to the most entangled groups. Every
@@ -193,14 +211,14 @@ consumers.
 |---|---|---|---|---|
 | 1 | Settings characterization (test-only) — covers *every* moved behavior: read/write-failure handling, `_load_last_model`, `_save_last_model` whitespace/no-op, `_pick_startup_model` | — | n/a | Not yet |
 | 2 | Settings extraction (group A subset) → own module | Phase 1 | Negligible | Not yet |
-| 3 | Composer geometry characterization (test-only) — full scope of Phase 4's move: sizing, char-cap truncation, placeholder visibility, scrollbar-policy transitions, the alignment-callback interaction | — | n/a | Not yet |
-| 4 | Composer geometry/character-cap extraction *only* — explicit interface for `_placeholder` injection, `_composer_truncating`/`_composer_layout_hooked` ownership, and the alignment callback | Phase 3 | Low | Not yet |
-| 5 | Export characterization (test-only) | — | n/a | Not yet |
-| 6 | Export extraction via an **injected title provider** — `_conversation_display_title` stays conversation-owned (shared with delete-confirm), export takes a `title_provider` callback instead of owning or reaching back for it (**this callback gets re-bound in Phase 22, per its round-7 correction**) | Phase 5 | Low-medium | Not yet |
-| 7 | Health/probe characterization (test-only) — **all of group I**: `_apply_health`/probe ordering, **plus `_on_health_action`'s three branches, `_preferred_model`, and model-selection edge cases, all confirmed untested** | — | n/a | Not yet |
-| 8 | Health/probe extraction (group I), **excluding** `_set_load_controls_sensitive` and **not claiming ownership of `_model`/`_loading_model`/`_load_failed`/`_load_generation`** — reports via callbacks into whatever currently owns model-session state (window-owned until Phase 10) | Phase 7 | Medium | Not yet |
-| 9 | Model-load characterization (test-only) — stale-load ordering, **plus** `_update_load_progress`'s NDJSON mapping and `_on_model_load_finished`'s success/failure completion UI, **plus greeting-dedup behavior across repeated loads** | — | n/a | Not yet |
-| 10 | Model-load extraction (group J), **excluding** `_set_load_controls_sensitive` and `_show_ephemeral_greeting`, and **becoming the sole canonical owner of model-session state** (`_model`/`_loading_model`/`_load_failed`/`_load_generation`, **and `_greeted_models`**, verified two-owner overlap with group F — this phase exposes `reset_greetings()` for the conversation-lifecycle phase) — migrates Phase 8's already-extracted callbacks onto this new interface | Phase 8, Phase 9 | Medium | Not yet |
+| 3 | Composer geometry characterization (test-only) — full scope of Phase 4's move: sizing, char-cap truncation, placeholder visibility, scrollbar-policy transitions, the alignment-callback interaction, **surface-layout hook retry/idempotence/immediate reapply/layout-event behavior, and line/content/window-size fallbacks** | — | n/a | Not yet |
+| 4 | Composer geometry/character-cap extraction *only* — explicit interface for `_placeholder` injection, `_composer_truncating`/`_composer_layout_hooked` ownership, the alignment callback, and **narrow surface/height/default-size providers**; explicitly rewires the initial height application plus buffer `changed`/`insert-text` and window `realize`/`map` connections | Phase 3 | Low | Not yet |
+| 5 | Export characterization (test-only) — both formats, format normalization/fallback, basename/title fallback, missing-conversation no-op, dialog cancellation/non-cancellation errors, `None` file/missing-path no-ops, successful UTF-8 write, and write-failure logging/dialog behavior | — | n/a | Not yet |
+| 6 | Export extraction via an **injected title provider** — `_conversation_display_title` stays conversation-owned (shared with delete-confirm), export takes a `title_provider` callback instead of owning or reaching back for it (**this callback gets re-bound and integration-tested in Phase 22**) plus its required store/transient-parent dependencies; `ChatSidebar.export_conversation` remains an intentional thin delegator so the two window actions and two popover callbacks keep one stable entrypoint | Phase 5 | Low-medium | Not yet |
+| 7 | Health/probe characterization (test-only) — **all of group I, branch by branch**: `_refresh_models`' loading no-op; `_apply_health`; current no-generation-guard probe ordering and every healthy/no-model/unavailable/error transition; `_on_health_action`'s three branches; `_preferred_model` store priority/exception fallback; and `_select_model_name`/`_on_model_selected` exact/soft/no-match, placeholder/error, same-model, retry, warm/no-warm, and load-in-progress paths | — | n/a | Not yet |
+| 8 | Health/probe extraction (group I), **excluding** `_set_load_controls_sensitive` and **not claiming ownership of model-session state** — owns `_health`, `_suppress_model_select`, `_health_action_id`, and `_health_action_model`; its explicit narrow contract supplies nullable current-model get/set, loading/failed reads, failed-state write, begin-load, messages-empty, active-conversation model-preference, status, overlay-hide, shared-sensitivity, send-sensitivity, and input-sensitivity callbacks/providers, plus the client/model-selector/refresh/health-presentation dependencies. Phase 10 rebinds model-session callbacks; Phase 22 later rebinds message/conversation providers | Phase 7 | Medium | Not yet |
+| 9 | Model-load characterization (test-only) — empty-model/streaming no-ops; stale status/chunk/finish ordering; cancellation/generation replacement; one-pulse-only start, stop, hidden-overlay termination, and determinate/indeterminate transitions; NDJSON mapping; success/failure completion UI and sensitivity ordering; last-model/conversation-model persistence ordering and failure continuation; repeated-load greeting dedup; and **the exact clear/successful-new/switch reset placement, including no reset for the already-empty `new_chat` branch** | — | n/a | Not yet |
+| 10 | Model-load extraction (group J), **excluding** `_set_load_controls_sensitive` and `_show_ephemeral_greeting`, and becoming sole canonical owner of `_model`/`_loading_model`/`_load_failed`/`_load_generation`, loader-private `_stop_load`/`_load_pulse_id`/`_load_indeterminate`, and `_greeted_models`. It migrates Phase 8's callbacks; exposes model-session queries/mutations plus `reset_greetings()`; **immediately rewires `clear_chat`/successful `new_chat`/`switch_conversation` to call that reset at their existing branch positions**; and installs read-only delegating compatibility properties for unmigrated `_model`/`_loading_model`/`_load_failed` readers until their inventoried Phase 18/20/22/24/26 migrations complete | Phase 8, Phase 9 | Medium | Not yet |
 | 11 | Transcript reset/replay/removal characterization (test-only) — first of three native-transcript slices (**round 7: split from one oversized pair — 13 methods, ~705 lines, incl. the 254-line `_start_assistant_stream`, measured directly**) | — | n/a | Not yet |
 | 12 | Transcript adapter seam: reset, replay, removal — incl. `_native_remove_message` (pure rendering, no message-action calls) | Phase 11 | Medium | Not yet |
 | 13 | Status-message and greeting characterization (test-only) — second slice: CLI status-bubble create/update, ephemeral greeting, both backends | — | n/a | Not yet |
@@ -212,7 +230,7 @@ consumers.
 | 19 | Composer-CLI-command characterization (test-only) — **all eight methods Phase 20 moves**, not just three: busy-state sensitivity, pull-progress formatting, status create/update, error handling, successful-pull-triggers-refresh | — | n/a | Not yet |
 | 20 | Composer-CLI-command extraction (group K) — CLI controller owns only the busy flag, reports it through a **new, narrow `on_cli_busy_changed(bool)` callback that reproduces today's send-button-only behavior** (not a call to `_set_load_controls_sensitive`, which touches far more widgets); also needs an `on_pull_succeeded` hook for the model-refresh call currently made directly | Phase 8, Phase 14, Phase 19 | Low-medium | Not yet |
 | 21 | Conversation-lifecycle characterization (test-only) — `new_chat`/`clear_chat`/`delete_conversation`/`_confirm_delete_conversation`, currently untested at the `ChatSidebar` level, **plus the persistence-failure-ordering asymmetry**: `switch_conversation` continues past a `set_active` failure while `delete_conversation` aborts past a store failure — confirmed via exact except-block behavior | — | n/a | Not yet |
-| 22 | Conversation-lifecycle extraction (group F) — **establishes the canonical in-memory active-conversation projection (conversation ID + messages *only*)** via a staged migration: `ConversationStore` stays canonical persisted storage; this phase owns the projection + a **getter-and-setter** compatibility facade (a getter alone can't support group L's whole-list reassignment call sites); **migrates every currently-known read-only `_messages` consumer**, **now including** the transcript-adapter's `current_text()` accessor, Phase 8's `_preferred_model`, Phase 18's active-ID accessor, and Phase 6's title-provider callback (round 7 additions — all confirmed consumers the round-6 list missed), plus re-pointing Phase 18's `on_activate`/`on_delete` callbacks to this phase's own object; **also becomes the owner of message-ID allocation** (`_next_msg_id`/`_msg_counter` — round 7 correction: these were misassigned to message actions; real callers are this phase, CLI, streaming, and native rendering, never group L) and **must explicitly preserve `_history_restored`** (write-only, never read, dropping it would be cleanup mixed into extraction) and **the persistence-failure-ordering asymmetry from Phase 21** | Phase 12, Phase 21 | Medium-high | Not yet |
+| 22 | Conversation-lifecycle extraction (group F) — **establishes the canonical in-memory active-conversation projection (conversation ID + messages *only*)** via a staged migration: `ConversationStore` stays canonical persisted storage; this phase owns the projection + a **getter-and-setter** compatibility facade (a getter alone can't support group L's whole-list reassignment call sites); **migrates every currently-known read-only `_messages` consumer**, including the transcript-adapter's `current_text()` accessor, Phase 8's `_preferred_model`, Phase 18's active-ID accessor, and Phase 6's title-provider callback, with an integration assertion that the rebound export provider sees the migrated projection; re-points Phase 18's `on_activate`/`on_delete` callbacks; **preserves Phase 10's already-rewired `reset_greetings()` calls at their exact clear/successful-new/switch branch positions**; **also becomes the owner of message-ID allocation** (`_next_msg_id`/`_msg_counter` — real callers are this phase, CLI, streaming, and native rendering, never group L); and **must explicitly preserve `_history_restored`** (write-only, never read, dropping it would be cleanup mixed into extraction) and **the persistence-failure-ordering asymmetry from Phase 21** | Phase 12, Phase 21 | Medium-high | Not yet |
 | 23 | Message-action characterization (test-only, group L, both transcript modes) — **including a direct test of `_on_web_intent` dispatch routing, and completed (not cancelled) regenerate/continue commits through `_commit_assistant_result`** (confirmed: `test_generation_lifecycle.py` has zero `"replace"`/`"continue"`/`_commit_assistant_result` references) | Phase 11/15 (as template) | n/a | Not yet |
 | 24 | Message-action extraction (group L, native-rendering **and message-ID allocation excluded** — both belong elsewhere per round 7) — **migrates onto Phase 22's interface** (facade not yet removed; group M still uses it) | Phase 16, Phase 22, Phase 23 | Medium-high | Not yet |
 | 25 | Streaming characterization (test-only) — non-cancellation error paths mid-stream, **plus `_send` itself** (round 7 correction: `test_generation_lifecycle.py`'s own helper docstring says it "mirrors" `_send` while explicitly skipping its composer/health/model guards — `_send` has zero direct coverage, not just thin coverage): empty-input guard, busy guards, composer-command routing, unhealthy-reprobe, missing-model guard, successful append/persist/start ordering | — | n/a | Not yet |
@@ -256,15 +274,15 @@ mismatch between them is itself a bug in the plan.
 |---|---|---|---|---|---|---|
 | **Messages / active conversation ID** (`self._messages`, `self._conversation_id`) | Written: F (clear/new/switch/restore), L (delete/drop/regenerate/edit-resend), M (send/commit). Read: D (`_composer_hint_should_show`), I (`_select_model_name`/`_on_model_selected`/`_on_ollama_probe`/`_on_health_action`/`_preferred_model`), J (`_on_model_load_finished`/`_show_ephemeral_greeting`), E (`_rebuild_history_list`/`_select_active_history_row`), C (`_build_ui` reads `_conversation_id` in its export-action closures, `window.py:720`/`726` — added: a retained reader earlier revisions omitted), transcript adapter's `current_text()`, export's `title_provider` | **Phase 22** | Getter-*and-setter* facade property on `ChatSidebar._messages`; `_conversation_id` a plain attribute until Phase 22 | Composer hint (retained method, migrated in-place by Phase 22), `_build_ui`'s export-action closures (retained, migrated in-place by Phase 22), health/load callback wiring (Phases 8/10), sidebar accessor (Phase 18), transcript adapter's `current_text()` (Phase 16), export's `title_provider` (Phase 6) | **Phase 26** (once groups L/M, the only mutators, are migrated) | Phase 21 (incl. persistence-failure-ordering asymmetry) |
 | **Message-ID allocation** (`_next_msg_id`, `_msg_counter`) | Called from F (`_apply_restored_transcript`), K (`_post_status_message`), M (`_send`, `_start_assistant_stream`), native rendering (`_append_message`) — **never L** | **Phase 22** | Plain `ChatSidebar` method (`_next_msg_id`) unchanged until Phase 22 | Phases 16/20/26's already-extracted objects' calls re-pointed to the new owner | N/A (thin delegator retained, not a raw-attribute facade) | Format guarantees (`{prefix}-{counter}-{uuid suffix}`) added to Phase 21's test scope |
-| **Model session** (`_model`, `_loading_model`, `_load_failed`, `_load_generation`) | Written by I (`_select_model_name`/`_on_model_selected`/`_on_ollama_probe`) and J (`_on_model_load_finished`, **and `_begin_model_load`** — corrected: `_begin_model_load` writes `_loading_model` (`window.py:2695`), `_load_failed` (`2696`), and is the **sole non-`__init__` writer of `_load_generation`** (`+= 1`, `2693`), the by-value-captured concurrency counter of §4.3; earlier revisions omitted it from this cell entirely) | **Phase 10** | I's methods use callbacks into `ChatSidebar` until Phase 10 lands, then Phase 10 migrates that wiring | Sidebar's `is_loading_model` (Phase 18, consumes directly — Phase 10 precedes it), streaming's guards (Phase 26) | N/A (Phase 10 becomes owner outright in its own phase) | Phase 9 (stale-load ordering + completion UI) |
-| **Greeting deduplication** (`_greeted_models`) | Cleared by F (clear/new/switch); read + mutated only by J (`_on_model_load_finished`) — I never touches it | **Phase 10** | Plain attribute until Phase 10 | Phase 22 calls `reset_greetings()` on every conversation transition | N/A (Phase 10 owns outright) | Phase 9 (added round 7) |
-| **Health** (`_health`, `HealthState`) | Written by I (`_apply_health`); read by M (`_send` checks `can_chat`) | **Phase 8** | N/A — I owns outright once extracted | `_send`'s reprobe check (Phase 26, consumes directly since Phase 8 precedes it) | N/A | Phase 7 (incl. `_on_health_action`, `_preferred_model` — round 7 additions); `_send`'s reprobe branch added to Phase 25 |
+| **Model session** (`_model`, `_loading_model`, `_load_failed`, `_load_generation`; loader-private `_stop_load`, `_load_pulse_id`, `_load_indeterminate`) | I writes `_model`/`_load_failed` and reads `_model`/`_loading_model`/`_load_failed`; J writes all four canonical fields and exclusively owns the three loader-private fields. Direct readers also remain in E (`_refresh_chat_title`), F (clear/new/switch/ensure/restore), L (message-action guards), K (CLI sensitivity/status), M (send/start/finish), N (`_set_status`), and retained `_set_load_controls_sensitive` | **Phase 10** | Phase 8 uses callbacks into `ChatSidebar` until Phase 10 migrates them. At cutover, Phase 10 supplies read-only delegating `ChatSidebar` compatibility properties for `_model`/`_loading_model`/`_load_failed`; `_load_generation` and the loader-private fields stay internal because no outside consumer needs them | Phase 18 sidebar/title; Phase 20 CLI; Phase 22 lifecycle/ensure/restore; Phase 24 message actions; Phase 26 send/stream/status. Phase 26 also rewires any retained `_set_load_controls_sensitive` or other window readers found by the required whole-file inventory | **Phase 26**, only after the whole-file inventory proves no raw compatibility-property consumers remain | Phase 9: no-op guards, generation/stale callbacks, cancellation, pulse/progress lifecycle, completion UI, sensitivity and persistence ordering |
+| **Greeting deduplication** (`_greeted_models`) | Cleared by F (`clear_chat`, successful `new_chat`, `switch_conversation`); read + mutated only by J (`_on_model_load_finished`) — I never touches it | **Phase 10** | Plain attribute until Phase 10 | **Phase 10 immediately rewires all three F call sites to `reset_greetings()` at their existing branch positions**; Phase 22 preserves those calls when it later extracts F | N/A (no invalid interim facade or second owner) | Phase 9: repeated-load dedup plus clear/successful-new/switch resets and the already-empty-new no-reset branch |
+| **Health/probe state** (`_health`, `_suppress_model_select`, `_health_action_id`, `_health_action_model`) | Written/read within I except `_health`, which M reads to decide whether `_send` re-probes | **Phase 8** | N/A — I owns outright once extracted; model-session and message/conversation state are supplied through the Phase-8 callback/provider contract | Phase 10 rebinds model-session callbacks; Phase 22 rebinds message/conversation providers; Phase 26 consumes health for `_send` | N/A | Phase 7 branch-level coverage for all seven I methods; Phase 25 covers `_send`'s reprobe branch |
 | **Streaming state** (`_streaming`, `_stream_generation`, `_active_stream_cancel`) | Written by M; read by F/L/E's guard checks **plus four further reader methods earlier revisions omitted** (six read sites, all on `_streaming`): J's `_begin_model_load` (`window.py:2688`), K's `_set_composer_cmd_busy` (`2955`), N's `_set_status` (`2372`), and the shared, window-owned sensitivity policy `_set_load_controls_sensitive` (`2560`, `2563`, `2573`) | **Phase 26** (last) | Plain attribute for everyone until Phase 26; F/L/E's already-extracted objects read via callback into `ChatSidebar` the whole time | F's guards (Phase 22), L's guards (Phase 24), E's `is_streaming` (Phase 18) — all migrated by Phase 26. **Plus the four readers above:** J needs streaming-state access once extracted at **Phase 10**; K's **Phase 20** `on_cli_busy_changed` callback must reproduce today's behavior *using streaming state*; `_set_status` is **not** moved by transcript Phases 12-16 — its streaming-state transition belongs to **Phase 26**; `_set_load_controls_sensitive` stays window-owned but will need access to Phase 26's streaming owner | **Phase 26** (last phase, nothing after it) | `test_generation_lifecycle.py` — strongest-covered state in the file; `_send`'s own guard added in Phase 25 |
 | **CLI busy state** (`_ollama_cli_busy`) | Written + read only by K; consumed for gating in `_send` | **Phase 20** | Dynamically-created plain attribute until Phase 20 | `_send`'s busy-check (Phase 26, consumes directly) | N/A (Phase 20 owns outright) | Phase 19 (widened, round 7) |
 | **History-dirty state** (`_history_dirty`) | Raw assignments in `__init__`/`_build_ui` (group C) and `_mark_history_dirty`/`_rebuild_history_list` (group E) — **group F never assigns directly, only calls `_mark_history_dirty()`** (round 7 correction to round 6's evidence) | **Phase 18** | Plain attribute/method until Phase 18 | Group F's calls to `_mark_history_dirty()` stay as plain calls into the new sidebar object until Phase 22 extracts F itself | N/A (Phase 18 owns outright) | Phase 17 (the short-circuit itself, not just setting the flag) |
 | **Transcript presentation** (`_transcript_mode` branch; `_web`/`chat_box`; status/greeting rendering; streaming update posting) | Touched by C, F, K, L (removal), M (streaming), native action-bar/edit/remove | **Phases 12/14/16** (three-way split, round 7) | N/A — this is the interface-introduction itself | F (Phase 22), K (Phase 20), L (Phase 24), M (Phase 26) all consume the finished `TranscriptSink` once their own phase runs (ordering already ensures adapter phases precede all four) | N/A (seam introduction, not a migration-with-facade) | Phases 11/13/15 (three slices, round 7 split) |
 | **Sensitivity policy** (`_set_load_controls_sensitive`, composer/nav/sidebar enablement) | **Current callers are exclusively I/J** (four call sites): I's `_refresh_models` (`window.py:2417`) and `_on_ollama_probe` (`2468`); J's `_show_load_overlay` (`2618`) and `_hide_load_overlay` (`2651`). **K does not call it today** — corrected: earlier revisions listed K in this "current" column, but K's Phase-20 narrow `on_cli_busy_changed` callback is *proposed* design, not current state, and per the CLI-busy row it deliberately does **not** call `_set_load_controls_sensitive` (which touches far more widgets than K's send-button-only behavior) | **Deliberately unresolved** — §5 risk 3, a decision for Scott | N/A | N/A until Scott authorizes a consolidation phase | N/A | None directly; exercised only incidentally through Phases 7-10/19-20's tests — flagged as a known gap, out of scope for these 26 phases |
-| **Status/title presentation** (`_conversation_display_title`, `_refresh_chat_title`, `_set_status`) | `_conversation_display_title` read by export (Phase 6) and delete-confirm (Phase 22); `_refresh_chat_title` (Phase 18) reads `_loading_model`/`_streaming`/`ConversationStore`/`_conversation_id`; `_set_status` (Phase 26) falls back to `_refresh_chat_title` | `_conversation_display_title` → **Phase 22**; `_refresh_chat_title` → **Phase 18** | Export's `title_provider` callback (Phase 6) bound to `ChatSidebar._conversation_display_title` until Phase 22 | Export's `title_provider` re-bound once Phase 22 lands; `_refresh_chat_title`'s accessors migrated per the model-session/streaming-state rows above | N/A | Phase 17 (round 7 addition — `_refresh_chat_title` was previously untested) |
+| **Status/title presentation** (`_conversation_display_title`, `_refresh_chat_title`, `_set_status`) | `_conversation_display_title` read by export (Phase 6) and delete-confirm (Phase 22); `_refresh_chat_title` (Phase 18) reads `_loading_model`/`_streaming`/`ConversationStore`/`_conversation_id`; `_set_status` (Phase 26) falls back to `_refresh_chat_title` | `_conversation_display_title` → **Phase 22**; `_refresh_chat_title` → **Phase 18** | Export's `title_provider` callback (Phase 6) bound to `ChatSidebar._conversation_display_title` until Phase 22 | Export's provider is re-bound once Phase 22 lands; `_refresh_chat_title`'s accessors migrate per the model-session/streaming-state rows above | N/A | Phase 5 covers export title fallback; Phase 17 covers `_refresh_chat_title`; Phase 22 must assert the rebound export provider sees the migrated active-conversation projection |
 
 ## Decisions log
 
@@ -362,12 +380,26 @@ mismatch between them is itself a bug in the plan.
   how many rounds running had found the same class of cross-phase
   attribution error, this round also adds the **ownership/migration
   matrix** above, so these relationships can be checked mechanically
-  rather than re-derived from prose each round. **Consensus so far covers
-  the findings from all seven rounds and the general revision direction;
-  it does not yet cover the precise 26-phase table as final** — that
-  table is the current best draft and remains open to a further review
-  round. No phase is approved for implementation until Scott says so,
-  independent of whether the research documents reach a stable state.
+  rather than re-derived from prose each round.
+- 2026-07-23 (round 8) — Browser GPT reviewed immutable published commit
+  `6040d39` and reported seven candidate findings for Phases 1-10. Codex
+  then verified each candidate against the synchronized local checkout,
+  current source, tests, phase text, and ownership matrix. Six structural
+  findings were confirmed: Phase 10's invalid greeting-ownership
+  interval; the incomplete model-session consumer/facade lifecycle;
+  missing loader-private ownership and Phase-9 behaviors; Phase 8's
+  incomplete callback/provider and internal-state contract; export's
+  missing async/no-op coverage and delegator/provider lifecycle; and
+  composer's missing geometry providers and build-time signal migration.
+  The settings candidate identified useful concrete assertions but was
+  not a structural defect because Phase 1 already requires every moved
+  behavior and Phase 2 already requires re-export compatibility.
+  **Consensus so far covers the findings from all eight rounds and the
+  general revision direction; it does not yet cover the precise 26-phase
+  table as final** — that table is the current best draft and remains
+  open to a further review round. No phase is approved for implementation
+  until Scott says so, independent of whether the research documents
+  reach a stable state.
 
 ## Successful phase reporting
 

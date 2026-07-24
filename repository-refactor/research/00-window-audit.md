@@ -252,6 +252,32 @@ per the working rules, remains a draft until it survives a review round
 with no further findings — see `../REFACTOR_PLAN.md` decisions log and
 its ownership/migration matrix.
 
+**Revision note (round 8):** browser GPT independently reviewed immutable
+published commit `6040d39` and produced seven candidate findings for
+Phases 1-10. It could inspect the published GitHub tree but not execute
+local Git, hashes, the manifest check, or tests; it disclosed those limits.
+Codex then verified every candidate against the clean synchronized local
+checkout, `window.py`, the test bodies, this audit, and the active plan.
+Six structural findings were confirmed: (1) Phase 10's ownership of
+`_greeted_models` left its three group-F reset writers pointing at the old
+attribute until Phase 22, an invalid twelve-phase interval; (2) the
+model-session row omitted many live readers plus its compatibility
+facade/removal lifecycle; (3) `_stop_load`, `_load_pulse_id`, and
+`_load_indeterminate` were unassigned despite being private state of the
+moved loader, and Phase 9 did not enumerate their behavior; (4) Phase 8's
+callback/provider contract and `_suppress_model_select` ownership were
+incomplete; (5) export characterization omitted dialog/write/no-op
+branches and Phase 6 did not settle caller/delegator lifetime; and (6)
+composer extraction omitted window-geometry providers and its build-time
+signal migration. The seventh candidate listed valid positive-path
+settings assertions, but was reclassified as useful enumeration rather
+than a structural defect: Phase 1 already requires every moved settings
+behavior and Phase 2 already requires re-export compatibility. The six
+confirmed corrections are folded into §7 and the active matrix; no phase
+number or order changed. Consensus remains on findings and direction;
+the phase table is on its eighth revision and remains a draft until it
+survives a review round with no further findings.
+
 ---
 
 ## 1. What window.py currently is
@@ -497,10 +523,14 @@ matter for extraction boundaries, grouped by who reads/writes them:
   (`switch_conversation`, `new_chat`, `delete_conversation` all check
   `_streaming` and call `_invalidate_active_stream`) and L (every message
   action guards on `_streaming`).
-- **Model-load state**: `_loading_model`, `_stop_load`,
-  `_load_generation`, `_load_failed`, `_load_indeterminate`. Written by
-  groups I/J, read by M (`_send` guards on `_loading_model`) and by the
-  composer-sensitivity logic in I/J/M/K jointly.
+- **Model-session/load state**: `_model`, `_loading_model`,
+  `_load_generation`, `_load_failed`, `_stop_load`, `_load_pulse_id`,
+  `_load_indeterminate`. Groups I/J both write `_model` and
+  `_load_failed`; J writes `_loading_model`/`_load_generation` and
+  exclusively owns `_stop_load`/`_load_pulse_id`/`_load_indeterminate`.
+  Direct readers span E/F/I/J/K/L/M/N plus the retained shared
+  sensitivity method; §7 Phase 10 and the active plan's ownership matrix
+  assign their staged migration.
 - **`_greeted_models`** (correction, round 6): this was previously
   bundled into "model-load state" and misattributed as "written by groups
   I/J" — verified that's wrong. It's actually cleared by three group-F
@@ -807,8 +837,15 @@ policy transitions** (`_apply_composer_height`'s `_input_scroll.set_policy(...)`
 switching between `NEVER`/`AUTOMATIC` as content crosses the visible-line
 cap), and the **alignment-callback interaction** (`_apply_composer_height`
 and `_on_buffer_changed` both invoking `_sync_composer_action_valign`,
-directly and via `GLib.idle_add` respectively). Risk: n/a (test-only).
-Verification: new tests pass against current `main` unmodified.
+directly and via `GLib.idle_add` respectively).
+
+**Correction (round 8):** the surface-layout hook and geometry fallbacks
+are part of the moved behavior too. Characterize hook retry when no
+surface is available, idempotence once connected, the immediate height
+reapplication after connection, later layout-event reapplication, and
+the line-height/content-height/window-height fallback paths. Risk: n/a
+(test-only). Verification: new tests pass against current `main`
+unmodified.
 
 **Phase 4 — Composer geometry/character-cap extraction only.** Covers
 *only* `_hook_composer_surface_layout`, `_composer_line_height_px`,
@@ -825,16 +862,30 @@ concern, since `_sync_composer_action_valign`/`_composer_hint_should_show`/
 `_sync_composer_hint`/`_on_input_key` stay on `ChatSidebar` (they touch
 `send_btn`/`stop_btn`/`_messages`/`_send` — group M/F territory, not
 geometry) and both `_apply_composer_height` and `_on_buffer_changed` call
-into that alignment method today. Risk: low, but only if the interface
-above is made explicit in the PR description and review — not left
-implicit. Verification: full suite + Phase 3 tests + manual resize check.
+into that alignment method today.
+
+**Correction (round 8):** the extracted object must also receive narrow
+providers for the compositor surface, current window height, and default
+window size instead of reaching back into `ChatSidebar` for
+`get_surface()`, `get_height()`, or `get_default_size()`. Phase 4 must
+rewire every construction-time connection that currently targets the
+moved methods: the initial height application, the buffer's `changed`
+and `insert-text` signals, and the window's `realize` and `map` signals.
+Risk: low, but only if the interface above is explicit. Verification:
+full suite + Phase 3 tests + manual resize check.
 
 **Phase 5 — Export characterization (test-only).** Currently zero
 automated coverage of `export_conversation`/`_safe_export_basename` at
-the `ChatSidebar` level. Add tests covering both formats (md/json), the
-basename-sanitization rules, and the case where `_conversation_display_title`
-falls back to a message excerpt. Risk: n/a (test-only). Verification: new
-tests pass against current `main` unmodified.
+the `ChatSidebar` level. Add tests covering both formats (md/json),
+format normalization and unsupported-format fallback, basename
+sanitization and title/message-excerpt fallback, and a missing
+conversation.
+
+**Correction (round 8):** characterize the asynchronous dialog/write
+lifecycle as well: dialog cancellation and non-cancellation errors,
+`None` file and missing-path no-ops, successful UTF-8 output, and write
+failure logging plus user-visible error dialog. Risk: n/a (test-only).
+Verification: new tests pass against current `main` unmodified.
 
 **Phase 6 — Export extraction, via an injected title provider.**
 `export_conversation`/`_safe_export_basename` depend only on
@@ -847,8 +898,17 @@ extracted export code must take a `title_provider: Callable[[str], str]`
 constructor argument (defaulting to a bound `_conversation_display_title`)
 rather than either reaching back into `ChatSidebar` or owning the title
 logic itself — this inverts the dependency correctly without requiring
-`_conversation_display_title` to move. Risk: low-medium. Verification:
-full suite + Phase 5 tests passing unmodified.
+`_conversation_display_title` to move. The exporter also receives the
+store and transient-parent dependencies explicitly.
+
+**Correction (round 8):** retain `ChatSidebar.export_conversation` as an
+intentional thin delegator. The two window actions and two history-popover
+callbacks currently share that stable entrypoint; forcing all four to
+know the exporter object would widen the extraction for no benefit. When
+Phase 22 moves `_conversation_display_title` and the active-conversation
+projection, it must rebind the injected title provider and assert in an
+integration test that export sees the migrated projection. Risk:
+low-medium. Verification: full suite + Phase 5 tests passing unmodified.
 
 **Phase 7 — Health/probe characterization (test-only), covering all of
 Phase 8's methods, not only `_apply_health`.** Add a deterministic
@@ -869,8 +929,17 @@ model-selection edge cases in `_select_model_name`/`_on_model_selected`
 (exact match, soft base-name match, retry-after-failure, ignoring
 truncated-error strings stuffed into the dropdown) are equally untested.
 Since Phase 8 moves all of group I together, this phase's scope must
-cover all of it. Risk: n/a (test-only). Verification: new tests pass
-against current `main` unmodified.
+cover all of it.
+
+**Correction (round 8):** make that completeness mechanically
+checkable, branch by branch: `_refresh_models`' loading no-op;
+`_apply_health`; current last-probe-wins ordering and every
+healthy/no-model/unavailable/error transition; all three
+`_on_health_action` branches; `_preferred_model` store priority and
+exception fallback; and `_select_model_name`/`_on_model_selected`
+exact/soft/no-match, placeholder/error, same-model, retry, warm/no-warm,
+and load-in-progress paths. Risk: n/a (test-only). Verification: new
+tests pass against current `main` unmodified.
 
 **Phase 8 — Health/probe extraction, excluding `_set_load_controls_sensitive`
 and *not* claiming ownership of model-session state.** Extract
@@ -897,8 +966,20 @@ narrow callbacks (e.g. `get_active_model()`/`on_model_chosen(name)`/
 `get_load_failed()`) into whatever currently owns them — which at this
 point in the sequence is still `ChatSidebar` directly, since Phase 10
 hasn't run yet. Phase 10 later migrates this phase's callback wiring onto
-the canonical model-session interface it establishes (see Phase 10). Risk:
-medium. Verification: full suite + Phase 7 tests passing unmodified.
+the canonical model-session interface it establishes (see Phase 10).
+
+**Correction (round 8):** this controller owns all of its private
+health/probe state: `_health`, `_suppress_model_select`,
+`_health_action_id`, and `_health_action_model`. Its narrow contract must
+explicitly supply nullable current-model get/set, loading/failed reads,
+failed-state write, and begin-load callbacks; message-empty and active-
+conversation model-preference providers; status, overlay-hide, shared-
+sensitivity, send-sensitivity, and input-sensitivity callbacks; and the
+client, model selector, refresh control, health banner/title/detail/action
+controls, and settings fallback. Phase 10 rebinds the model-session
+callbacks to its new owner; Phase 22 rebinds message/conversation
+providers to its projection. Risk: medium. Verification: full suite +
+Phase 7 tests passing unmodified.
 
 **Phase 9 — Model-load characterization (test-only).**
 `test_generation_lifecycle.py` does not cover `_load_generation`/
@@ -911,8 +992,18 @@ deterministic test for stale-load-can't-clobber-a-newer-load, **plus**
 named as a gap in §6.2's group-J row: "`_update_load_progress`/pull-progress
 formatting paths") and `_on_model_load_finished`'s success/failure
 completion UI — button re-enablement, health-state update on both
-outcomes, and the greeting trigger on success. Risk: n/a (test-only).
-Verification: new tests pass against current `main` unmodified.
+outcomes, and the greeting trigger on success.
+
+**Correction (round 8):** the complete characterization also includes
+empty-model and streaming no-ops; stale status, chunk, and finish
+callbacks; cancellation/generation replacement; one-pulse-only start,
+stop, hidden-overlay termination, and determinate/indeterminate
+transitions; sensitivity ordering; last-model and conversation-model
+persistence ordering plus failure continuation; repeated-load greeting
+deduplication; and the exact reset placement in `clear_chat`, successful
+`new_chat`, and `switch_conversation`, including that the already-empty
+`new_chat` branch does not reset. Risk: n/a (test-only). Verification:
+new tests pass against current `main` unmodified.
 
 **Phase 10 — Model-load extraction, excluding `_set_load_controls_sensitive`
 and `_show_ephemeral_greeting`, and becoming the canonical owner of
@@ -944,6 +1035,9 @@ none of `_model`/`_loading_model`/`_load_failed`/`_load_generation`** (see
 Phase 8's correction above); **this phase (10) becomes the sole canonical
 owner of that model-session state**, exposing queries (e.g.
 `current_model`, `is_loading`, `has_failed`) and mutation entrypoints.
+It also owns the loader-private `_stop_load`, `_load_pulse_id`, and
+`_load_indeterminate`; no other group reads those fields, so they need no
+compatibility surface.
 Because Phase 8 already landed with callbacks pointed at raw `ChatSidebar`
 attributes, this phase's own scope includes migrating those
 already-extracted callbacks onto the new model-session interface — the
@@ -956,19 +1050,37 @@ correction, this dedup set is cleared by group F
 (`clear_chat`/`new_chat`/`switch_conversation`) and read + mutated only
 by this group's `_on_model_load_finished` — group I never touches it.
 This phase becomes its owner too (it's model-load-completion bookkeeping,
-not health/probe), exposing **`reset_greetings()`** for Phase 22 to call
-on every conversation transition, and internally deciding — via the
-existing "on ready, should-greet" callback — whether a given model
-warrants a greeting, mirroring the current `if greet and model not in
-self._greeted_models and not self._messages` check
-(`window.py:2837`). Note the `not self._messages` half of that
-condition is itself a `_messages` read this phase currently makes
-directly; per Phase 22's migration approach (see Phase 22's round-6
-correction), this call site is one more the general read-only-consumer
-migration list should pick up. Depends on Phase 8 (shares the
-health-state interface for load failures, and is the phase whose
-callback wiring gets migrated here). Risk: medium. Verification: full
-suite + Phase 9 tests passing unmodified.
+not health/probe), exposing **`reset_greetings()`** and internally
+deciding — via the existing "on ready, should-greet" callback — whether a
+given model warrants a greeting, mirroring the current `if greet and
+model not in self._greeted_models and not self._messages` check
+(`window.py:2837`). Note the `not self._messages` half of that condition
+is itself a `_messages` read this phase currently makes directly; per
+Phase 22's migration approach (see Phase 22's round-6 correction), this
+call site is one more the general read-only-consumer migration list
+should pick up.
+
+**Correction (round 8):** Phase 10 must immediately replace the three
+existing direct clears in `clear_chat` (`window.py:1543`), successful
+`new_chat` (`1611`), and `switch_conversation` (`1970`) with calls to
+`reset_greetings()` at those exact branch positions. Deferring that
+rewiring until Phase 22 would leave an invalid twelve-phase interval in
+which the new owner and the old group-F writers diverge. The
+already-empty `new_chat` branch (`1587-1596`) must remain a no-reset
+path.
+
+Phase 10 also installs read-only delegating `ChatSidebar` compatibility
+properties for `_model`, `_loading_model`, and `_load_failed`, because
+unmigrated consumers remain in sidebar/title, conversation lifecycle,
+message actions, CLI/status, and streaming code. `_load_generation` and
+the loader-private fields remain internal. Phases 18, 20, 22, 24, and 26
+migrate their inventoried readers; Phase 26 performs the required
+whole-file raw-reference inventory, rewires any retained window
+consumers such as `_set_load_controls_sensitive`, and removes the three
+properties only after the inventory proves zero consumers. Depends on
+Phase 8 (shares the health-state interface for load failures, and is the
+phase whose callback wiring gets migrated here). Risk: medium.
+Verification: full suite + Phase 9 tests passing unmodified.
 
 **Phase 11 — Transcript reset/replay/removal characterization
 (test-only).** First of three native-transcript slices (**correction,
@@ -1351,8 +1463,10 @@ hadn't landed yet when Phase 18 ran) — re-bind to this phase's real
 accessor now that it exists; (4) Phase 6's `title_provider` callback
 (bound to `_conversation_display_title`, which reads
 `self._conversation_id`/`self._messages` in its fallback path) — re-bind
-to whatever now backs that lookup. Additionally, Phase 18's `on_activate`
-and `on_delete` presenter callbacks were bound to `switch_conversation`/
+to whatever now backs that lookup, with an integration assertion that
+the rebound provider sees the migrated projection. Additionally, Phase
+18's `on_activate` and `on_delete` presenter callbacks were bound to
+`switch_conversation`/
 `_confirm_delete_conversation` while those methods still lived on
 `ChatSidebar` directly — since this phase moves both methods into its own
 object, Phase 18's callback wiring needs re-pointing to their new
@@ -1369,6 +1483,14 @@ facade's mutable interface. The same applies to
 `_health`/`_loading_model`/`_load_failed`/`_model`/`_ollama_cli_busy`,
 which `_send` (Phase 26) reads directly: those belong to interfaces
 Phases 8/10/20 establish, consumed via callback the same way, not copied.
+
+**Correction (round 8):** Phase 22 does not introduce the greeting reset
+calls. Phase 10 already rewired `clear_chat`, successful `new_chat`, and
+`switch_conversation` to `reset_greetings()` when it took ownership of
+`_greeted_models`; this phase preserves those calls at the same branch
+positions while moving the surrounding lifecycle methods. Likewise, the
+Phase 6 title-provider rebind is not complete until its integration test
+proves export title fallback reads this phase's projection.
 
 **Correction (round 7) — message-ID allocation and `_history_restored`.**
 `_next_msg_id`/`_msg_counter` (`window.py:2071-2073`) were previously
