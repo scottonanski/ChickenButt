@@ -7,7 +7,10 @@ Scott's decisions on them.
 Scope: `window.py` as of commit `d12bf2e` (main, recovery closed
 2026-07-23). File is 3,753 lines; the module holds a handful of top-level
 helpers/constants (lines 1-494) and a single class, `ChatSidebar`
-(`Adw.ApplicationWindow` subclass, lines 495-3753, 99 methods).
+(`Adw.ApplicationWindow` subclass, lines 495-3742, 99 methods). The class
+body ends at line 3742; lines 3743-3753 are the module-level helper
+`_fmt_bytes` (`def` at 3745, column 0), which is listed under group A
+below and is *not* a `ChatSidebar` method.
 
 Method used: read the file in full, section by section, cross-referenced
 against the 15-script test suite (`scripts/test_*.py`) and the sibling
@@ -354,7 +357,19 @@ and `_on_input_key` (2384) calls `self._send()` (group M) on Enter. See
 `switch_conversation` (1944), `delete_conversation` (1918),
 `_confirm_delete_conversation` (1896), `_conversation_display_title`
 (1798), `_ensure_conversation` (2075), `_restore_history` (2098),
-`_apply_restored_transcript` (2160), `_persist_message` (2082).
+`_apply_restored_transcript` (2160), `_persist_message` (2082),
+`_next_msg_id` (2071).
+**Placement note for `_next_msg_id`:** the round-7 correction under group L
+established that it does *not* belong to message actions (its five call
+sites span F/K/M/N, never L) and deferred its owner to "§7's
+conversation-lifecycle phase" — but no group list was ever updated, leaving
+it unplaced in the responsibility map. It is listed here because
+`REFACTOR_PLAN.md`'s ownership/migration matrix assigns message-ID
+allocation (`_next_msg_id` + `_msg_counter`) to **Phase 22**, the
+conversation-lifecycle (group F) extraction. This is shared allocation
+infrastructure called from F/K/M/N, not F-private logic: it stays a plain
+`ChatSidebar` method until Phase 22, which then re-points the already
+extracted callers (Phases 16/20/26) at the new owner.
 
 ### G. Export
 `_safe_export_basename` (1815), `export_conversation` (1824).
@@ -440,7 +455,16 @@ works via `_on_web_intent`. See §7 Phase 12.
 `_scroll_to_end` (3409).
 
 ### N. Transcript rendering (native path) / status line
-`_append_message` (3170), `_set_status` (2368).
+`_append_message` (3170), `_set_status` (2368), `_native_action_bar`
+(3251), `_native_edit_user` (3360), `_native_remove_message` (3401).
+The three `_native_*` methods are listed here explicitly: the round-7
+ownership correction under group L reassigned them from L to N (they are
+the native-GTK backend implementation of message-row rendering, not
+mode-agnostic message-action logic), but earlier revisions recorded that
+reassignment only in group L's prose and never added them to this list —
+leaving them unplaced in the responsibility map itself. Per §7, they must
+be reworked to emit intents through an injected callback rather than
+calling group-L methods or reading `_messages` directly.
 
 ### O. Web-intent bridge (WebKit page → Python)
 `_on_web_intent` (2048) — routes `copy_text`/`regenerate`/`continue`/
@@ -492,8 +516,15 @@ matter for extraction boundaries, grouped by who reads/writes them:
   `_web` (the `WebTranscriptView` or `None`), `chat_box`/`scroller`
   (native GTK containers), `_native_rows` (id → row widget, native only).
   Branched on in groups C, F, K, L, M — see §4.2.
-  `_transcript_mode` is fixed once (module env var `CHICKENBUTT_TRANSCRIPT`
-  read at `__init__`, `window.py:509`) and never changes at runtime.
+  `_transcript_mode` is initialized from the module env var
+  `CHICKENBUTT_TRANSCRIPT` at `__init__` (`window.py:509`), and **may still
+  change once more during UI construction**: `_build_ui` reassigns it to
+  `"native"` (`window.py:805`) in the `except` branch taken when
+  `WebTranscriptView(...)` construction fails and the code falls back to the
+  native GTK transcript. After `_build_ui` completes it is stable — nothing
+  rewrites it during send/switch/stream. Any extraction that snapshots the
+  mode at `__init__` time and passes it down would silently drop the
+  native-fallback path.
 - **Composer "busy" flags**: `_streaming`, `_loading_model`,
   `_load_failed`, `_ollama_cli_busy` (set via `_set_composer_cmd_busy`,
   group K). These four flags jointly gate `send_btn`/`input`/
