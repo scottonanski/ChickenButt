@@ -278,6 +278,27 @@ number or order changed. Consensus remains on findings and direction;
 the phase table is on its eighth revision and remains a draft until it
 survives a review round with no further findings.
 
+**Revision note (round 9):** browser GPT directly audited the published
+repository at immutable commit `4473906` for Phases 11-20 and reported
+eight candidate findings. Codex verified all eight locally against
+`window.py`, the test bodies/evidence, this audit, and the active matrix.
+Confirmed: (1) Phase 12 replay/status needed a dependency-closed native
+row primitive before Phase 16; (2) transcript/native mutable state had no
+single staged owner; (3) moving `_native_remove_message`/later
+`_append_message` lacked inbound delegator lifecycles; (4) Phase 16's
+streaming surface omitted native `_render_serial` identity/currentness;
+(5) forced WebKit-constructor fallback was uncharacterized and its
+backend-selection point unspecified; (6) Phase 18 omitted
+`_sidebar_syncing`, construction wiring, and retained inbound callers;
+(7) Phase 20's ownership of CLI state/methods left `_send` on raw window
+surfaces until Phase 26; and (8) Phases 19/20 omitted material
+controller dependencies and pull-loop behavior. The suggested Phase-6
+hard dependency for Phase 18 was narrowed: only Phase 10 is a hard
+state-interface prerequisite; `on_export` remains bound to Phase 6's
+stable delegator. The corrections are folded into §7 and the matrix
+without changing the 26-phase order. The ninth revision remains a
+proposal; no implementation is authorized.
+
 ---
 
 ## 1. What window.py currently is
@@ -1104,6 +1125,19 @@ skip, under native mode. Risk: n/a (test-only). Verification: new tests
 pass against current `main` unmodified; full (WebKit-mode) suite still
 green.
 
+**Correction (round 9):** Phase 11 must also force
+`WebTranscriptView` construction to fail after the requested mode starts
+as `webkit`. Backend choice is not final until `_build_ui` catches that
+failure and changes `_transcript_mode` to `native`
+(`window.py:796-829`). The test preserves today's exact fallback,
+including the fact that `ensure_md_css()` is called only before
+`_build_ui` when the initially requested mode is already native
+(`window.py:567-569`), not after a WebKit construction failure. It must
+then exercise reset/replay/removal against the fallback-native sink.
+Also assert replay's default role/content handling, missing-ID allocation,
+empty-state and `_native_rows` transitions, not merely final visible
+rows.
+
 **Phase 12 — Transcript adapter seam: reset, replay, removal.**
 Addresses §4.2 directly for this slice: formalize the `webkit`/`native`
 branch for `reset`/replay/`remove_message` as an object (e.g.
@@ -1116,6 +1150,30 @@ native implementation here (it's pure rendering — pops
 Phase 11. Risk: medium (breadth within this slice only). Verification:
 full suite (WebKit mode) + Phase 11's tests, run directly.
 
+**Correction (round 9) — dependency-closed foundation and single state
+owner.** Phase 12 selects/constructs the sink only after the WebKit
+constructor either succeeds or falls back. It establishes one canonical
+owner for the selected backend and, on native, the widget/scroller/box,
+`_native_rows`, and empty/icon/title/subtitle state. No mutable container
+is copied or exposed as a raw compatibility property. The retained
+style-manager callback reaches the icon through the owner interface.
+
+Replay cannot wait for Phase 16: `_apply_restored_transcript` currently
+calls `_append_message` and `_next_msg_id` (`window.py:2177-2181`), and
+Phase 14 status rendering needs row construction too. Phase 12 therefore
+introduces the lowest-level native row primitive needed by replay/status,
+with any action-bar concern still awaiting Phase 16 supplied through a
+narrow temporary factory rather than a broad window reference. Its
+message-ID provider initially binds to the unchanged
+`ChatSidebar._next_msg_id` and is re-bound in Phase 22.
+
+Moving `_native_remove_message` does not remove its window signature:
+callers remain in K/L/M until Phases 20/24/26. Phase 12 installs explicit
+delegators for every retained transcript entrypoint and records their
+last consumer; raw F clears/resets are redirected to the owner
+immediately. Transcript delegators are removed only in Phase 26 after a
+whole-file inventory proves no caller remains.
+
 **Phase 13 — Status-message and greeting characterization (test-only).**
 Second of the three native-transcript slices: **status-message
 create/update** (the CLI commands' `_post_status_message`/
@@ -1124,6 +1182,12 @@ create/update** (the CLI commands' `_post_status_message`/
 greeting** (`_show_ephemeral_greeting`'s `empty_state` post vs. native
 empty-box text swap). Both backends. Risk: n/a (test-only). Verification:
 new tests pass against current `main` unmodified.
+
+**Correction (round 9):** assert that status rows remain non-persisted,
+retain the same allocated ID across update/done, and use Phase 12's
+native row foundation. Greeting coverage includes the empty-state
+presence/recreation branches, title/subtitle substitution, and the
+separate send-button enablement that remains outside the sink.
 
 **Phase 14 — Transcript adapter seam: status messages and greeting.**
 Formalizes the `webkit`/`native` branch for the status-message and
@@ -1136,6 +1200,13 @@ transcript-mode branching does. Requires Phase 12 (shares the sink
 object) and Phase 13. Risk: medium. Verification: full suite + Phase 13's
 tests.
 
+**Correction (round 9):** Phase 14 extends the single owner created in
+Phase 12; it does not acquire separate copies of `_empty_box`,
+`_empty_title`, `_empty_sub`, or `_native_rows`. Status create/update uses
+the Phase-12 row primitive, while `_show_ephemeral_greeting` retains its
+message-policy and send-sensitivity work and delegates only transcript
+presentation.
+
 **Phase 15 — Streaming-update/finalization and native-intent
 characterization (test-only).** Third and riskiest of the three
 native-transcript slices: **streaming update/finalization**
@@ -1145,6 +1216,15 @@ native-transcript slices: **streaming update/finalization**
 rendering + intent dispatch** (`_append_message`, `_native_action_bar`,
 `_native_edit_user`). Both backends. Risk: n/a (test-only). Verification:
 new tests pass against current `main` unmodified.
+
+**Correction (round 9):** enumerate the protocol Phase 16 will introduce:
+new/replace/continue begin behavior; native `_render_serial`
+currentness/stale-handle rejection; paced and leftover deltas;
+error-with/without-partial-text, empty response, and successful
+finalization; replacement of the temporary native row with its final
+action-enabled row; scroll scheduling; and copy/edit/action intent
+payloads, including native edit-dialog cancel, empty-save, and valid-save
+branches.
 
 **Phase 16 — Transcript adapter seam: streaming updates/finalization and
 native intent dispatch.** Completes the `TranscriptSink` object with the
@@ -1177,6 +1257,22 @@ WebKit-assuming scripts). Whether to also promote a standing native-mode
 CI lane beyond these targeted tests is a decision for Scott, not assumed
 here.
 
+**Correction (round 9) — executable streaming/native contract.** The
+sink returns an opaque stream handle from `begin`; it owns native
+`_render_serial` and exposes `is_current(handle)`, paced `delta`, error,
+finalize, and final-row-replacement operations. The streaming engine
+never receives a `MessageBody` or reads backend internals. Scrolling and
+empty/native-row state remain inside the Phase-12 owner.
+
+Native row/action/edit construction receives explicit `on_intent`,
+`current_text`, transient-parent, and message-ID providers. Phase 22
+re-binds text/ID providers to its projection/allocation owner; Phase 24
+re-binds intent dispatch to the extracted message-action owner. Public
+window `_append_message`/`_native_remove_message` delegators remain only
+for inventoried L/M callers through Phases 24/26, then retire at the
+Phase-26 whole-file gate. This phase depends on Phase 14 as well as
+Phases 12/15 because it completes the same progressively-built owner.
+
 **Phase 17 — Sidebar/history-UI characterization (test-only), covering
 all eight methods Phase 18 moves, not only the popover.**
 `_make_chat_actions_popover` (export/delete menu wiring) has zero
@@ -1195,6 +1291,15 @@ as setup, it never exercises the already-clean short-circuit path. This
 phase's scope must cover all four of those alongside the popover, since
 Phase 18 moves all eight group-E methods together. Risk: n/a (test-only).
 Verification: new tests pass against current `main` unmodified.
+
+**Correction (round 9):** method bodies alone are insufficient because
+Phase 18 must also rewire `_build_ui`/`_build_history_sidebar`. Cover
+`_sidebar_syncing`'s recursion guard; the window action, toggle signal,
+row-activation signal, and initial idle rebuild/title callbacks; title
+loading/streaming guard, store fallback, and truncation; dirty/clean,
+empty-list, list-error, selection, activation, and popover dispatch
+branches. Assert exactly-once signal delivery so extraction cannot
+double-connect retained and controller handlers.
 
 **Phase 18 — Sidebar/history-UI extraction (group E), via injected
 presenter callbacks, status accessors that consume already-landed
@@ -1255,6 +1360,23 @@ ownership never changes, per §1) and `get_active_conversation_id()`
 same pattern). Risk: medium. Verification: full suite + Phase 17 tests
 passing unmodified.
 
+**Correction (round 9) — construction and inbound compatibility.** The
+sidebar controller owns `_sidebar_syncing` alongside `_history_dirty` and
+receives the exact sidebar/toggle/history/title widget references it
+needs; group C may construct those widgets, but it injects them once and
+connects the action/signals/idle callbacks to the new controller.
+
+Moving the eight methods does not make their retained callers disappear.
+Phase 18 preserves explicit `ChatSidebar` delegators: `mark_dirty` and
+rebuild through Phase 22's F migration, and title refresh through Phase
+26 because retained `_set_status` calls it. `toggle_sidebar` either stays
+as the intentional public window delegator or the window action is
+rewired directly; the choice is recorded, not implicit. Phase 22 rebinds
+only `on_activate`/`on_delete` and the active-ID provider. `on_export`
+continues to target Phase 6's intentional stable delegator. Phase 10 is
+a hard dependency for loading-state queries; Phase 6 need not be a hard
+dependency merely to provide the export callback.
+
 **Phase 19 — Composer-CLI-command characterization (test-only), covering
 all eight methods Phase 20 moves, not just three entry points.**
 `_try_composer_command`/`_run_ollama_pull`/`_run_ollama_info` (group K)
@@ -1271,6 +1393,17 @@ branches), and the successful-pull-triggers-refresh behavior
 (`_run_ollama_pull`'s `done()` calling `self._refresh_models()` on
 success, `window.py:3076`). Risk: n/a (test-only). Verification: new
 tests pass against current `main` unmodified.
+
+**Correction (round 9):** expand this into branch-level coverage:
+non-command, pull/list/ps, unsupported-command help, and already-busy
+routing; status-row non-persistence; progress formatting, duplicate
+suppression, same-phase percentage replacement, 12-line rolling cap,
+redundant-UI suppression, clean EOF without an explicit `success` chunk,
+`OllamaError` and generic errors; and completion order (final row, clear
+busy, then refresh on success or restore model status on failure).
+Because Phase 20 immediately changes `_send`'s CLI integration, Phase 19
+also characterizes its raw busy guard and command-dispatch call before
+the rewire.
 
 **Phase 20 — Composer-CLI-command extraction, with a narrow
 `on_cli_busy_changed` callback — not a call to `_set_load_controls_sensitive`
@@ -1301,6 +1434,21 @@ needs a second callback (e.g. `on_pull_succeeded()`) for this, rather
 than reaching back into the health/probe object. Depends on Phase 8 (for
 that refresh hook), Phase 14 (status-message adapter), Phase 19. Risk:
 low-medium. Verification: full suite + Phase 19 tests passing unmodified.
+
+**Correction (round 9) — no invalid CLI interval.** Phase 20 owns
+`_ollama_cli_busy` and exposes `is_busy()`/`try_command()`. It immediately
+rewrites `_send`'s raw `getattr(..., "_ollama_cli_busy", False)` and
+`self._try_composer_command(text)` calls (`window.py:3124,3132`) to those
+interfaces; Phase 26 later preserves the calls rather than performing
+the first migration. No duplicate flag or raw compatibility property is
+left behind.
+
+The controller contract also injects the client, Phase-14 transcript
+status surface, Phase-10 current-model query, status callback, narrow
+busy callback, Phase-8 pull-success refresh hook, scheduler/worker
+boundary, and message-ID provider. The ID provider initially targets the
+unchanged window allocator and is re-bound in Phase 22. Consequently
+Phase 10 is an explicit dependency alongside Phases 8/14/19.
 
 **Phase 21 — Conversation-lifecycle characterization (test-only),
 including the persistence-failure-ordering asymmetry.** `new_chat`,
@@ -1492,6 +1640,14 @@ positions while moving the surrounding lifecycle methods. Likewise, the
 Phase 6 title-provider rebind is not complete until its integration test
 proves export title fallback reads this phase's projection.
 
+**Correction (round 9):** this phase is also the explicit rebind point
+for the Phase-12 replay, Phase-16 native-rendering, and Phase-20 CLI
+message-ID providers, plus Phase 16's `current_text` provider. It re-points
+Phase 18's `on_activate`/`on_delete` callbacks to the extracted lifecycle
+owner and removes Phase 18's shorter-lived mark/rebuild window delegators
+after a caller inventory proves group F was their last consumer. These
+are required cutover steps, not follow-up cleanup.
+
 **Correction (round 7) — message-ID allocation and `_history_restored`.**
 `_next_msg_id`/`_msg_counter` (`window.py:2071-2073`) were previously
 misassigned to the message-action phase; verified their five call sites
@@ -1577,6 +1733,12 @@ narrow interface, not reach into streaming internals. Depends on Phase
 medium-high. Verification: full suite + Phase 23 tests passing
 unmodified.
 
+**Correction (round 9):** this phase rebinds Phase 16's `on_intent`
+provider to the extracted group-L owner. After both WebKit and native
+dispatch terminate there, it inventories and removes the now-unused
+window action/removal delegators; any transcript delegator still needed
+by group M remains until Phase 26.
+
 **Phase 25 — Streaming characterization (test-only), covering `_send`
 itself, not only mid-stream errors.** `test_generation_lifecycle.py`
 covers cancellation and generation races thoroughly but contains zero
@@ -1624,6 +1786,15 @@ ordering characterized in Phase 25, and finish migrating group M itself
 onto Phase 22's message-state interface, Phase 10's model-session
 interface, and Phase 20's CLI-busy interface — reading through their
 query methods, not raw attributes.
+
+**Correction (round 9):** Phase 20 already converted `_send` to the
+permanent CLI `is_busy()`/`try_command()` interface, so this phase
+preserves those calls. It also consumes the Phase-12/14/16 transcript
+owner and Phase-18 sidebar/title interfaces directly. After group M is
+migrated, a whole-file inventory gates removal of the last transcript,
+sidebar/title, and model-session compatibility delegators/properties as
+well as the Phase-22 messages facade; compatibility is removed only when
+that inventory proves zero callers.
 
 **Correction (round 6):** round 5 assigned this phase an "inventory and
 migrate every remaining reader" step, on the theory that readers were
