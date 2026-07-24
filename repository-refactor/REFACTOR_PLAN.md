@@ -122,8 +122,8 @@ part of the codebase without a clear ownership seam — see
 self-contained)
 
 - Current code and test behavior outrank documentation.
-- One concern per PR: never mix behavior change, feature work, cleanup,
-  and structural extraction in the same PR.
+- One concern per implementation PR: never mix behavior change, feature
+  work, cleanup, and structural extraction in the same PR.
 - No wholesale rewrite of `window.py`.
 - Preserve observable behavior unless Scott separately authorizes a
   behavior change.
@@ -139,14 +139,18 @@ self-contained)
 - Do not modify `recovery-reports/REPOSITORY_RECOVERY.md` as part of this
   work; it's retired.
 
-## Claude/Codex coordination
+## Implementation coordination
 
-For each task, one of Claude or Codex is researcher/implementer and the
-other is independent reviewer; roles can switch between tasks. Never both
-editing the same branch at once. The reviewer inspects the actual diff
-and reruns the tests themselves — a clean review does not itself
-authorize a merge. Every merge decision is presented to Scott (reviewed
-head SHA, test results, risks, recommendation) and requires his explicit
+Documentation-only audit findings and plan corrections do not require a
+PR. After their factual basis and diff are checked, they may be committed
+directly to `main` with Scott's authorization.
+
+For each implementation phase, one person is implementer and another is
+independent reviewer; roles can switch between phases. Never both edit
+the same branch at once. The reviewer inspects the actual diff and reruns
+the tests themselves — a clean review does not itself authorize a merge.
+Every implementation merge decision is presented to Scott (reviewed head
+SHA, test results, risks, recommendation) and requires his explicit
 go-ahead.
 
 ---
