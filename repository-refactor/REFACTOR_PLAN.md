@@ -133,8 +133,9 @@ self-contained)
 - Every implementation PR runs the complete documented 15-script suite;
   the Meson-backed tests must genuinely run — "SKIPPED" is not a pass.
 - GitHub Actions must pass on the exact reviewed PR head.
-- After a merge: confirm `main` is clean, synced with origin, and CI
-  passes on the combined tree — then update the ledger below.
+- After a phase merge: confirm `main` is clean and synced with origin, and
+  that CI passes on the combined tree — then replace that phase's proposal
+  in the phase table with its verified completion report.
 - Do not modify `recovery-reports/REPOSITORY_RECOVERY.md` as part of this
   work; it's retired.
 
@@ -364,8 +365,28 @@ mismatch between them is itself a bug in the plan.
   round. No phase is approved for implementation until Scott says so,
   independent of whether the research documents reach a stable state.
 
-## Refactor ledger
+## Successful phase reporting
 
-*(Empty — fills in after each phase merges: PR link, merge SHA, tests
-run, any remaining limitations. One entry per completed phase, oldest
-first.)*
+This is a living plan, not an append-only progress log. An unstarted phase
+remains a proposal in the phase table. After a phase is merged and verified
+on a clean, synchronized `main`, replace that phase's existing proposal row
+in place with a concise factual completion report.
+
+Each successful completion report records:
+
+- completed status, PR link, and merge SHA;
+- actual scope and files changed;
+- exact tests and CI checks run, with results;
+- the behavior or guarantee preserved by the phase;
+- any remaining compatibility interface or downstream dependency; and
+- any approved deviation from the proposal.
+
+Replace obsolete predictions and instructions for the completed phase; do
+not append a second history entry below the table and do not create a
+separate status, handoff, or progress-log file. Git history preserves the
+superseded proposal. In the same update, correct any document-wide status,
+approval, sequencing, dependency, or ownership-matrix claim made stale by
+the completed phase; these are current-state corrections, not appended
+history. Failed, incomplete, or merely attempted work is not reported as
+successful progress: its phase remains uncompleted until the required
+result and verification exist.
